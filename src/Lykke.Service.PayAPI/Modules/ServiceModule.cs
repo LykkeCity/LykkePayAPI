@@ -1,7 +1,14 @@
-﻿using Autofac;
+﻿using System;
+using System.Linq;
+using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Common;
 using Common.Log;
+using Lykke.Service.Assets.Client;
+using Lykke.Service.Assets.Client.Models;
+using Lykke.Service.MarketProfile.Client;
 using Lykke.Service.PayAPI.Core.Services;
+using Lykke.Service.PayAPI.Core.Settings;
 using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayAPI.Services;
 using Lykke.SettingsReader;
@@ -11,12 +18,12 @@ namespace Lykke.Service.PayAPI.Modules
 {
     public class ServiceModule : Module
     {
-        private readonly IReloadingManager<PayAPISettings> _settings;
+        private readonly IReloadingManager<AppSettings> _settings;
         private readonly ILog _log;
         // NOTE: you can remove it if you don't need to use IServiceCollection extensions to register service specific dependencies
         private readonly IServiceCollection _services;
 
-        public ServiceModule(IReloadingManager<PayAPISettings> settings, ILog log)
+        public ServiceModule(IReloadingManager<AppSettings> settings, ILog log)
         {
             _settings = settings;
             _log = log;
@@ -46,7 +53,21 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
 
-            // TODO: Add your dependencies here
+            builder.RegisterType<LykkeMarketProfile>()
+                .As<ILykkeMarketProfile>()
+                .WithParameter("baseUri", new Uri(_settings.CurrentValue.MarketProfileServiceClient.ServiceUrl));
+
+            builder.RegisterInstance<IAssetsService>(
+                new AssetsService(new Uri(_settings.CurrentValue.AssetsServiceClient.ServiceUrl)));
+
+            builder.Register(x =>
+            {
+                var assetsService = x.Resolve<IComponentContext>().Resolve<IAssetsService>();
+
+                return new CachedDataDictionary<string, AssetPair>(
+                    async () => (await assetsService.AssetPairGetAllAsync()).ToDictionary(itm => itm.Id)
+                );
+            });
 
             builder.Populate(_services);
         }
