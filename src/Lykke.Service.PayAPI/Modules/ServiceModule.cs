@@ -13,6 +13,7 @@ using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayAPI.Services;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
+using Lykke.Service.PayAuth.Client;
 
 namespace Lykke.Service.PayAPI.Modules
 {
@@ -47,6 +48,10 @@ namespace Lykke.Service.PayAPI.Modules
                 .As<IHealthService>()
                 .SingleInstance();
 
+            builder.RegisterType<PayAuthClient>()
+                .As<IPayAuthClient>()
+                .WithParameter("settings", new PayAuthServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayAuthClient.ServiceUrl })
+                .SingleInstance();
             builder.RegisterType<StartupManager>()
                 .As<IStartupManager>();
 
