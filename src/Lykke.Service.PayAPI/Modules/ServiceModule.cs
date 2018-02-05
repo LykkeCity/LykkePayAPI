@@ -11,6 +11,7 @@ using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
 using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayAPI.Services;
+using Lykke.Service.PayInternal.Client;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,12 +34,6 @@ namespace Lykke.Service.PayAPI.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            // TODO: Do not register entire settings in container, pass necessary settings to services which requires them
-            // ex:
-            //  builder.RegisterType<QuotesPublisher>()
-            //      .As<IQuotesPublisher>()
-            //      .WithParameter(TypedParameter.From(_settings.CurrentValue.QuotesPublication))
-
             builder.RegisterInstance(_log)
                 .As<ILog>()
                 .SingleInstance();
@@ -59,6 +54,10 @@ namespace Lykke.Service.PayAPI.Modules
 
             builder.RegisterInstance<IAssetsService>(
                 new AssetsService(new Uri(_settings.CurrentValue.AssetsServiceClient.ServiceUrl)));
+
+            builder.RegisterType<PayInternalClient>()
+                .As<IPayInternalClient>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayInternalServiceClient));
 
             builder.Register(x =>
             {
