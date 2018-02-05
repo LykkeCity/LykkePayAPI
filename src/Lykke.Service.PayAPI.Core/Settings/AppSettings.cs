@@ -1,5 +1,6 @@
 ﻿using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayAPI.Core.Settings.SlackNotifications;
+using Lykke.SettingsReader.Attributes;
 
 namespace Lykke.Service.PayAPI.Core.Settings
 {
@@ -14,14 +15,17 @@ namespace Lykke.Service.PayAPI.Core.Settings
 
     public class MarketProfileServiceClientSettings
     {
+        [HttpCheck("api/isalive")]
         public string ServiceUrl { get; set; }
     }
     public class PayAuthClientSettings
     {
+        [HttpCheck("api/isalive")]
         public string ServiceUrl { get; set; }
     }
     public class AssetsServiceClientSettings
     {
+        [HttpCheck("api/isalive")]
         public string ServiceUrl { get; set; }
     }
 }
