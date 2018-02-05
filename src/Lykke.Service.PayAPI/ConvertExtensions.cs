@@ -1,4 +1,5 @@
-﻿using Lykke.Service.PayAPI.Models;
+﻿using System;
+using Lykke.Service.PayAPI.Models;
 using CreatePaymentRequestModelClient = Lykke.Service.PayInternal.Client.Models.PaymentRequest.CreatePaymentRequestModel;
 
 namespace Lykke.Service.PayAPI
@@ -17,8 +18,8 @@ namespace Lykke.Service.PayAPI
                 OrderId = src.OrderId,
                 PaymentAssetId = src.PaymentAsset,
                 SettlementAssetId = src.SettlementAsset,
-                DueDate = src
-            }
+                DueDate = DateTime.UtcNow
+            };
         }
     }
 }
