@@ -14,6 +14,7 @@ using Lykke.Service.PayAPI.Services;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 using Lykke.Service.PayAuth.Client;
+using Lykke.Service.PayInvoice.Client;
 
 namespace Lykke.Service.PayAPI.Modules
 {
@@ -39,11 +40,12 @@ namespace Lykke.Service.PayAPI.Modules
             //  builder.RegisterType<QuotesPublisher>()
             //      .As<IQuotesPublisher>()
             //      .WithParameter(TypedParameter.From(_settings.CurrentValue.QuotesPublication))
-
             builder.RegisterInstance(_log)
                 .As<ILog>()
                 .SingleInstance();
-
+            builder.RegisterInstance(_settings)
+                .As<IReloadingManager<AppSettings>>()
+                .SingleInstance();
             builder.RegisterType<HealthService>()
                 .As<IHealthService>()
                 .SingleInstance();
@@ -51,6 +53,10 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<PayAuthClient>()
                 .As<IPayAuthClient>()
                 .WithParameter("settings", new PayAuthServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayAuthClient.ServiceUrl })
+                .SingleInstance();
+            builder.RegisterType<PayInvoiceClient>()
+                .As<IPayInvoiceClient>()
+                .WithParameter("settings", new PayInvoice.Client.PayInvoiceServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayInvoiceServiceClient.ServiceUrl })
                 .SingleInstance();
             builder.RegisterType<StartupManager>()
                 .As<IStartupManager>();
@@ -73,7 +79,6 @@ namespace Lykke.Service.PayAPI.Modules
                     async () => (await assetsService.AssetPairGetAllAsync()).ToDictionary(itm => itm.Id)
                 );
             });
-
             builder.Populate(_services);
         }
     }

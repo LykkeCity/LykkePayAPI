@@ -12,6 +12,8 @@ using Common.Log;
 using Lykke.Contracts.Security;
 using Lykke.Service.PayAuth.Client;
 using Lykke.Service.PayAuth.Client.Models;
+using Lykke.SettingsReader;
+using Lykke.Service.PayAPI.Core.Settings;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -23,7 +25,7 @@ namespace Lykke.Service.PayAPI.Controllers
         protected readonly ILog _log;
         protected readonly IPayAuthClient _payAuthClient;
 
-        public BaseController(ILog log, IPayAuthClient payAuthClient)
+        public BaseController(ILog log, IPayAuthClient payAuthClient, IReloadingManager<AppSettings> settings)
         {
             _log = log;
             _payAuthClient = payAuthClient;
