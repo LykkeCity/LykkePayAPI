@@ -8,15 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="4.4.1" />
     <PackageReference Include="Lykke.Service.Assets.Client" Version="3.3.1" />
     <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.0.20" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.16" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.20" />
     <PackageReference Include="Lykke.SettingsReader" Version="1.1.4" />
   </ItemGroup>
 

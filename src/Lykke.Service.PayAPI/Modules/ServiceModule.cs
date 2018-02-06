@@ -9,7 +9,6 @@ using Lykke.Service.Assets.Client.Models;
 using Lykke.Service.MarketProfile.Client;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
-using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayAPI.Services;
 using Lykke.Service.PayInternal.Client;
 using Lykke.SettingsReader;
@@ -63,6 +62,15 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<PayInternalClient>()
                 .As<IPayInternalClient>()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayInternalServiceClient));
+
+            builder.RegisterType<PaymentRequestService>()
+                .As<IPaymentRequestService>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.PaymentRequestDueDate))
+                .SingleInstance();
+
+            builder.RegisterType<RatesService>()
+                .As<IRatesService>()
+                .SingleInstance();
 
             builder.Register(x =>
             {
