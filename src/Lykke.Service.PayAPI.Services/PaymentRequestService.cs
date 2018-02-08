@@ -4,6 +4,8 @@ using Common;
 using Common.Log;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Services;
+using Lykke.Service.PayCallback.Client;
+using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 
@@ -12,15 +14,18 @@ namespace Lykke.Service.PayAPI.Services
     public class PaymentRequestService : IPaymentRequestService
     {
         private readonly IPayInternalClient _payInternalClient;
+        private readonly IPayCallbackClient _payCallbackClient;
         private readonly TimeSpan _dueDate;
         private readonly ILog _log;
 
         public PaymentRequestService(
             IPayInternalClient payInternalClient,
+            IPayCallbackClient payCallbackClient,
             TimeSpan dueDate,
             ILog log)
         {
             _payInternalClient = payInternalClient ?? throw new ArgumentNullException(nameof(payInternalClient));
+            _payCallbackClient = payCallbackClient ?? throw new ArgumentNullException(nameof(payCallbackClient));
             _dueDate = dueDate;
             _log = log ?? throw new ArgumentNullException(nameof(log));
         }
@@ -38,7 +43,12 @@ namespace Lykke.Service.PayAPI.Services
             PaymentRequestDetailsModel
                 checkout = await _payInternalClient.ChechoutAsync(request.MerchantId, payment.Id);
 
-            // todo: create callback url record
+            await _payCallbackClient.AddPaymentCallback(new CreatePaymentCallbackModel
+            {
+                MerchantId = payment.MerchantId,
+                PaymentRequestId = payment.Id,
+                CallbackUrl = request.CallbackUrl
+            });
 
             return new CreatePaymentResponse
             {
