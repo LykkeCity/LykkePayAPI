@@ -1,5 +1,7 @@
 ﻿using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayAPI.Core.Settings.SlackNotifications;
+using Lykke.Service.PayAuth.Client;
+using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayCallback.Client;
 using Lykke.SettingsReader.Attributes;
 using Lykke.Service.PayInternal.Client;
@@ -14,6 +16,8 @@ namespace Lykke.Service.PayAPI.Core.Settings
         public MarketProfileServiceClientSettings MarketProfileServiceClient { get; set; }
         public AssetsServiceClientSettings AssetsServiceClient { get; set; }
         public PayAuthServiceClientSettings PayAuthServiceClient { get; set; }
+        public PayInvoicePortalSettings PayInvoicePortal { get; set; }
+        public PayInvoiceServiceClientSettings PayInvoiceServiceClient { get; set; }
         public PayInternalServiceClientSettings PayInternalServiceClient { get; set; }
         public PayCallbackServiceClientSettings PayCallbackServiceClient { get; set; }
     }
@@ -23,7 +27,14 @@ namespace Lykke.Service.PayAPI.Core.Settings
         [HttpCheck("api/isalive")]
         public string ServiceUrl { get; set; }
     }
-
+    public class PayInvoicePortalSettings
+    {
+        public string SiteUrl { get; set; }
+    }
+    public class PayInternalClientSettings
+    {
+        public string ServiceUrl { get; set; }
+    }
     public class AssetsServiceClientSettings
     {
         [HttpCheck("api/isalive")]
