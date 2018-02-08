@@ -52,11 +52,11 @@ namespace Lykke.Service.PayAPI.Modules
 
             builder.RegisterType<PayAuthClient>()
                 .As<IPayAuthClient>()
-                .WithParameter("settings", new PayAuthServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayAuthClient.ServiceUrl })
+                .WithParameter("settings", new PayAuthServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayAuthServiceClient.ServiceUrl })
                 .SingleInstance();
             builder.RegisterType<PayInvoiceClient>()
                 .As<IPayInvoiceClient>()
-                .WithParameter("settings", new PayInvoice.Client.PayInvoiceServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayInvoiceServiceClient.ServiceUrl })
+                .WithParameter("settings", new PayInvoiceServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayInvoiceServiceClient.ServiceUrl })
                 .SingleInstance();
             builder.RegisterType<StartupManager>()
                 .As<IStartupManager>();

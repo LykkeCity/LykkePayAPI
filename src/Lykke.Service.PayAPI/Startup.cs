@@ -51,6 +51,7 @@ namespace Lykke.Service.PayAPI
                 services.AddSwaggerGen(options =>
                 {
                     options.DefaultLykkeConfiguration("v1", "PayAPI");
+                    options.OperationFilter<HeaderAccessOperationFilter>();
                 });
 
                 var builder = new ContainerBuilder();
@@ -82,7 +83,6 @@ namespace Lykke.Service.PayAPI
 
                 app.UseLykkeMiddleware("PayAPI", ex => new { Message = "Technical problem" });
                 app.UseAuth();
-
                 app.UseMvc();
                 app.UseSwagger(c =>
                 {
@@ -94,7 +94,7 @@ namespace Lykke.Service.PayAPI
                     x.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
                 });
                 app.UseStaticFiles();
-
+                
                 appLifetime.ApplicationStarted.Register(() => StartApplication().GetAwaiter().GetResult());
                 appLifetime.ApplicationStopping.Register(() => StopApplication().GetAwaiter().GetResult());
                 appLifetime.ApplicationStopped.Register(() => CleanUp().GetAwaiter().GetResult());

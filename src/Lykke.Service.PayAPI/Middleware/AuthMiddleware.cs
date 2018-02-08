@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Lykke.Service.PayAPI.Middleware
 {
@@ -30,16 +31,12 @@ namespace Lykke.Service.PayAPI.Middleware
         public async Task Invoke(HttpContext context)
         {
             var MerchantId = context.Request.Headers["Lykke-Merchant-Id"].ToString() ?? "";
-            var TrasterSignIn = context.Request.Headers["Lykke-Merchant-Traster-SignIn"].ToString() ?? "";
-            await _log.WriteInfoAsync("Lykke Pay", "Validate Trasted Sign", JsonConvert.SerializeObject(new
+            var TrasterSignIn = context.Request.Headers["Lykke-Merchant-Sign"].ToString() ?? "";
+            await _log.WriteInfoAsync("Lykke Pay", "Validate Sign", JsonConvert.SerializeObject(new
             {
                 MerchantId,
                 TrasterSignIn
             }), null);
-            if (!string.IsNullOrEmpty(MerchantId) && !string.IsNullOrEmpty(TrasterSignIn))
-            {
-                //return Ok();
-            }
 
             string strToSign;
             Console.WriteLine($"Method {context.Request.Method}");
@@ -52,46 +49,42 @@ namespace Lykke.Service.PayAPI.Middleware
                     strToSign = reader.ReadToEnd();
                 }
                 context.Request.Body.Position = 0;
-            }
-            else
-            {
-                strToSign = $"{context.Request.Path.ToString().TrimEnd('/')}{context.Request.QueryString}";
-            }
-            Console.WriteLine($"strToSign {strToSign}");
-            var strToSend = JsonConvert.SerializeObject(new MerchantAuthRequest
-            {
-                MerchantId = MerchantId,
-                StringToSign = strToSign,
-                Sign = context.Request.Headers["Lykke-Merchant-Sign"].ToString() ?? ""
-            });
-            Console.WriteLine($"strToSend {strToSend}");
-            var request = new VerifyRequest()
-            {
-                ClientId = MerchantId,
-                SystemId = "LykkePay",
-                Signature = context.Request.Headers["Lykke-Merchant-Sign"].ToString() ?? "",
-                Text = strToSign
-            };
-
-            var isValid = (SecurityErrorType)int.Parse(await _payAuthClient.VerifyAsync(request));
-            Console.WriteLine($"isValid {isValid}");
-            if (isValid != SecurityErrorType.Ok)
-            {
-                switch (isValid)
+                Console.WriteLine($"strToSign {strToSign}");
+                var strToSend = JsonConvert.SerializeObject(new MerchantAuthRequest
                 {
-                    case SecurityErrorType.AssertEmpty:
-                         await CreateErrorResponse(context, StatusCodes.Status500InternalServerError);
-                        break;
-                    case SecurityErrorType.MerchantUnknown:
-                    case SecurityErrorType.SignEmpty:
-                        await CreateErrorResponse(context, StatusCodes.Status500InternalServerError);
-                        break;
-                    case SecurityErrorType.SignIncorrect:
-                        await CreateErrorResponse(context, StatusCodes.Status401Unauthorized);
-                        break;
-                    default:
-                        await CreateErrorResponse(context, StatusCodes.Status500InternalServerError);
-                        break;
+                    MerchantId = MerchantId,
+                    StringToSign = strToSign,
+                    Sign = context.Request.Headers["Lykke-Merchant-Sign"].ToString() ?? ""
+                });
+                Console.WriteLine($"strToSend {strToSend}");
+                var request = new VerifyRequest()
+                {
+                    ClientId = MerchantId,
+                    SystemId = "LykkePay",
+                    Signature = context.Request.Headers["Lykke-Merchant-Sign"].ToString() ?? "",
+                    Text = strToSign
+                };
+
+                var isValid = (SecurityErrorType)int.Parse(await _payAuthClient.VerifyAsync(request));
+                Console.WriteLine($"isValid {isValid}");
+                if (isValid != SecurityErrorType.Ok)
+                {
+                    switch (isValid)
+                    {
+                        case SecurityErrorType.AssertEmpty:
+                            await CreateErrorResponse(context, StatusCodes.Status500InternalServerError);
+                            break;
+                        case SecurityErrorType.MerchantUnknown:
+                        case SecurityErrorType.SignEmpty:
+                            await CreateErrorResponse(context, StatusCodes.Status500InternalServerError);
+                            break;
+                        case SecurityErrorType.SignIncorrect:
+                            await CreateErrorResponse(context, StatusCodes.Status401Unauthorized);
+                            break;
+                        default:
+                            await CreateErrorResponse(context, StatusCodes.Status500InternalServerError);
+                            break;
+                    }
                 }
             }
             await _next(context);
@@ -100,8 +93,7 @@ namespace Lykke.Service.PayAPI.Middleware
         {
             ctx.Response.ContentType = "application/json";
             ctx.Response.StatusCode = statusCode;
-
-            await ctx.Response.WriteAsync("{Message: 'SignIn incorrect'}");
+            return;
         }
     }
     public static class AuthMiddlewareExtensions

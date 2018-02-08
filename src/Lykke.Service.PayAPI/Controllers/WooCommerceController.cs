@@ -13,20 +13,21 @@ using System.Net;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.SettingsReader;
 using Lykke.Service.PayAPI.Core.Settings;
+using Lykke.Service.PayAPI.Attributes;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
     [Route("api/[controller]")]
+    [SignatureVerification]
     public class WooCommerceController : BaseController
     {
         private readonly IReloadingManager<AppSettings> _settings;
         private readonly IPayInvoiceClient _invoicesServiceClient;
-        public WooCommerceController(ILog log, IPayAuthClient payAuthClient, IPayInvoiceClient invoicesServiceClient, IReloadingManager<AppSettings> settings) : base(log, payAuthClient, settings)
+        public WooCommerceController(ILog log, IPayInvoiceClient invoicesServiceClient, IReloadingManager<AppSettings> settings) : base(log)
         {
             _invoicesServiceClient = invoicesServiceClient;
             _settings = settings;
         }
-
         [HttpPost("Create")]
         [SwaggerOperation("Create")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
@@ -63,6 +64,8 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             return new JsonResult(response);
         }
+
+        
         [HttpPost("Status")]
         [SwaggerOperation("Status")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
