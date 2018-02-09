@@ -17,6 +17,7 @@ namespace Lykke.Service.PayAPI.Controllers
 {
     public class BaseController : Controller
     {
+        protected string MerchantId => HttpContext.Request.Headers["Lykke-Merchant-Id"].ToString() ?? "";
         protected readonly ILog _log;
 
         public BaseController(ILog log)

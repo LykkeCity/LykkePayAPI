@@ -22,7 +22,7 @@ namespace Lykke.Service.PayAPI.Controllers
         public PaymentRequestController(
             IPaymentRequestService paymentRequestService,
             IPayAuthClient payAuthClient,
-            ILog log) : base(log, payAuthClient)
+            ILog log) : base(log)
         {
             _paymentRequestService =
                 paymentRequestService ?? throw new ArgumentNullException(nameof(paymentRequestService));
@@ -40,7 +40,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(CreatePaymentResponseModel), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> CreatePaymentRequest([FromBody] CreatePaymentRequestModel request)
         {
-            await ValidateRequest();
 
             if (!ModelState.IsValid)
                 return BadRequest(new ErrorResponse().AddErrors(ModelState));
@@ -74,7 +73,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> GetPaymentStatus(string address)
         {
-            await ValidateRequest();
 
             try
             {
