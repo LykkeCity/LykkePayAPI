@@ -11,10 +11,12 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using CreatePaymentRequestModel = Lykke.Service.PayAPI.Models.CreatePaymentRequestModel;
 using ErrorResponseException = Lykke.Service.PayInternal.Client.ErrorResponseException;
+using Lykke.Service.PayAPI.Attributes;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
     [Route("api/[controller]")]
+    [SignatureVerification]
     public class PaymentRequestController : BaseController
     {
         private readonly IPaymentRequestService _paymentRequestService;

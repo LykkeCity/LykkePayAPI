@@ -5,7 +5,6 @@ using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayCallback.Client;
 using Lykke.SettingsReader.Attributes;
 using Lykke.Service.PayInternal.Client;
-using Lykke.Service.PayAuth.Client;
 
 namespace Lykke.Service.PayAPI.Core.Settings
 {
