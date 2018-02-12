@@ -9,16 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="4.4.2" />
+    <PackageReference Include="Lykke.Contracts" Version="1.0.43" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.PayAPI.Core\Lykke.Service.PayAPI.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Lykke.Contracts">
-      <HintPath>..\..\..\..\Users\atarutin\.nuget\packages\lykke.contracts\1.0.43\lib\netstandard1.6\Lykke.Contracts.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
