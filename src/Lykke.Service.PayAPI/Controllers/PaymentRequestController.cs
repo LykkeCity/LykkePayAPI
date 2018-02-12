@@ -60,6 +60,13 @@ namespace Lykke.Service.PayAPI.Controllers
             {
                 await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
                     request.ToJson(), ex);
+
+                return StatusCode((int) ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
+                    request.ToJson(), ex);
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
