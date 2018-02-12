@@ -57,7 +57,7 @@ namespace Lykke.Service.PayAPI.Services
                 ClientId = httpRequest.GetMerchantId(),
                 SystemId = LykkePayConstants.SystemId,
                 Signature = httpRequest.GetMerchantSign(),
-                Text = httpRequest.Path
+                Text = httpRequest.Path.Value
             };
 
             return await DoVerifyRequest(verifyRequest);
