@@ -1,10 +1,9 @@
 ﻿using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Linq;
 using Lykke.Service.PayAPI.Attributes;
+using Lykke.Service.PayAPI.Core;
 
 namespace Lykke.Service.PayAPI
 {
@@ -21,15 +20,16 @@ namespace Lykke.Service.PayAPI
 
                 operation.Parameters.Add(new NonBodyParameter
                 {
-                    Name = "Lykke-Merchant-Id",
+                    Name = LykkePayConstants.Headers.MerchantId,
                     In = "header",
                     Description = "MerchantId",
                     Required = true,
                     Type = "string"
                 });
+
                 operation.Parameters.Add(new NonBodyParameter
                 {
-                    Name = "Lykke-Merchant-Sign",
+                    Name = LykkePayConstants.Headers.MerchantSign,
                     In = "header",
                     Description = "signature",
                     Required = true,
