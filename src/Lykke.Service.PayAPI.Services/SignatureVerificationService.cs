@@ -32,6 +32,7 @@ namespace Lykke.Service.PayAPI.Services
                 case WebRequestMethods.Http.Get:
                     return await VerifyGetRequest(httpRequest);
                 default:
+                    // todo: requires rethinking
                     return SecurityErrorType.SignIncorrect;
             }
         }
