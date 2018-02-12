@@ -6,6 +6,7 @@ using Lykke.Service.Assets.Client.Models;
 using Lykke.Service.MarketProfile.Client;
 using Lykke.Service.MarketProfile.Client.Models;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
+using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 
 namespace Lykke.Service.PayAPI.Services
@@ -30,7 +31,7 @@ namespace Lykke.Service.PayAPI.Services
 
             if (response is ErrorModel error)
             {
-                throw new Exception(error.Message);
+                throw new ApiRequestException(error.Message, error.Code?.ToString());
             }
 
             if (response is AssetPairModel assetPairRate)

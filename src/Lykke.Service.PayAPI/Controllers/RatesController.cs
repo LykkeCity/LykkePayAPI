@@ -3,7 +3,9 @@ using System.Net;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
+using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +41,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation("GetAssetPairRates")]
         [ProducesResponseType(typeof(AssetPairResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetAssetPairRates(string assetPairId)
         {
             try
@@ -51,6 +54,11 @@ namespace Lykke.Service.PayAPI.Controllers
             {
                 await _log.WriteErrorAsync(nameof(RatesController), nameof(GetAssetPairRates),
                     new {AssetPairId = assetPairId}.ToJson(), ex);
+
+                if (ex is ApiRequestException apiException)
+                {
+                    return apiException.GenerateErrorResponse();
+                }
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);

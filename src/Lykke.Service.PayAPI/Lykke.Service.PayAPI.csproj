@@ -34,7 +34,7 @@
     <PackageReference Include="Lykke.Logs" Version="3.6.0" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.10" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.3" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.22" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.23" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
     <PackageReference Include="Lykke.SettingsReader" Version="1.1.4" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.1" />
