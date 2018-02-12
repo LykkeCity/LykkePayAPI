@@ -9,11 +9,13 @@ using Lykke.Service.PayAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Lykke.Service.PayAPI.Attributes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
+    [Authorize]
+    [SignatureHeaders]
     [Route("api/[controller]")]
-    [SignatureVerification]
     public class RatesController : Controller
     {
         private readonly IRatesService _ratesService;

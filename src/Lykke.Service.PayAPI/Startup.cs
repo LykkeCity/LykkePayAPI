@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Lykke.Service.PayAPI.Middleware;
 
 namespace Lykke.Service.PayAPI
 {
@@ -92,7 +91,7 @@ namespace Lykke.Service.PayAPI
                 }
 
                 app.UseLykkeMiddleware("PayAPI", ex => new { Message = "Technical problem" });
-                app.UseAuth();
+
                 app.UseAuthentication();
 
                 app.UseMvc();
