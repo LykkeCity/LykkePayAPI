@@ -13,7 +13,7 @@ namespace Lykke.Service.PayAPI
         public void Apply(Operation operation, OperationFilterContext context)
         {
             var filterPipeline = context.ApiDescription.ActionDescriptor.FilterDescriptors;
-            var isSignAccess = filterPipeline.Select(filterInfo => filterInfo.Filter).Any(filter => filter is SignatureVerificationAttribute);
+            var isSignAccess = filterPipeline.Select(filterInfo => filterInfo.Filter).Any(filter => filter is SignatureHeadersAttribute);
             if (isSignAccess)
             {
                 if (operation.Parameters == null)

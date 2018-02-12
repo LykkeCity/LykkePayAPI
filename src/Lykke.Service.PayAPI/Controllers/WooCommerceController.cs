@@ -1,24 +1,23 @@
 ﻿using Common.Log;
-using Lykke.Service.PayAuth.Client;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using WooCommerceInvoiceModel = Lykke.Service.PayAPI.Models.WooCommerceInvoiceModel;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Lykke.Service.PayAPI.Models;
 using System.Net;
+using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.SettingsReader;
 using Lykke.Service.PayAPI.Core.Settings;
-using Lykke.Service.PayAPI.Attributes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
+    [Authorize]
+    [SignatureHeaders]
     [Route("api/[controller]")]
-    [SignatureVerification]
     public class WooCommerceController : BaseController
     {
         private readonly IReloadingManager<AppSettings> _settings;

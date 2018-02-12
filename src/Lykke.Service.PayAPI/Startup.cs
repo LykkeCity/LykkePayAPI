@@ -7,8 +7,10 @@ using Common.Log;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
+using Lykke.Service.PayAPI.Core;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
+using Lykke.Service.PayAPI.Infrastructure.Authentication;
 using Lykke.Service.PayAPI.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
@@ -16,7 +18,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Lykke.Service.PayAPI.Middleware;
 
 namespace Lykke.Service.PayAPI
 {
@@ -54,6 +55,14 @@ namespace Lykke.Service.PayAPI
                     options.OperationFilter<HeaderAccessOperationFilter>();
                 });
 
+                services.AddAuthentication(options =>
+                    {
+                        options.DefaultAuthenticateScheme = LykkePayConstants.AuthenticationScheme;
+                        options.DefaultChallengeScheme = LykkePayConstants.AuthenticationScheme;
+                    })
+                    .AddScheme<LykkePayAuthOptions, LykkePayAuthHandler>(LykkePayConstants.AuthenticationScheme,
+                        LykkePayConstants.AuthenticationScheme, options => { });
+
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();
 
@@ -82,17 +91,22 @@ namespace Lykke.Service.PayAPI
                 }
 
                 app.UseLykkeMiddleware("PayAPI", ex => new { Message = "Technical problem" });
-                app.UseAuth();
+
+                app.UseAuthentication();
+
                 app.UseMvc();
+
                 app.UseSwagger(c =>
                 {
                     c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
                 });
+
                 app.UseSwaggerUI(x =>
                 {
                     x.RoutePrefix = "swagger/ui";
                     x.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
                 });
+
                 app.UseStaticFiles();
                 
                 appLifetime.ApplicationStarted.Register(() => StartApplication().GetAwaiter().GetResult());
