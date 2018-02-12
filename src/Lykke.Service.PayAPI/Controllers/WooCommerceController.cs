@@ -18,8 +18,9 @@ using Lykke.Common.Api.Contract.Responses;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
+	[Authorize]
+    [SignatureHeaders]
     [Route("api/[controller]")]
-    [SignatureVerification]
     public class WooCommerceController : BaseController
     {
         private readonly IReloadingManager<AppSettings> _settings;

@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="Domain\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +20,12 @@
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.3" />
     <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.22" />
     <PackageReference Include="Lykke.SettingsReader" Version="1.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Lykke.Contracts">
+      <HintPath>..\..\..\..\Users\atarutin\.nuget\packages\lykke.contracts\1.0.43\lib\netstandard1.6\Lykke.Contracts.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
