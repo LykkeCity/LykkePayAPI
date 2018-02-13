@@ -5,7 +5,6 @@ using Lykke.Service.PayAuth.Client;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.SettingsReader.Attributes;
 using Lykke.Service.PayInternal.Client;
-using Lykke.Service.PayAuth.Client;
 
 namespace Lykke.Service.PayAPI.Core.Settings
 {
@@ -30,12 +29,10 @@ namespace Lykke.Service.PayAPI.Core.Settings
 
     public class PayInvoicePortalSettings
     {
+        [HttpCheck("/")]
         public string SiteUrl { get; set; }
     }
-    public class PayInternalClientSettings
-    {
-        public string ServiceUrl { get; set; }
-    }
+
     public class AssetsServiceClientSettings
     {
         [HttpCheck("api/isalive")]
