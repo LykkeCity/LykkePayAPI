@@ -6,13 +6,13 @@ namespace Lykke.Service.PayAPI.Controllers
 {
     public class BaseController : Controller
     {
-        protected string MerchantId => HttpContext.Request.GetMerchantId();
+        protected readonly ILog Log;
 
-        protected readonly ILog _log;
+        protected string MerchantId => HttpContext.Request.GetMerchantId();
 
         public BaseController(ILog log)
         {
-            _log = log;
+            Log = log;
         }
     }
 }

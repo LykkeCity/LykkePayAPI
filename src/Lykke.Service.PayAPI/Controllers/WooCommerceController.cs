@@ -28,6 +28,7 @@ namespace Lykke.Service.PayAPI.Controllers
             _invoicesServiceClient = invoicesServiceClient;
             _settings = settings;
         }
+
         [HttpPost("Create")]
         [SwaggerOperation("Create")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]

@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Lykke.Service.PayAPI.Attributes;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Lykke.Service.PayAPI.Controllers
 {

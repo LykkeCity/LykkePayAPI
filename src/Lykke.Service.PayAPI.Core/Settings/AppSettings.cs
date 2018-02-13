@@ -26,14 +26,13 @@ namespace Lykke.Service.PayAPI.Core.Settings
         [HttpCheck("api/isalive")]
         public string ServiceUrl { get; set; }
     }
+
     public class PayInvoicePortalSettings
     {
+        [HttpCheck("/")]
         public string SiteUrl { get; set; }
     }
-    public class PayInternalClientSettings
-    {
-        public string ServiceUrl { get; set; }
-    }
+
     public class AssetsServiceClientSettings
     {
         [HttpCheck("api/isalive")]

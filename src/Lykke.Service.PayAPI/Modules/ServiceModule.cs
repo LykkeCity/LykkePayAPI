@@ -51,7 +51,7 @@ namespace Lykke.Service.PayAPI.Modules
 
             builder.RegisterType<PayAuthClient>()
                 .As<IPayAuthClient>()
-                .WithParameter("settings", new PayAuthServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayAuthServiceClient.ServiceUrl })
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAuthServiceClient))
                 .SingleInstance();
 
             builder.RegisterType<PayInvoiceClient>()

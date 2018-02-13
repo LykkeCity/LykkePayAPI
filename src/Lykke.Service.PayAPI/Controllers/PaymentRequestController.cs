@@ -4,15 +4,14 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
-using Lykke.Service.PayAuth.Client;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using CreatePaymentRequestModel = Lykke.Service.PayAPI.Models.CreatePaymentRequestModel;
 using ErrorResponseException = Lykke.Service.PayInternal.Client.ErrorResponseException;
-using Lykke.Service.PayAPI.Attributes;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -25,7 +24,6 @@ namespace Lykke.Service.PayAPI.Controllers
 
         public PaymentRequestController(
             IPaymentRequestService paymentRequestService,
-            IPayAuthClient payAuthClient,
             ILog log) : base(log)
         {
             _paymentRequestService =
@@ -44,7 +42,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(CreatePaymentResponseModel), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> CreatePaymentRequest([FromBody] CreatePaymentRequestModel request)
         {
-
             if (!ModelState.IsValid)
                 return BadRequest(new ErrorResponse().AddErrors(ModelState));
 
@@ -58,14 +55,14 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (ErrorResponseException ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
+                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
                     request.ToJson(), ex);
 
                 return StatusCode((int) ex.StatusCode, ex.Message);
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
+                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
                     request.ToJson(), ex);
             }
 
@@ -84,7 +81,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> GetPaymentStatus(string address)
         {
-
             try
             {
                 var paymentRequestDetails = await _paymentRequestService.GetPaymentRequestDetailsAsync(address);
@@ -93,14 +89,14 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (ErrorResponseException ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentStatus),
+                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentStatus),
                     new {Address = address}.ToJson(), ex);
 
                 return StatusCode((int) ex.StatusCode, ex.Message);
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentStatus),
+                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentStatus),
                     new {Address = address}.ToJson(), ex);
             }
 
