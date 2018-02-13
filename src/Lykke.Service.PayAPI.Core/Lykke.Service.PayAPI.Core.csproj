@@ -8,15 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="4.4.2" />
     <PackageReference Include="Lykke.Contracts" Version="1.0.43" />
     <PackageReference Include="Lykke.Service.Assets.Client" Version="3.3.1" />
     <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.0.20" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.10" />
+    <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.3" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.23" />
     <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="2.0.0" />
     <PackageReference Include="Lykke.SettingsReader" Version="1.1.4" />
   </ItemGroup>

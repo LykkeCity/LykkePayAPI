@@ -1,29 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
 using Common.Log;
-using Lykke.Contracts.Security;
-using Lykke.Service.PayAuth.Client;
-using Lykke.Service.PayAuth.Client.Models;
-using Lykke.SettingsReader;
-using Lykke.Service.PayAPI.Core.Settings;
+using Lykke.Service.PayAPI.Core;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
     public class BaseController : Controller
     {
-        protected readonly ILog _log;
+        protected readonly ILog Log;
+
+        protected string MerchantId => HttpContext.Request.GetMerchantId();
 
         public BaseController(ILog log)
         {
-            _log = log;
+            Log = log;
         }
     }
 }

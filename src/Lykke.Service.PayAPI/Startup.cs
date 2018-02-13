@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 
 namespace Lykke.Service.PayAPI
 {
@@ -45,8 +46,7 @@ namespace Lykke.Service.PayAPI
                 services.AddMvc()
                     .AddJsonOptions(options =>
                     {
-                        options.SerializerSettings.ContractResolver =
-                            new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     });
 
                 services.AddSwaggerGen(options =>
