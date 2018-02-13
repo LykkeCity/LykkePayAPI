@@ -15,6 +15,7 @@ using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 using Lykke.Service.PayAuth.Client;
 using Lykke.Service.PayCallback.Client;
+using Lykke.Service.PayInvoice.Client;
 
 namespace Lykke.Service.PayAPI.Modules
 {
@@ -38,6 +39,10 @@ namespace Lykke.Service.PayAPI.Modules
                 .As<ILog>()
                 .SingleInstance();
 
+            builder.RegisterInstance(_settings)
+                .As<IReloadingManager<AppSettings>>()
+                .SingleInstance();
+
             builder.RegisterType<HealthService>()
                 .As<IHealthService>()
                 .SingleInstance();
@@ -47,11 +52,19 @@ namespace Lykke.Service.PayAPI.Modules
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAuthServiceClient))
                 .SingleInstance();
 
+            builder.RegisterType<PayInvoiceClient>()
+                .As<IPayInvoiceClient>()
+                .WithParameter("settings", new PayInvoiceServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayInvoiceServiceClient.ServiceUrl })
+                .SingleInstance();
+
             builder.RegisterType<StartupManager>()
                 .As<IStartupManager>();
 
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
+
+            builder.RegisterType<SignatureVerificationService>()
+                .As<ISignatureVerificationService>();
 
             builder.RegisterType<LykkeMarketProfile>()
                 .As<ILykkeMarketProfile>()
