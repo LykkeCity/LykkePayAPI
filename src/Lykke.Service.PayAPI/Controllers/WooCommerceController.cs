@@ -1,7 +1,6 @@
 ﻿using Common.Log;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Globalization;
 using System.Threading.Tasks;
 using WooCommerceInvoiceModel = Lykke.Service.PayAPI.Models.WooCommerceInvoiceModel;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -44,17 +43,13 @@ namespace Lykke.Service.PayAPI.Controllers
                     Number = model.InvoiceNumber,
                     ClientName = model.ClientName,
                     ClientEmail = model.ClientEmail,
-                    Amount = decimal.Parse(model.Amount, CultureInfo.InvariantCulture),
+                    Amount = model.Amount,
                     DueDate = DateTime.Now.AddDays(1),
                     PaymentAssetId = "BTC",
                     SettlementAssetId = model.Currency
                 });
-                response.InvoiceURL = string.Format("{0}{1}{2}{3}{4}",
-                    _settings.CurrentValue.PayInvoicePortal.SiteUrl,
-                    "invoice/",
-                    invoice.Id,
-                    "?callback=",
-                    WebUtility.UrlEncode(model.CallbackUrl));
+                response.InvoiceURL =
+                    $"{_settings.CurrentValue.PayInvoicePortal.SiteUrl}invoice/{invoice.Id}?callback={WebUtility.UrlEncode(model.CallbackUrl)}";
                 response.InvoiceId = invoice.Id;
                 response.ErrorCode = "0";
             }
