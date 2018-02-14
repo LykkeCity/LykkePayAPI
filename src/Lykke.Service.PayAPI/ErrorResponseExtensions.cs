@@ -31,7 +31,7 @@ namespace Lykke.Service.PayAPI
 
         public static ObjectResult GenerateErrorResponse(this ApiRequestException src)
         {
-            var message = $"{src.Message}. Application status code: {src.AppStatusCode}";
+            var message = $"{src.Message}. Application status code: {src.AppStatusCode ?? "no information"}";
 
             return src.HttpStatusCode == null
                 ? new BadRequestObjectResult(ErrorResponse.Create(message))

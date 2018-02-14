@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Runtime.Serialization;
 
 namespace Lykke.Service.PayAPI.Core.Exceptions
@@ -17,13 +18,13 @@ namespace Lykke.Service.PayAPI.Core.Exceptions
         {
         }
 
-        public ApiRequestException(string message, string appStatusCode, int? httpStatusCode = null) : base(message)
+        public ApiRequestException(string message, string appStatusCode, HttpStatusCode? httpStatusCode = null) : base(message)
         {
             HttpStatusCode = httpStatusCode;
             AppStatusCode = appStatusCode;
         }
 
-        public int? HttpStatusCode { get; set; }
+        public HttpStatusCode? HttpStatusCode { get; set; }
 
         public string AppStatusCode { get; set; }
     }

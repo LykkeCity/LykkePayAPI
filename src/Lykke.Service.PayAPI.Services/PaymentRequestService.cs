@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
+using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayCallback.Client.Models;
@@ -38,17 +39,36 @@ namespace Lykke.Service.PayAPI.Services
 
             CreatePaymentRequestModel createPaymentRequest = request.ToServiceClientModel(paymentDueDate);
 
-            PaymentRequestModel payment = await _payInternalClient.CreatePaymentRequestAsync(createPaymentRequest);
+            PaymentRequestModel payment;
+            PaymentRequestDetailsModel checkout;
 
-            PaymentRequestDetailsModel
-                checkout = await _payInternalClient.ChechoutAsync(request.MerchantId, payment.Id);
-
-            await _payCallbackClient.AddPaymentCallback(new CreatePaymentCallbackModel
+            try
             {
-                MerchantId = payment.MerchantId,
-                PaymentRequestId = payment.Id,
-                CallbackUrl = request.CallbackUrl
-            });
+                payment = await _payInternalClient.CreatePaymentRequestAsync(createPaymentRequest);
+
+                checkout = await _payInternalClient.ChechoutAsync(request.MerchantId, payment.Id);
+            }
+            catch (PayInternal.Client.ErrorResponseException ex)
+            {
+                throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.CallbackUrl))
+            {
+                try
+                {
+                    await _payCallbackClient.AddPaymentCallback(new CreatePaymentCallbackModel
+                    {
+                        MerchantId = payment.MerchantId,
+                        PaymentRequestId = payment.Id,
+                        CallbackUrl = request.CallbackUrl
+                    });
+                }
+                catch (PayCallback.Client.ErrorResponseException ex)
+                {
+                    throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
+                }
+            }
 
             return new CreatePaymentResponse
             {
@@ -63,9 +83,17 @@ namespace Lykke.Service.PayAPI.Services
 
         public async Task<PaymentRequestDetailsModel> GetPaymentRequestDetailsAsync(string address)
         {
-            PaymentRequestModel paymentRequest = await _payInternalClient.GetPaymentRequestByAddressAsync(address);
+            try
+            {
+                PaymentRequestModel paymentRequest = await _payInternalClient.GetPaymentRequestByAddressAsync(address);
 
-            return await _payInternalClient.GetPaymentRequestDetailsAsync(paymentRequest.MerchantId, paymentRequest.Id);
+                return await _payInternalClient.GetPaymentRequestDetailsAsync(paymentRequest.MerchantId,
+                    paymentRequest.Id);
+            }
+            catch (PayInternal.Client.ErrorResponseException ex)
+            {
+                throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
+            }
         }
     }
 }
