@@ -12,7 +12,7 @@
     <PackageReference Include="Lykke.Contracts" Version="1.0.43" />
     <PackageReference Include="Lykke.Service.Assets.Client" Version="3.3.1" />
     <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.0.20" />
-    <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.10" />
+    <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.12" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.3" />
     <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.23" />
     <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="2.0.0" />

@@ -65,10 +65,10 @@ namespace Lykke.Service.PayAPI.Services
 
         private async Task<SecurityErrorType> DoVerifyRequest(VerifyRequest verifyRequest)
         {
-            string verificationResultStr = await _payAuthClient.VerifyAsync(verifyRequest);
+            SignatureValidationResponse validationResponse = await _payAuthClient.VerifyAsync(verifyRequest);
 
-            if (!Enum.TryParse(verificationResultStr, out SecurityErrorType verificationResult))
-                throw new UnrecognizedSignatureVerificationException(verificationResultStr);
+            if (!Enum.TryParse(validationResponse.ErrorType, out SecurityErrorType verificationResult))
+                throw new UnrecognizedSignatureVerificationException(validationResponse.Description);
 
             return verificationResult;
         }
