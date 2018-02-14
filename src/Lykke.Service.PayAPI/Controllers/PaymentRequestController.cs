@@ -5,13 +5,13 @@ using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
+using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using CreatePaymentRequestModel = Lykke.Service.PayAPI.Models.CreatePaymentRequestModel;
-using ErrorResponseException = Lykke.Service.PayInternal.Client.ErrorResponseException;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -53,17 +53,15 @@ namespace Lykke.Service.PayAPI.Controllers
 
                 return Ok(response.ToApiModel());
             }
-            catch (ErrorResponseException ex)
-            {
-                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
-                    request.ToJson(), ex);
-
-                return StatusCode((int) ex.StatusCode, ex.Message);
-            }
             catch (Exception ex)
             {
                 await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
                     request.ToJson(), ex);
+
+                if (ex is ApiRequestException apiRequestException)
+                {
+                    return apiRequestException.GenerateErrorResponse();
+                }
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -87,17 +85,15 @@ namespace Lykke.Service.PayAPI.Controllers
 
                 return Ok(paymentRequestDetails.ToStatusApiModel());
             }
-            catch (ErrorResponseException ex)
-            {
-                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentStatus),
-                    new {Address = address}.ToJson(), ex);
-
-                return StatusCode((int) ex.StatusCode, ex.Message);
-            }
             catch (Exception ex)
             {
                 await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentStatus),
                     new {Address = address}.ToJson(), ex);
+
+                if (ex is ApiRequestException apiRequestException)
+                {
+                    return apiRequestException.GenerateErrorResponse();
+                }
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
