@@ -10,6 +10,6 @@ namespace Lykke.Service.PayAPI.Core.Services
 
         Task<PaymentRequestDetailsModel> GetPaymentRequestDetailsAsync(string address);
 
-        Task RefundAsync(string paymentRequestId, string addresss);
+        Task<string> RefundAsync(string merchantId, string address, string destinationAddress);
     }
 }

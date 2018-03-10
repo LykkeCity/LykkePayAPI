@@ -9,6 +9,7 @@ using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
+using Lykke.Service.PayInternal.Client.Models.Refunds;
 
 namespace Lykke.Service.PayAPI.Services
 {
@@ -96,11 +97,18 @@ namespace Lykke.Service.PayAPI.Services
             }
         }
 
-        public async Task RefundAsync(string paymentRequestId, string addresss)
+        public async Task<string> RefundAsync(string merchantId, string address, string destAddress)
         {
             try
             {
-                //todo: call payinternalClient to initiate a refund
+                RefundResponse refundRequest = await _payInternalClient.CreateRefundRequestAsync(new RefundRequestModel
+                {
+                    MerchantId = merchantId,
+                    SourceAddress = address,
+                    DestinationAddress = destAddress
+                });
+
+                return refundRequest.RefundId;
             }
             catch (PayInternal.Client.ErrorResponseException ex)
             {

@@ -2,6 +2,6 @@
 {
     public class RefundResponseModel
     {
-        
+        public string Id { get; set; }
     }
 }

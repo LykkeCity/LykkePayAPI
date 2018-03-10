@@ -100,25 +100,33 @@ namespace Lykke.Service.PayAPI.Controllers
             return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
+        /// <summary>
+        /// Initiates a refund on a payment by the address
+        /// </summary>
+        /// <param name="address">Wallet address binded to the payment request</param>
+        /// <param name="destinationAddress">Destination wallet address, optional</param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("refund")]
+        [Route("{address}/refund")]
         [SwaggerOperation("Refund")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(RefundResponseModel), (int) HttpStatusCode.OK)]
-        public async Task<IActionResult> Refund([FromBody] RefundRequestModel request)
+        public async Task<IActionResult> Refund(string address, [FromQuery] string destinationAddress)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new ErrorResponse().AddErrors(ModelState));
-
             try
             {
-                var response = _paymentRequestService.RefundAsync(request.PaymentRequestId, request.Address);
+                string refundId = await _paymentRequestService.RefundAsync(MerchantId, address, destinationAddress);
 
-                return Ok(response);
+                return Ok(new RefundResponseModel {Id = refundId});
             }
             catch (Exception ex)
             {
-                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(Refund), request.ToJson(), ex);
+                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(Refund), new
+                {
+                    address,
+                    destinationAddress
+                }.ToJson(), ex);
 
                 if (ex is ApiRequestException apiRequestException)
                 {
