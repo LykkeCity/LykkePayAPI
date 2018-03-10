@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
+using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Exceptions;
@@ -89,6 +90,35 @@ namespace Lykke.Service.PayAPI.Controllers
             {
                 await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentStatus),
                     new {Address = address}.ToJson(), ex);
+
+                if (ex is ApiRequestException apiRequestException)
+                {
+                    return apiRequestException.GenerateErrorResponse();
+                }
+            }
+
+            return StatusCode((int) HttpStatusCode.InternalServerError);
+        }
+
+        [HttpPost]
+        [Route("refund")]
+        [SwaggerOperation("Refund")]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(RefundResponseModel), (int) HttpStatusCode.OK)]
+        public async Task<IActionResult> Refund([FromBody] RefundRequestModel request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ErrorResponse().AddErrors(ModelState));
+
+            try
+            {
+                var response = _paymentRequestService.RefundAsync(request.PaymentRequestId, request.Address);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(Refund), request.ToJson(), ex);
 
                 if (ex is ApiRequestException apiRequestException)
                 {

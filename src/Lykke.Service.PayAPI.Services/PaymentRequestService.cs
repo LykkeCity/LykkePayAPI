@@ -95,5 +95,17 @@ namespace Lykke.Service.PayAPI.Services
                 throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
             }
         }
+
+        public async Task RefundAsync(string paymentRequestId, string addresss)
+        {
+            try
+            {
+                //todo: call payinternalClient to initiate a refund
+            }
+            catch (PayInternal.Client.ErrorResponseException ex)
+            {
+                throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
+            }
+        }
     }
 }
