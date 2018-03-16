@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Common;
-using Common.Log;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
@@ -9,7 +8,7 @@ using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
-using Lykke.Service.PayInternal.Client.Models.Refunds;
+using RefundResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundResponse;
 
 namespace Lykke.Service.PayAPI.Services
 {
@@ -18,18 +17,15 @@ namespace Lykke.Service.PayAPI.Services
         private readonly IPayInternalClient _payInternalClient;
         private readonly IPayCallbackClient _payCallbackClient;
         private readonly TimeSpan _dueDate;
-        private readonly ILog _log;
 
         public PaymentRequestService(
             IPayInternalClient payInternalClient,
             IPayCallbackClient payCallbackClient,
-            TimeSpan dueDate,
-            ILog log)
+            TimeSpan dueDate)
         {
             _payInternalClient = payInternalClient ?? throw new ArgumentNullException(nameof(payInternalClient));
             _payCallbackClient = payCallbackClient ?? throw new ArgumentNullException(nameof(payCallbackClient));
             _dueDate = dueDate;
-            _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
         public async Task<CreatePaymentResponse> CreatePaymentRequestAsync(CreatePaymentRequest request)
@@ -73,6 +69,7 @@ namespace Lykke.Service.PayAPI.Services
 
             return new CreatePaymentResponse
             {
+                Id = payment.Id,
                 PaymentAssetId = payment.PaymentAssetId,
                 Amount = checkout.Order.PaymentAmount,
                 OrderId = payment.OrderId,
@@ -82,14 +79,11 @@ namespace Lykke.Service.PayAPI.Services
             };
         }
 
-        public async Task<PaymentRequestDetailsModel> GetPaymentRequestDetailsAsync(string address)
+        public async Task<PaymentRequestDetailsModel> GetPaymentRequestDetailsAsync(string merchantId, string paymentRequestId)
         {
             try
             {
-                PaymentRequestModel paymentRequest = await _payInternalClient.GetPaymentRequestByAddressAsync(address);
-
-                return await _payInternalClient.GetPaymentRequestDetailsAsync(paymentRequest.MerchantId,
-                    paymentRequest.Id);
+                return await _payInternalClient.GetPaymentRequestDetailsAsync(merchantId, paymentRequestId);
             }
             catch (PayInternal.Client.ErrorResponseException ex)
             {
@@ -97,18 +91,13 @@ namespace Lykke.Service.PayAPI.Services
             }
         }
 
-        public async Task<string> RefundAsync(string merchantId, string address, string destAddress)
+        public async Task<RefundResponse> RefundAsync(RefundRequest request)
         {
             try
             {
-                RefundResponse refundRequest = await _payInternalClient.CreateRefundRequestAsync(new RefundRequestModel
-                {
-                    MerchantId = merchantId,
-                    SourceAddress = address,
-                    DestinationAddress = destAddress
-                });
+                var response = await _payInternalClient.RefundAsync(request.ToServiceClientModel());
 
-                return refundRequest.RefundId;
+                return response.ToDomain();
             }
             catch (PayInternal.Client.ErrorResponseException ex)
             {
