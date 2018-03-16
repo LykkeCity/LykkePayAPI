@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lykke.Service.PayAPI.Models
+namespace Lykke.Service.PayAPI.Core.Domain.PaymentRequest
 {
-    public class RefundResponseModel
+    public class RefundResponse
     {
         public string PaymentRequestId { get; set; }
 
@@ -13,6 +13,6 @@ namespace Lykke.Service.PayAPI.Models
 
         public DateTime DueDate { get; set; }
 
-        public IEnumerable<RefundTransactionResponseModel> Transactions { get; set; }
+        public IEnumerable<RefundTransactionResponse> Transactions { get; set; }
     }
 }

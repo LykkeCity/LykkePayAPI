@@ -3,9 +3,9 @@ using System.Net;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
-using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
+using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
@@ -69,27 +69,27 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// The method returns status on a payment by the address
+        /// Returns status of a payment request
         /// </summary>
-        /// <param name="address"></param>
+        /// <param name="paymentRequestId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{address}/status")]
-        [SwaggerOperation("GetPaymentStatus")]
+        [Route("{paymentRequestId}/status")]
+        [SwaggerOperation("GetPaymentRequestStatus")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
-        public async Task<IActionResult> GetPaymentStatus(string address)
+        public async Task<IActionResult> GetPaymentRequestStatus(string paymentRequestId)
         {
             try
             {
-                var paymentRequestDetails = await _paymentRequestService.GetPaymentRequestDetailsAsync(address);
+                var paymentRequestDetails = await _paymentRequestService.GetPaymentRequestDetailsAsync(MerchantId, paymentRequestId);
 
                 return Ok(paymentRequestDetails.ToStatusApiModel());
             }
             catch (Exception ex)
             {
-                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentStatus),
-                    new {Address = address}.ToJson(), ex);
+                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentRequestStatus),
+                    new {paymentRequestId}.ToJson(), ex);
 
                 if (ex is ApiRequestException apiRequestException)
                 {
@@ -101,31 +101,39 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Initiates a refund on a payment by the address
+        /// Initiates a refund on a payment
         /// </summary>
-        /// <param name="address">Wallet address binded to the payment request</param>
-        /// <param name="destinationAddress">Destination wallet address, optional</param>
+        /// <param name="paymentRequestId"></param>
+        /// <param name="destinationAddress"></param>
+        /// <param name="callbackUrl"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("{address}/refund")]
+        [Route("{paymentRequestId}/refund")]
         [SwaggerOperation("Refund")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(RefundResponseModel), (int) HttpStatusCode.OK)]
-        public async Task<IActionResult> Refund(string address, [FromQuery] string destinationAddress)
+        public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress, [FromQuery] string callbackUrl)
         {
             try
             {
-                string refundId = await _paymentRequestService.RefundAsync(MerchantId, address, destinationAddress);
+                RefundResponse refundResponse = await _paymentRequestService.RefundAsync(new RefundRequest
+                {
+                    MerchantId = MerchantId,
+                    PaymentRequestId = paymentRequestId,
+                    DestinationAddress = destinationAddress,
+                    CallbackUrl = callbackUrl
+                });
 
-                return Ok(new RefundResponseModel {Id = refundId});
+                return Ok(refundResponse.ToApiModel());
             }
             catch (Exception ex)
             {
                 await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(Refund), new
                 {
-                    address,
-                    destinationAddress
+                    paymentRequestId,
+                    destinationAddress,
+                    callbackUrl
                 }.ToJson(), ex);
 
                 if (ex is ApiRequestException apiRequestException)

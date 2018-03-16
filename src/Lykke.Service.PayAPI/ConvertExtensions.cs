@@ -5,6 +5,8 @@ using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using CreatePaymentRequestModel = Lykke.Service.PayAPI.Models.CreatePaymentRequestModel;
+using RefundTransactionResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundTransactionResponse;
+using RefundResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundResponse;
 
 namespace Lykke.Service.PayAPI
 {
@@ -30,6 +32,7 @@ namespace Lykke.Service.PayAPI
         {
             return new CreatePaymentResponseModel
             {
+                Id = src.Id,
                 OrderId = src.OrderId,
                 Amount = src.Amount,
                 PaymentAsset = src.PaymentAssetId,
@@ -71,6 +74,31 @@ namespace Lykke.Service.PayAPI
                 Accuracy = src.Accuracy,
                 Bid = src.Bid,
                 Ask = src.Ask
+            };
+        }
+
+        public static RefundTransactionResponseModel ToApiModel(this RefundTransactionResponse src)
+        {
+            return new RefundTransactionResponseModel
+            {
+                Amount = src.Amount,
+                AssetId = src.AssetId,
+                Blockchain = src.Blockchain,
+                DestinationAddress = src.DestinationAddress,
+                Hash = src.Hash,
+                SourceAddress = src.SourceAddress
+            };
+        }
+
+        public static RefundResponseModel ToApiModel(this RefundResponse src)
+        {
+            return new RefundResponseModel
+            {
+                Amount = src.Amount,
+                PaymentRequestId = src.PaymentRequestId,
+                AssetId = src.AssetId,
+                DueDate = src.DueDate,
+                Transactions = src.Transactions.Select(x => x.ToApiModel())
             };
         }
     }

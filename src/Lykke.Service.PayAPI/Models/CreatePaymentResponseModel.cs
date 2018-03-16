@@ -2,6 +2,8 @@
 {
     public class CreatePaymentResponseModel
     {
+        public string Id { get; set; }
+
         public string Timestamp { get; set; }
 
         public string Address { get; set; }
