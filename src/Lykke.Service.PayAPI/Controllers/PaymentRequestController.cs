@@ -9,6 +9,8 @@ using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
+using Lykke.Service.PayCallback.Client;
+using Lykke.Service.PayCallback.Client.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -22,13 +24,16 @@ namespace Lykke.Service.PayAPI.Controllers
     public class PaymentRequestController : BaseController
     {
         private readonly IPaymentRequestService _paymentRequestService;
+        private readonly IPayCallbackClient _payCallbackClient;
 
         public PaymentRequestController(
             IPaymentRequestService paymentRequestService,
+            IPayCallbackClient payCallbackClient,
             ILog log) : base(log)
         {
             _paymentRequestService =
                 paymentRequestService ?? throw new ArgumentNullException(nameof(paymentRequestService));
+            _payCallbackClient = payCallbackClient ?? throw new ArgumentNullException(nameof(payCallbackClient));
         }
 
         /// <summary>
@@ -105,7 +110,6 @@ namespace Lykke.Service.PayAPI.Controllers
         /// </summary>
         /// <param name="paymentRequestId"></param>
         /// <param name="destinationAddress"></param>
-        /// <param name="callbackUrl"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("{paymentRequestId}/refund")]
@@ -113,7 +117,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(RefundResponseModel), (int) HttpStatusCode.OK)]
-        public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress, [FromQuery] string callbackUrl)
+        public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress)
         {
             try
             {
@@ -121,8 +125,7 @@ namespace Lykke.Service.PayAPI.Controllers
                 {
                     MerchantId = MerchantId,
                     PaymentRequestId = paymentRequestId,
-                    DestinationAddress = destinationAddress,
-                    CallbackUrl = callbackUrl
+                    DestinationAddress = destinationAddress
                 });
 
                 return Ok(refundResponse.ToApiModel());
@@ -132,14 +135,50 @@ namespace Lykke.Service.PayAPI.Controllers
                 await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(Refund), new
                 {
                     paymentRequestId,
-                    destinationAddress,
-                    callbackUrl
+                    destinationAddress
                 }.ToJson(), ex);
 
                 if (ex is ApiRequestException apiRequestException)
                 {
                     return apiRequestException.GenerateErrorResponse();
                 }
+            }
+
+            return StatusCode((int) HttpStatusCode.InternalServerError);
+        }
+
+        /// <summary>
+        /// Adds or updates payment request callback url
+        /// </summary>
+        /// <param name="paymentRequestId"></param>
+        /// <param name="callbackUrl"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("{paymentRequestId}/callback")]
+        [SwaggerOperation("SetCallback")]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
+        public async Task<IActionResult> SetCallbackUrl(string paymentRequestId, [FromQuery] string callbackUrl)
+        {
+            try
+            {
+                await _payCallbackClient.SetPaymentCallback(new SetPaymentCallbackModel
+                {
+                    MerchantId = MerchantId,
+                    PaymentRequestId = paymentRequestId,
+                    CallbackUrl = callbackUrl
+                });
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(SetCallbackUrl), new
+                {
+                    paymentRequestId,
+                    callbackUrl
+                }.ToJson(), ex);
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
