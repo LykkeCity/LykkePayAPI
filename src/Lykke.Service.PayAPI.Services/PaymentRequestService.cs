@@ -54,7 +54,7 @@ namespace Lykke.Service.PayAPI.Services
             {
                 try
                 {
-                    await _payCallbackClient.AddPaymentCallback(new CreatePaymentCallbackModel
+                    await _payCallbackClient.SetPaymentCallback(new SetPaymentCallbackModel
                     {
                         MerchantId = payment.MerchantId,
                         PaymentRequestId = payment.Id,

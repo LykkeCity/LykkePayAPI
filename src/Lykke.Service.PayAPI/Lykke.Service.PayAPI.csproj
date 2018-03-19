@@ -32,8 +32,8 @@
     <PackageReference Include="Lykke.Contracts" Version="1.0.43" />
     <PackageReference Include="Lykke.Logs" Version="3.6.0" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.12" />
-    <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.3" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.46" />
+    <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.4" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.48" />
     <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="2.0.0" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
     <PackageReference Include="Lykke.SettingsReader" Version="1.1.4" />

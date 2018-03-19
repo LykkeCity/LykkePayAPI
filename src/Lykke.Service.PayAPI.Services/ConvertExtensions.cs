@@ -33,7 +33,6 @@ namespace Lykke.Service.PayAPI.Services
             {
                 MerchantId = src.MerchantId,
                 PaymentRequestId = src.PaymentRequestId,
-                CallbackUrl = src.CallbackUrl,
                 DestinationAddress = src.DestinationAddress
             };
         }
