@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using Common;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Exceptions;
@@ -34,7 +35,8 @@ namespace Lykke.Service.PayAPI.Services
 
             var requestTime = DateTime.UtcNow;
 
-            CreatePaymentRequestModel createPaymentRequest = request.ToServiceClientModel(paymentDueDate);
+            var createPaymentRequest =
+                Mapper.Map<CreatePaymentRequestModel>(request, opt => opt.Items["DueDate"] = paymentDueDate);
 
             PaymentRequestModel payment;
             PaymentRequestDetailsModel checkout;
@@ -95,9 +97,9 @@ namespace Lykke.Service.PayAPI.Services
         {
             try
             {
-                var response = await _payInternalClient.RefundAsync(request.ToServiceClientModel());
+                var response = await _payInternalClient.RefundAsync(Mapper.Map<RefundRequestModel>(request));
 
-                return response.ToDomain();
+                return Mapper.Map<RefundResponse>(response);
             }
             catch (PayInternal.Client.ErrorResponseException ex)
             {

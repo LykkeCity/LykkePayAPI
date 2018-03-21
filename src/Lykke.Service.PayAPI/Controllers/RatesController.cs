@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
@@ -48,7 +49,7 @@ namespace Lykke.Service.PayAPI.Controllers
             {
                 AssetPairRate rate = await _ratesService.Get(assetPairId);
 
-                return Ok(rate.ToApiModel());
+                return Ok(Mapper.Map<AssetPairResponseModel>(rate));
             }
             catch (Exception ex)
             {
