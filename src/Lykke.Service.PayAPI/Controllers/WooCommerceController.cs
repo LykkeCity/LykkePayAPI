@@ -1,10 +1,6 @@
 ﻿using Common.Log;
-using Lykke.Service.PayAuth.Client;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using WooCommerceInvoiceModel = Lykke.Service.PayAPI.Models.WooCommerceInvoiceModel;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -13,15 +9,23 @@ using System.Net;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.SettingsReader;
 using Lykke.Service.PayAPI.Core.Settings;
+using Lykke.Common.Api.Contract.Responses;
+using Lykke.Service.PayAPI.Attributes;
+using Lykke.Service.PayInvoice.Client;
+using Lykke.SettingsReader;
+using Lykke.Service.PayAPI.Core.Settings;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
+    [Authorize]
+    [SignatureHeaders]
     [Route("api/[controller]")]
     public class WooCommerceController : BaseController
     {
         private readonly IReloadingManager<AppSettings> _settings;
         private readonly IPayInvoiceClient _invoicesServiceClient;
-        public WooCommerceController(ILog log, IPayAuthClient payAuthClient, IPayInvoiceClient invoicesServiceClient, IReloadingManager<AppSettings> settings) : base(log, payAuthClient, settings)
+        public WooCommerceController(ILog log, IPayInvoiceClient invoicesServiceClient, IReloadingManager<AppSettings> settings) : base(log)
         {
             _invoicesServiceClient = invoicesServiceClient;
             _settings = settings;
@@ -42,17 +46,13 @@ namespace Lykke.Service.PayAPI.Controllers
                     Number = model.InvoiceNumber,
                     ClientName = model.ClientName,
                     ClientEmail = model.ClientEmail,
-                    Amount = decimal.Parse(model.Amount, CultureInfo.InvariantCulture),
+                    Amount = model.Amount,
                     DueDate = DateTime.Now.AddDays(1),
                     PaymentAssetId = "BTC",
                     SettlementAssetId = model.Currency
                 });
-                response.InvoiceURL = string.Format("{0}{1}{2}{3}{4}",
-                    _settings.CurrentValue.PayInvoicePortal.SiteUrl,
-                    "invoice/",
-                    invoice.Id,
-                    "?callback=",
-                    WebUtility.UrlEncode(model.CallbackUrl));
+                response.InvoiceURL =
+                    $"{_settings.CurrentValue.PayInvoicePortal.SiteUrl}invoice/{invoice.Id}?callback={WebUtility.UrlEncode(model.CallbackUrl)}";
                 response.InvoiceId = invoice.Id;
                 response.ErrorCode = "0";
             }

@@ -2,13 +2,17 @@
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
+using Lykke.Service.PayAPI.Core;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
+using Lykke.Service.PayAPI.Infrastructure.Authentication;
+using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayAPI.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
@@ -16,6 +20,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 
 namespace Lykke.Service.PayAPI
 {
@@ -43,14 +48,22 @@ namespace Lykke.Service.PayAPI
                 services.AddMvc()
                     .AddJsonOptions(options =>
                     {
-                        options.SerializerSettings.ContractResolver =
-                            new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     });
 
                 services.AddSwaggerGen(options =>
                 {
                     options.DefaultLykkeConfiguration("v1", "PayAPI");
+                    options.OperationFilter<HeaderAccessOperationFilter>();
                 });
+
+                services.AddAuthentication(options =>
+                    {
+                        options.DefaultAuthenticateScheme = LykkePayConstants.AuthenticationScheme;
+                        options.DefaultChallengeScheme = LykkePayConstants.AuthenticationScheme;
+                    })
+                    .AddScheme<LykkePayAuthOptions, LykkePayAuthHandler>(LykkePayConstants.AuthenticationScheme,
+                        LykkePayConstants.AuthenticationScheme, options => { });
 
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();
@@ -60,6 +73,14 @@ namespace Lykke.Service.PayAPI
                 builder.RegisterModule(new ServiceModule(appSettings, Log));
                 builder.Populate(services);
                 ApplicationContainer = builder.Build();
+
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.AddProfiles(typeof(AutoMapperProfile));
+                    cfg.AddProfiles(typeof(Services.AutoMapperProfile));
+                });
+
+                Mapper.AssertConfigurationIsValid();
 
                 return new AutofacServiceProvider(ApplicationContainer);
             }
@@ -81,18 +102,23 @@ namespace Lykke.Service.PayAPI
 
                 app.UseLykkeMiddleware("PayAPI", ex => new { Message = "Technical problem" });
 
+                app.UseAuthentication();
+
                 app.UseMvc();
+
                 app.UseSwagger(c =>
                 {
                     c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
                 });
+
                 app.UseSwaggerUI(x =>
                 {
                     x.RoutePrefix = "swagger/ui";
                     x.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
                 });
-                app.UseStaticFiles();
 
+                app.UseStaticFiles();
+                
                 appLifetime.ApplicationStarted.Register(() => StartApplication().GetAwaiter().GetResult());
                 appLifetime.ApplicationStopping.Register(() => StopApplication().GetAwaiter().GetResult());
                 appLifetime.ApplicationStopped.Register(() => CleanUp().GetAwaiter().GetResult());
