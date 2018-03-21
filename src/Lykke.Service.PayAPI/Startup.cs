@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Common.ApiLibrary.Middleware;
@@ -11,6 +12,7 @@ using Lykke.Service.PayAPI.Core;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
 using Lykke.Service.PayAPI.Infrastructure.Authentication;
+using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayAPI.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
@@ -71,6 +73,14 @@ namespace Lykke.Service.PayAPI
                 builder.RegisterModule(new ServiceModule(appSettings, Log));
                 builder.Populate(services);
                 ApplicationContainer = builder.Build();
+
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.AddProfiles(typeof(AutoMapperProfile));
+                    cfg.AddProfiles(typeof(Services.AutoMapperProfile));
+                });
+
+                Mapper.AssertConfigurationIsValid();
 
                 return new AutofacServiceProvider(ApplicationContainer);
             }
