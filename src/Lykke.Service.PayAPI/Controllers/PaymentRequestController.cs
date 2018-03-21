@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
@@ -53,11 +54,12 @@ namespace Lykke.Service.PayAPI.Controllers
 
             try
             {
-                var domainRequest = request.ToDomain(MerchantId);
+                var domainRequest =
+                    Mapper.Map<CreatePaymentRequest>(request, opt => opt.Items["MerchantId"] = MerchantId);
 
                 var response = await _paymentRequestService.CreatePaymentRequestAsync(domainRequest);
 
-                return Ok(response.ToApiModel());
+                return Ok(Mapper.Map<CreatePaymentResponseModel>(response));
             }
             catch (Exception ex)
             {
@@ -115,7 +117,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [Route("{paymentRequestId}/refund")]
         [SwaggerOperation("Refund")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(RefundResponseModel), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress)
         {
@@ -128,7 +129,7 @@ namespace Lykke.Service.PayAPI.Controllers
                     DestinationAddress = destinationAddress
                 });
 
-                return Ok(refundResponse.ToApiModel());
+                return Ok(Mapper.Map<RefundResponseModel>(refundResponse));
             }
             catch (Exception ex)
             {
@@ -157,7 +158,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [Route("{paymentRequestId}/callback")]
         [SwaggerOperation("SetCallback")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> SetCallbackUrl(string paymentRequestId, [FromQuery] string callbackUrl)
         {
