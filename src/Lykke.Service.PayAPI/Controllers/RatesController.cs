@@ -45,6 +45,9 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetAssetPairRates(string assetPairId)
         {
+            if (string.IsNullOrWhiteSpace(assetPairId))
+                return BadRequest(ErrorResponse.Create($"{nameof(assetPairId)} has invalid value"));
+
             try
             {
                 AssetPairRate rate = await _ratesService.Get(assetPairId);

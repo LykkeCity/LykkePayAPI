@@ -93,6 +93,10 @@ namespace Lykke.Service.PayAPI.Modules
                 .As<IRatesService>()
                 .SingleInstance();
 
+            builder.RegisterType<HeadersHelper>()
+                .As<IHeadersHelper>()
+                .SingleInstance();
+
             builder.Register(x =>
             {
                 var assetsService = x.Resolve<IComponentContext>().Resolve<IAssetsService>();

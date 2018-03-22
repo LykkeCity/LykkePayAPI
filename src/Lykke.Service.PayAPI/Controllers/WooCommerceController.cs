@@ -1,5 +1,4 @@
-﻿using Common.Log;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using WooCommerceInvoiceModel = Lykke.Service.PayAPI.Models.WooCommerceInvoiceModel;
@@ -18,11 +17,14 @@ namespace Lykke.Service.PayAPI.Controllers
 	[Authorize]
     [SignatureHeaders]
     [Route("api/[controller]")]
-    public class WooCommerceController : BaseController
+    public class WooCommerceController : Controller
     {
         private readonly IReloadingManager<AppSettings> _settings;
         private readonly IPayInvoiceClient _invoicesServiceClient;
-        public WooCommerceController(ILog log, IPayInvoiceClient invoicesServiceClient, IReloadingManager<AppSettings> settings) : base(log)
+
+        public WooCommerceController(
+            IPayInvoiceClient invoicesServiceClient, 
+            IReloadingManager<AppSettings> settings)
         {
             _invoicesServiceClient = invoicesServiceClient;
             _settings = settings;
