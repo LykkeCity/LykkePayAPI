@@ -39,12 +39,14 @@ namespace Lykke.Service.PayAPI.Services
 
         public async Task<SecurityErrorType> VerifyPostRequest(HttpRequest httpRequest)
         {
+            string body = httpRequest.ReadBody();
+
             var verifyRequest = new VerifyRequest
             {
                 ClientId = httpRequest.GetMerchantId(),
                 SystemId = LykkePayConstants.SystemId,
                 Signature = httpRequest.GetMerchantSign(),
-                Text = httpRequest.ReadBody()
+                Text = string.IsNullOrEmpty(body) ? httpRequest.Path.Value : body
             };
 
             return await DoVerifyRequest(verifyRequest);
