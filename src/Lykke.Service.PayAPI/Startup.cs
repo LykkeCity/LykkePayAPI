@@ -59,7 +59,6 @@ namespace Lykke.Service.PayAPI
                     .AddJsonOptions(options =>
                     {
                         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     });
 
                 services.AddApiVersioning(opt =>
