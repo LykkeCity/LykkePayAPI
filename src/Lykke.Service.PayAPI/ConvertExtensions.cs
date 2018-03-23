@@ -27,8 +27,8 @@ namespace Lykke.Service.PayAPI
                                 Address = src.WalletAddress,
                                 OrderId = src.Order?.Id,
                                 PaymentAsset = src.PaymentAssetId,
-                                Amount = src.Order?.PaymentAmount ?? 0,
-                                ExchangeRate = src.Order?.ExchangeRate ?? 0,
+                                Amount = src.Order?.PaymentAmount,
+                                ExchangeRate = src.Order?.ExchangeRate,
                                 Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>).ToList()
                             }
                         };
