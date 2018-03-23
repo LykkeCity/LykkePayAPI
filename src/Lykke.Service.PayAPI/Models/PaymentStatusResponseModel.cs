@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Lykke.Service.PayAPI.Models
 {
@@ -10,18 +11,18 @@ namespace Lykke.Service.PayAPI.Models
 
     public class PaymentResponseModel
     {
-        public string Id { get; set; }
-        public string Address { get; set; }
-        public string OrderId { get; set; }
-        public string PaymentAsset { get; set; }
-        public decimal Amount { get; set; }
-        public decimal ExchangeRate { get; set; }
-        public string Timestamp { get; set; }
-        public string RefundLink { get; set; }
-        public string Error { get; set; }
-        public string Settlement { get; set; }
+        [CanBeNull] public string Id { get; set; }
+        [CanBeNull] public string Address { get; set; }
+        [CanBeNull] public string OrderId { get; set; }
+        [CanBeNull] public string PaymentAsset { get; set; }
+        public decimal? Amount { get; set; }
+        public decimal? ExchangeRate { get; set; }
+        [CanBeNull] public string Timestamp { get; set; }
+        [CanBeNull] public string RefundLink { get; set; }
+        [CanBeNull] public string Error { get; set; }
+        [CanBeNull] public string Settlement { get; set; }
 
-        public IList<PaymentResponseTransactionModel> Transactions { get; set; }
+        [CanBeNull] public IList<PaymentResponseTransactionModel> Transactions { get; set; }
     }
 
     public class PaymentResponseTransactionModel
@@ -31,7 +32,7 @@ namespace Lykke.Service.PayAPI.Models
         public int NumberOfConfirmations { get; set; }
         public string Currency { get; set; }
         public decimal Amount { get; set; }
-        public string Url { get; set; }
-        public string RefundLink { get; set; }
+        [CanBeNull] public string Url { get; set; }
+        [CanBeNull] public string RefundLink { get; set; }
     }
 }
