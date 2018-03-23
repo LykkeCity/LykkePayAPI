@@ -16,5 +16,14 @@ namespace Lykke.Service.PayAPI.Models
         public string Signature { get; set; }
         public string InvoiceId { get; set; }
         public string CallbackUrl { get; set; }
+        public bool IsValid()
+        {
+            return !string.IsNullOrWhiteSpace(InvoiceNumber) &&
+                !string.IsNullOrWhiteSpace(ClientName) &&
+                !string.IsNullOrWhiteSpace(ClientEmail) &&
+                !string.IsNullOrWhiteSpace(Currency) &&
+                !string.IsNullOrWhiteSpace(MerchantId) &&
+                !string.IsNullOrWhiteSpace(CallbackUrl);
+        }
     }
 }
