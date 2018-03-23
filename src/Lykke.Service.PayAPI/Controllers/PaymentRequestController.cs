@@ -21,7 +21,8 @@ namespace Lykke.Service.PayAPI.Controllers
 {
     [Authorize]
     [SignatureHeaders]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class PaymentRequestController : Controller
     {
         private readonly IPaymentRequestService _paymentRequestService;
