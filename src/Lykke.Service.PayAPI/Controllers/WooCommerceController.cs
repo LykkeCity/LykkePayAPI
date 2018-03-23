@@ -37,6 +37,12 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Create(WooCommerceInvoiceModel model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(new ErrorResponse().AddErrors(ModelState));
+
+            if (!model.IsValid())
+                return BadRequest(ErrorResponse.Create($"{nameof(model)} has invalid value"));
+
             var response = new WooCommerceResponse();
             try
             {
@@ -71,6 +77,11 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Status(WooCommerceInvoiceModel model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(new ErrorResponse().AddErrors(ModelState));
+            if (!string.IsNullOrWhiteSpace(model.InvoiceId))
+                return BadRequest(ErrorResponse.Create($"{nameof(model.InvoiceId)} has invalid value"));
+
             var response = new WooCommerceResponse();
             try
             {
