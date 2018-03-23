@@ -10,9 +10,17 @@ namespace Lykke.Service.PayAPI.Models
 
     public class PaymentResponseModel
     {
+        public string Id { get; set; }
+        public string Address { get; set; }
+        public string OrderId { get; set; }
+        public string PaymentAsset { get; set; }
+        public decimal Amount { get; set; }
+        public decimal ExchangeRate { get; set; }
+        public string Timestamp { get; set; }
+        public string RefundLink { get; set; }
         public string Error { get; set; }
-        public string PaymentRequestId { get; set; }
-        public string WalletAddress { get; set; }
+        public string Settlement { get; set; }
+
         public IList<PaymentResponseTransactionModel> Transactions { get; set; }
     }
 
