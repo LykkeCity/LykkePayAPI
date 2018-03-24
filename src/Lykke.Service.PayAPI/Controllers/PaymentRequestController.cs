@@ -21,20 +21,26 @@ namespace Lykke.Service.PayAPI.Controllers
 {
     [Authorize]
     [SignatureHeaders]
-    [Route("api/[controller]")]
-    public class PaymentRequestController : BaseController
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    public class PaymentRequestController : Controller
     {
         private readonly IPaymentRequestService _paymentRequestService;
         private readonly IPayCallbackClient _payCallbackClient;
+        private readonly IHeadersHelper _headersHelper;
+        private readonly ILog _log;
 
         public PaymentRequestController(
             IPaymentRequestService paymentRequestService,
             IPayCallbackClient payCallbackClient,
-            ILog log) : base(log)
+            IHeadersHelper headersHelper,
+            ILog log)
         {
             _paymentRequestService =
                 paymentRequestService ?? throw new ArgumentNullException(nameof(paymentRequestService));
             _payCallbackClient = payCallbackClient ?? throw new ArgumentNullException(nameof(payCallbackClient));
+            _headersHelper = headersHelper ?? throw new ArgumentNullException(nameof(headersHelper));
+            _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
         /// <summary>
@@ -55,7 +61,7 @@ namespace Lykke.Service.PayAPI.Controllers
             try
             {
                 var domainRequest =
-                    Mapper.Map<CreatePaymentRequest>(request, opt => opt.Items["MerchantId"] = MerchantId);
+                    Mapper.Map<CreatePaymentRequest>(request, opt => opt.Items["MerchantId"] = _headersHelper.MerchantId);
 
                 var response = await _paymentRequestService.CreatePaymentRequestAsync(domainRequest);
 
@@ -63,7 +69,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
+                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
                     request.ToJson(), ex);
 
                 if (ex is ApiRequestException apiRequestException)
@@ -85,17 +91,22 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation("GetPaymentRequestStatus")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetPaymentRequestStatus(string paymentRequestId)
         {
+            if (!paymentRequestId.IsValidPaymentRequestId())
+                return BadRequest(ErrorResponse.Create($"{nameof(paymentRequestId)} has invalid value"));
+
             try
             {
-                var paymentRequestDetails = await _paymentRequestService.GetPaymentRequestDetailsAsync(MerchantId, paymentRequestId);
+                var paymentRequestDetails =
+                    await _paymentRequestService.GetPaymentRequestDetailsAsync(_headersHelper.MerchantId, paymentRequestId);
 
                 return Ok(paymentRequestDetails.ToStatusApiModel());
             }
             catch (Exception ex)
             {
-                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentRequestStatus),
+                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentRequestStatus),
                     new {paymentRequestId}.ToJson(), ex);
 
                 if (ex is ApiRequestException apiRequestException)
@@ -118,13 +129,17 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation("Refund")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(RefundResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress)
         {
+            if (!paymentRequestId.IsValidPaymentRequestId())
+                return BadRequest(ErrorResponse.Create($"{nameof(paymentRequestId)} has invalid value"));
+
             try
             {
                 RefundResponse refundResponse = await _paymentRequestService.RefundAsync(new RefundRequest
                 {
-                    MerchantId = MerchantId,
+                    MerchantId = _headersHelper.MerchantId,
                     PaymentRequestId = paymentRequestId,
                     DestinationAddress = destinationAddress
                 });
@@ -133,7 +148,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(Refund), new
+                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(Refund), new
                 {
                     paymentRequestId,
                     destinationAddress
@@ -159,13 +174,20 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation("SetCallback")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> SetCallbackUrl(string paymentRequestId, [FromQuery] string callbackUrl)
         {
+            if (!paymentRequestId.IsValidPaymentRequestId())
+                return BadRequest(ErrorResponse.Create($"{nameof(paymentRequestId)} has invalid value"));
+
+            if(string.IsNullOrWhiteSpace(callbackUrl))
+                return BadRequest(ErrorResponse.Create($"{nameof(callbackUrl)} has invalid value"));
+
             try
             {
                 await _payCallbackClient.SetPaymentCallback(new SetPaymentCallbackModel
                 {
-                    MerchantId = MerchantId,
+                    MerchantId = _headersHelper.MerchantId,
                     PaymentRequestId = paymentRequestId,
                     CallbackUrl = callbackUrl
                 });
@@ -174,7 +196,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await Log.WriteErrorAsync(nameof(PaymentRequestController), nameof(SetCallbackUrl), new
+                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(SetCallbackUrl), new
                 {
                     paymentRequestId,
                     callbackUrl

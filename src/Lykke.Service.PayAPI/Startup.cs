@@ -18,10 +18,13 @@ using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Lykke.Service.PayAPI
 {
@@ -46,15 +49,35 @@ namespace Lykke.Service.PayAPI
         {
             try
             {
+                services.AddMvcCore().AddVersionedApiExplorer(opt =>
+                {
+                    opt.GroupNameFormat = "'v'VVV";
+                    opt.SubstituteApiVersionInUrl = true;
+                });
+
                 services.AddMvc()
                     .AddJsonOptions(options =>
                     {
                         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     });
 
+                services.AddApiVersioning(opt =>
+                {
+                    opt.ReportApiVersions = true;
+                    opt.AssumeDefaultVersionWhenUnspecified = true;
+                    opt.DefaultApiVersion = new ApiVersion(1, 0);
+                });
+
                 services.AddSwaggerGen(options =>
                 {
-                    options.DefaultLykkeConfiguration("v1", "PayAPI");
+                    var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        options.DefaultLykkeConfiguration(description.GroupName, "PayAPI");
+                    }
+
+                    options.OperationFilter<SwaggerDefaultValues>();
                     options.OperationFilter<HeaderAccessOperationFilter>();
                 });
 
@@ -92,7 +115,7 @@ namespace Lykke.Service.PayAPI
             }
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime, IApiVersionDescriptionProvider provider)
         {
             try
             {
@@ -112,14 +135,19 @@ namespace Lykke.Service.PayAPI
                     c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
                 });
 
-                app.UseSwaggerUI(x =>
-                {
-                    x.RoutePrefix = "swagger/ui";
-                    x.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-                });
+                app.UseSwaggerUI(
+                    options =>
+                    {
+                        foreach (var description in provider.ApiVersionDescriptions)
+                        {
+                            options.RoutePrefix = "swagger/ui";
+                            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                                description.GroupName.ToUpperInvariant());
+                        }
+                    });
 
                 app.UseStaticFiles();
-                
+
                 appLifetime.ApplicationStarted.Register(() => StartApplication().GetAwaiter().GetResult());
                 appLifetime.ApplicationStopping.Register(() => StopApplication().GetAwaiter().GetResult());
                 appLifetime.ApplicationStopped.Register(() => CleanUp().GetAwaiter().GetResult());
