@@ -12,10 +12,13 @@ using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayCallback.Client.Models;
+using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client.Apigen.Attributes;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using CreatePaymentRequestModel = Lykke.Service.PayAPI.Models.CreatePaymentRequestModel;
+using RefundResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundResponse;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -46,7 +49,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation("CreatePaymentRequest")]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(CreatePaymentResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> CreatePaymentRequest([FromBody] CreatePaymentRequestModel request)
         {
             if (!ModelState.IsValid)
@@ -57,9 +60,13 @@ namespace Lykke.Service.PayAPI.Controllers
                 var domainRequest =
                     Mapper.Map<CreatePaymentRequest>(request, opt => opt.Items["MerchantId"] = MerchantId);
 
-                var response = await _paymentRequestService.CreatePaymentRequestAsync(domainRequest);
+                CreatePaymentResponse createResponse =
+                    await _paymentRequestService.CreatePaymentRequestAsync(domainRequest);
 
-                return Ok(Mapper.Map<CreatePaymentResponseModel>(response));
+                PaymentRequestDetailsModel paymentRequestDetails =
+                    await _paymentRequestService.GetPaymentRequestDetailsAsync(MerchantId, createResponse.Id);
+
+                return Ok(paymentRequestDetails.ToStatusApiModel());
             }
             catch (Exception ex)
             {
@@ -117,7 +124,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [Route("{paymentRequestId}/refund")]
         [SwaggerOperation("Refund")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(RefundResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress)
         {
             try
@@ -129,7 +136,10 @@ namespace Lykke.Service.PayAPI.Controllers
                     DestinationAddress = destinationAddress
                 });
 
-                return Ok(Mapper.Map<RefundResponseModel>(refundResponse));
+                PaymentRequestDetailsModel paymentRequestDetails =
+                    await _paymentRequestService.GetPaymentRequestDetailsAsync(MerchantId, refundResponse.PaymentRequestId);
+
+                return Ok(paymentRequestDetails.ToStatusApiModel());
             }
             catch (Exception ex)
             {

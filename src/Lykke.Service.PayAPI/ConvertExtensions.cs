@@ -11,143 +11,93 @@ namespace Lykke.Service.PayAPI
     {
         public static PaymentStatusResponseModel ToStatusApiModel(this PaymentRequestDetailsModel src)
         {
-            PaymentStatusResponseModel apiResponse;
+            PaymentStatusResponseModel response = new PaymentStatusResponseModel
+            {
+                Id = src.Id,
+                PaymentAsset = src.PaymentAssetId,
+                SettlementAsset = src.SettlementAssetId,
+                OrderId = src.OrderId,
+                PaymentRequest = new PaymentRequestResponseModel
+                {
+                    Amount = src.Order?.PaymentAmount,
+                    Address = src.WalletAddress,
+                    CreatedAt = src.Timestamp.ToIsoDateTime(),
+                    ExchangeRate = src.Order?.ExchangeRate,
+                    ExpirationDt = src.DueDate.ToIsoDateTime(),
+                    Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>).ToList()
+                }
+            };
 
             switch (src.Status)
             {
-                    case PaymentRequestStatus.New:
+                case PaymentRequestStatus.New:
 
-                        apiResponse = new PaymentStatusResponseModel
-                        {
-                            PaymentStatus = "PAYMENT_REQUEST_CREATED",
-                            PaymentResponse = new PaymentResponseModel
-                            {
-                                Id = src.Id,
-                                Timestamp = src.Timestamp.ToIsoDateTime(), 
-                                Address = src.WalletAddress,
-                                OrderId = src.Order?.Id,
-                                PaymentAsset = src.PaymentAssetId,
-                                Amount = src.Order?.PaymentAmount,
-                                ExchangeRate = src.Order?.ExchangeRate,
-                                Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>).ToList()
-                            }
-                        };
-
-                        break;
-                    case PaymentRequestStatus.Confirmed:
-
-                        apiResponse = new PaymentStatusResponseModel
-                        {
-                            PaymentStatus = "PAYMENT_CONFIRMED",
-                            PaymentResponse = new PaymentResponseModel
-                            {
-                                PaymentAsset = src.PaymentAssetId,
-                                Timestamp = src.Timestamp.ToIsoDateTime(),
-                                Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>)
-                                    .ToList()
-                            }
-                        };
-
-                        break;
-                    case PaymentRequestStatus.InProcess:
-
-                        apiResponse = new PaymentStatusResponseModel
-                        {
-                            PaymentStatus = "PAYMENT_INPROGRESS",
-                            PaymentResponse = new PaymentResponseModel
-                            {
-                                PaymentAsset = src.PaymentAssetId,
-                                Timestamp = src.Timestamp.ToIsoDateTime(),
-                                Settlement = "TRANSACTION_DETECTED",
-                                Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>)
-                                    .ToList()
-                            }
-                        };
+                    response.PaymentStatus = "PAYMENT_REQUEST_CREATED";
 
                     break;
-                    case PaymentRequestStatus.Error:
-                        var apiStatus = "PAYMENT_ERROR";
+                case PaymentRequestStatus.Confirmed:
 
-                        if (src.Error.Equals("NOT DETECTED"))
-                        {
-                            apiResponse = new PaymentStatusResponseModel
-                            {
-                                PaymentStatus = apiStatus,
-                                PaymentResponse = new PaymentResponseModel
-                                {
-                                    Error = "TRANSACTION_NOT_DETECTED"
-                                }
-                            };
-                        } else if (src.Error.Equals("NOT CONFIRMED"))
-                        {
-                            apiResponse = new PaymentStatusResponseModel
-                            {
-                                PaymentStatus = apiStatus,
-                                PaymentResponse = new PaymentResponseModel
-                                {
-                                    Error = "TRANSACTION_NOT_CONFIRMED"
-                                }
-                            };
-                        } else if (src.Error.Equals("AMOUNT BELOW"))
-                        {
-                            apiResponse = new PaymentStatusResponseModel
-                            {
-                                PaymentStatus = apiStatus,
-                                PaymentResponse = new PaymentResponseModel
-                                {
-                                    Error = "AMOUNT_BELOW",
-                                    PaymentAsset = src.PaymentAssetId,
-                                    Timestamp = src.Timestamp.ToIsoDateTime(),
-                                    RefundLink =
-                                        src.Transactions.OrderByDescending(x => x.FirstSeen).FirstOrDefault()
-                                            ?.RefundLink,
-                                    Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>)
-                                        .ToList()
-                                }
-                            };
-                        } else if (src.Error.Equals("AMOUNT ABOVE"))
-                        {
-                            apiResponse = new PaymentStatusResponseModel
-                            {
-                                PaymentStatus = apiStatus,
-                                PaymentResponse = new PaymentResponseModel
-                                {
-                                    Error = "AMOUNT_ABOVE",
-                                    PaymentAsset = src.PaymentAssetId,
-                                    Timestamp = src.Timestamp.ToIsoDateTime(),
-                                    RefundLink =
-                                        src.Transactions.OrderByDescending(x => x.FirstSeen).FirstOrDefault()
-                                            ?.RefundLink,
-                                    Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>)
-                                        .ToList()
-                                }
-                            };
-                        } else if (src.Error.Equals("EXPIRED"))
-                        {
-                            apiResponse = new PaymentStatusResponseModel
-                            {
-                                PaymentStatus = apiStatus,
-                                PaymentResponse = new PaymentResponseModel
-                                {
-                                    Error = "PAYMENT_EXPIRED",
-                                    PaymentAsset = src.PaymentAssetId,
-                                    Timestamp = src.Timestamp.ToIsoDateTime(),
-                                    RefundLink =
-                                        src.Transactions.OrderByDescending(x => x.FirstSeen).FirstOrDefault()
-                                            ?.RefundLink,
-                                    Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>)
-                                        .ToList()
-                                }
-                            };
-                        }
-                        else throw new Exception("Unknown payment request error description");
+                    response.PaymentStatus = "PAYMENT_CONFIRMED";
 
-                        break;
-                    default:
-                        throw new Exception("Unknown payment request status");
+                    break;
+                case PaymentRequestStatus.InProcess:
+
+                    response.PaymentStatus = "PAYMENT_INPROGRESS";
+
+                    break;
+                case PaymentRequestStatus.Error:
+
+                    response.PaymentStatus = "PAYMENT_ERROR";
+
+                    if (src.Error.Equals("NOT DETECTED"))
+                    {
+                        response.PaymentRequest.Error = "TRANSACTION_NOT_DETECTED";
+                    }
+                    else if (src.Error.Equals("NOT CONFIRMED"))
+                    {
+                        response.PaymentRequest.Error = "TRANSACTION_NOT_CONFIRMED";
+                    }
+                    else if (src.Error.Equals("AMOUNT BELOW"))
+                    {
+                        response.PaymentRequest.Error = "AMOUNT_BELOW";
+                    }
+                    else if (src.Error.Equals("AMOUNT ABOVE"))
+                    {
+                        response.PaymentRequest.Error = "AMOUNT_ABOVE";
+                    }
+                    else if (src.Error.Equals("EXPIRED"))
+                    {
+                        response.PaymentRequest.Error = "PAYMENT_EXPIRED";
+                    } 
+                    else if (src.Error.Equals("REFUND NOT CONFIRMED"))
+                    {
+                        response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
+
+                        if (response.RefundRequest != null)
+                            response.RefundRequest.Error = "TRANSACTION_NOT_CONFIRMED";
+                    }
+                    else throw new Exception("Unknown payment request error description");
+
+                    break;
+                case PaymentRequestStatus.RefundInProgress:
+
+                    response.PaymentStatus = "REFUND_INPROGRESS";
+
+                    response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
+
+                    break;
+                case PaymentRequestStatus.Refunded:
+
+                    response.PaymentStatus = "REFUND_CONFIRMED";
+
+                    response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
+
+                    break;
+                default:
+                    throw new Exception("Unknown payment request status");
             }
 
-            return apiResponse;
+            return response;
         }
     }
 }
