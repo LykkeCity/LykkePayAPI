@@ -1,5 +1,4 @@
-﻿using Common.Log;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using WooCommerceInvoiceModel = Lykke.Service.PayAPI.Models.WooCommerceInvoiceModel;
@@ -17,12 +16,16 @@ namespace Lykke.Service.PayAPI.Controllers
 {
     [Authorize]
     [SignatureHeaders]
-    [Route("api/[controller]")]
-    public class WooCommerceController : BaseController
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    public class WooCommerceController : Controller
     {
         private readonly IReloadingManager<AppSettings> _settings;
         private readonly IPayInvoiceClient _invoicesServiceClient;
-        public WooCommerceController(ILog log, IPayInvoiceClient invoicesServiceClient, IReloadingManager<AppSettings> settings) : base(log)
+
+        public WooCommerceController(
+            IPayInvoiceClient invoicesServiceClient, 
+            IReloadingManager<AppSettings> settings)
         {
             _invoicesServiceClient = invoicesServiceClient;
             _settings = settings;
@@ -35,6 +38,12 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Create(WooCommerceInvoiceModel model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(new ErrorResponse().AddErrors(ModelState));
+
+            if (!model.IsValid())
+                return BadRequest(ErrorResponse.Create($"{nameof(model)} has invalid value"));
+
             var response = new WooCommerceResponse();
             try
             {
@@ -69,6 +78,11 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Status(WooCommerceInvoiceModel model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(new ErrorResponse().AddErrors(ModelState));
+            if (!string.IsNullOrWhiteSpace(model.InvoiceId))
+                return BadRequest(ErrorResponse.Create($"{nameof(model.InvoiceId)} has invalid value"));
+
             var response = new WooCommerceResponse();
             try
             {

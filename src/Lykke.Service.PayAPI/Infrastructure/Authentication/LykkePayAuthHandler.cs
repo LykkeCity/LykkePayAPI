@@ -21,11 +21,14 @@ namespace Lykke.Service.PayAPI.Infrastructure.Authentication
         private readonly ISignatureVerificationService _signatureVerificationService;
         private readonly ILog _log;
 
-        public LykkePayAuthHandler(IOptionsMonitor<LykkePayAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock, IHttpContextAccessor httpContextAccessor,
+        public LykkePayAuthHandler(
+            IOptionsMonitor<LykkePayAuthOptions> options,
+            ILoggerFactory logger,
+            UrlEncoder encoder,
+            ISystemClock clock,
+            IHttpContextAccessor httpContextAccessor,
             ISignatureVerificationService signatureVerificationService,
-            ILog log) : base(options, logger,
-            encoder, clock)
+            ILog log) : base(options, logger, encoder, clock)
         {
             _httpContext = httpContextAccessor.HttpContext;
             _signatureVerificationService = signatureVerificationService ??
