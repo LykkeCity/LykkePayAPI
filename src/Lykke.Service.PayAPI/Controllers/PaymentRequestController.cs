@@ -218,7 +218,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpGet]
         [Route("{paymentRequestId}/callback")]
         [SwaggerOperation("GetCallback")]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(GetPaymentCallbackResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetCallbackUrl(string paymentRequestId)
@@ -239,7 +239,7 @@ namespace Lykke.Service.PayAPI.Controllers
                     new {paymentRequestId}.ToJson(), ex);
             }
 
-            return StatusCode((int) HttpStatusCode.InternalServerError);
+            return NotFound();
         }
     }
 }
