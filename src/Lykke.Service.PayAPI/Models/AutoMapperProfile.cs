@@ -29,10 +29,19 @@ namespace Lykke.Service.PayAPI.Models
 
             CreateMap<RefundResponse, RefundResponseModel>();
 
-            CreateMap<PaymentRequestTransactionModel, PaymentResponseTransactionModel>()
+            CreateMap<PaymentRequestTransactionModel, PaymentResponseTransactionModel>(MemberList.Destination)
                 .ForMember(dest => dest.Timestamp, opt => opt.ResolveUsing(src => src.FirstSeen.ToIsoDateTime()))
-                .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.AssetId))
-                .ForMember(dest => dest.NumberOfConfirmations, opt => opt.MapFrom(src => src.Confirmations));
+                .ForMember(dest => dest.NumberOfConfirmations, opt => opt.MapFrom(src => src.Confirmations))
+                .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<PaymentRequestRefundTransactionModel, RefundResponseTransactionModel>(MemberList.Destination)
+                .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Timestamp.ToIsoDateTime()))
+                .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.Hash));
+
+            CreateMap<PaymentRequestRefundModel, RefundRequestResponseModel>(MemberList.Destination)
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.Timestamp.ToIsoDateTime()))
+                .ForMember(dest => dest.ExpirationDt, opt => opt.MapFrom(src => src.DueDate.ToIsoDateTime()))
+                .ForMember(dest => dest.Error, opt => opt.Ignore());
         }
     }
 }
