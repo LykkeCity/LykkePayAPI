@@ -214,5 +214,32 @@ namespace Lykke.Service.PayAPI.Controllers
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
         }
+
+        [HttpGet]
+        [Route("{paymentRequestId}/callback")]
+        [SwaggerOperation("GetCallback")]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(GetPaymentCallbackResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetCallbackUrl(string paymentRequestId)
+        {
+            if (!paymentRequestId.IsValidPaymentRequestId())
+                return BadRequest(ErrorResponse.Create($"{nameof(paymentRequestId)} has invalid value"));
+
+            try
+            {
+                GetPaymentCallbackModel callbackInfo =
+                    await _payCallbackClient.GetPaymentCallback(_headersHelper.MerchantId, paymentRequestId);
+
+                return Ok(Mapper.Map<GetPaymentCallbackResponseModel>(callbackInfo));
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetCallbackUrl),
+                    new {paymentRequestId}.ToJson(), ex);
+            }
+
+            return StatusCode((int) HttpStatusCode.InternalServerError);
+        }
     }
 }

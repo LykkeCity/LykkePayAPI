@@ -2,6 +2,7 @@
 using Common;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
+using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using RefundResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundResponse;
 using RefundTransactionResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundTransactionResponse;
@@ -42,6 +43,9 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.Timestamp.ToIsoDateTime()))
                 .ForMember(dest => dest.ExpirationDt, opt => opt.MapFrom(src => src.DueDate.ToIsoDateTime()))
                 .ForMember(dest => dest.Error, opt => opt.Ignore());
+
+            CreateMap<GetPaymentCallbackModel, GetPaymentCallbackResponseModel>(MemberList.Destination)
+                .ForMember(dest => dest.CallbackUrl, opt => opt.MapFrom(src => src.Url));
         }
     }
 }
