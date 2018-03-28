@@ -24,7 +24,7 @@ namespace Lykke.Service.PayAPI
                     CreatedAt = src.Timestamp.ToIsoDateTime(),
                     ExchangeRate = src.Order?.ExchangeRate,
                     ExpirationDt = src.DueDate.ToIsoDateTime(),
-                    Transactions = src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>).ToList()
+                    Transactions = src.Transactions.Any() ? src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>).ToList() : null
                 }
             };
 
