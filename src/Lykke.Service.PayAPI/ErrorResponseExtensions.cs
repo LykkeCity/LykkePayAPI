@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -31,9 +32,14 @@ namespace Lykke.Service.PayAPI
 
         public static ObjectResult GenerateErrorResponse(this ApiRequestException src)
         {
-            var message = $"{src.Message}. Application status code: {src.AppStatusCode ?? "no information"}";
+            string appStatusCode = string.Empty;
 
-            return src.HttpStatusCode == null
+            if (!string.IsNullOrEmpty(src.AppStatusCode))
+                appStatusCode = $"App status code: {src.AppStatusCode}";
+
+            var message = $"{src.Message} {appStatusCode}";
+
+            return src.HttpStatusCode == null || src.HttpStatusCode == HttpStatusCode.BadRequest
                 ? new BadRequestObjectResult(ErrorResponse.Create(message))
                 : new ObjectResult(ErrorResponse.Create(message)) {StatusCode = (int) src.HttpStatusCode};
         }
