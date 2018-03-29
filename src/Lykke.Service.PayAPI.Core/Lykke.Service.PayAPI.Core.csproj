@@ -14,7 +14,7 @@
     <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.0.20" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.12" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.5" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.54" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="1.0.56" />
     <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="2.0.0" />
     <PackageReference Include="Lykke.SettingsReader" Version="1.1.4" />
   </ItemGroup>
