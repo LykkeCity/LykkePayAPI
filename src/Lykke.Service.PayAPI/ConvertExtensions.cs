@@ -4,6 +4,9 @@ using AutoMapper;
 using Common;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
+using Lykke.Service.PayInternal.Contract.PaymentRequest;
+using PaymentRequestErrorType = Lykke.Service.PayInternal.Client.Models.PaymentRequest.PaymentRequestErrorType;
+using PaymentRequestStatus = Lykke.Service.PayInternal.Client.Models.PaymentRequest.PaymentRequestStatus;
 
 namespace Lykke.Service.PayAPI
 {
@@ -32,38 +35,38 @@ namespace Lykke.Service.PayAPI
             {
                 case PaymentRequestStatus.New:
 
-                    response.PaymentStatus = "PAYMENT_REQUEST_CREATED";
+                    response.PaymentStatus = PaymentRequestPublicStatuses.PaymentRequestCreated;
 
                     break;
                 case PaymentRequestStatus.Confirmed:
 
-                    response.PaymentStatus = "PAYMENT_CONFIRMED";
+                    response.PaymentStatus = PaymentRequestPublicStatuses.PaymentConfirmed;
 
                     break;
                 case PaymentRequestStatus.InProcess:
 
-                    response.PaymentStatus = "PAYMENT_INPROGRESS";
+                    response.PaymentStatus = PaymentRequestPublicStatuses.PaymentInProgress;
 
                     break;
                 case PaymentRequestStatus.Error:
 
-                    response.PaymentStatus = "PAYMENT_ERROR";
+                    response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
 
                     switch (src.Error)
                     {
                         case PaymentRequestErrorType.PaymentAmountAbove:
 
-                            response.PaymentRequest.Error = "AMOUNT_ABOVE";
+                            response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentAmountAbove;
 
                             break;
                         case PaymentRequestErrorType.PaymentAmountBelow:
 
-                            response.PaymentRequest.Error = "AMOUNT_BELOW";
+                            response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentAmountBelow;
 
                             break;
                         case PaymentRequestErrorType.PaymentExpired:
 
-                            response.PaymentRequest.Error = "PAYMENT_EXPIRED";
+                            response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentExpired;
 
                             break;
                         case PaymentRequestErrorType.RefundNotConfirmed:
@@ -71,7 +74,7 @@ namespace Lykke.Service.PayAPI
                             response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
 
                             if (response.RefundRequest != null)
-                                response.RefundRequest.Error = "TRANSACTION_NOT_CONFIRMED";
+                                response.RefundRequest.Error = PaymentRequestErrorPublicCodes.TransactionNotConfirmed;
 
                             break;
                         default:
@@ -81,14 +84,14 @@ namespace Lykke.Service.PayAPI
                     break;
                 case PaymentRequestStatus.RefundInProgress:
 
-                    response.PaymentStatus = "REFUND_INPROGRESS";
+                    response.PaymentStatus = PaymentRequestPublicStatuses.RefundInProgress;
 
                     response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
 
                     break;
                 case PaymentRequestStatus.Refunded:
 
-                    response.PaymentStatus = "REFUND_CONFIRMED";
+                    response.PaymentStatus = PaymentRequestPublicStatuses.RefundConfirmed;
 
                     response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
 
