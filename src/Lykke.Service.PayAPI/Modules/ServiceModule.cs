@@ -14,8 +14,8 @@ using Lykke.Service.PayInternal.Client;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 using Lykke.Service.PayAuth.Client;
-using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayInvoice.Client;
+using Lykke.Service.PayCallback.Client;
 
 namespace Lykke.Service.PayAPI.Modules
 {
@@ -38,7 +38,9 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterInstance(_log)
                 .As<ILog>()
                 .SingleInstance();
-
+            builder.RegisterInstance(_settings)
+                .As<IReloadingManager<AppSettings>>()
+                .SingleInstance();
             builder.RegisterInstance(_settings)
                 .As<IReloadingManager<AppSettings>>()
                 .SingleInstance();
@@ -103,7 +105,6 @@ namespace Lykke.Service.PayAPI.Modules
                     async () => (await assetsService.AssetPairGetAllAsync()).ToDictionary(itm => itm.Id)
                 );
             });
-
             builder.Populate(_services);
         }
     }

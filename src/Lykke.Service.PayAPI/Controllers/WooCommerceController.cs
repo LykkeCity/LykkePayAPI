@@ -5,16 +5,16 @@ using WooCommerceInvoiceModel = Lykke.Service.PayAPI.Models.WooCommerceInvoiceMo
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Lykke.Service.PayAPI.Models;
 using System.Net;
-using Lykke.Common.Api.Contract.Responses;
-using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.SettingsReader;
 using Lykke.Service.PayAPI.Core.Settings;
+using Lykke.Service.PayAPI.Attributes;
+using Lykke.Common.Api.Contract.Responses;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
-    [Authorize]
+	[Authorize]
     [SignatureHeaders]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
