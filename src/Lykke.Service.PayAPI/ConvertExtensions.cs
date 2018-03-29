@@ -49,34 +49,34 @@ namespace Lykke.Service.PayAPI
 
                     response.PaymentStatus = "PAYMENT_ERROR";
 
-                    if (src.Error.Equals("NOT DETECTED"))
+                    switch (src.Error)
                     {
-                        response.PaymentRequest.Error = "TRANSACTION_NOT_DETECTED";
-                    }
-                    else if (src.Error.Equals("NOT CONFIRMED"))
-                    {
-                        response.PaymentRequest.Error = "TRANSACTION_NOT_CONFIRMED";
-                    }
-                    else if (src.Error.Equals("AMOUNT BELOW"))
-                    {
-                        response.PaymentRequest.Error = "AMOUNT_BELOW";
-                    }
-                    else if (src.Error.Equals("AMOUNT ABOVE"))
-                    {
-                        response.PaymentRequest.Error = "AMOUNT_ABOVE";
-                    }
-                    else if (src.Error.Equals("EXPIRED"))
-                    {
-                        response.PaymentRequest.Error = "PAYMENT_EXPIRED";
-                    } 
-                    else if (src.Error.Equals("REFUND NOT CONFIRMED"))
-                    {
-                        response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
+                        case PaymentRequestErrorType.PaymentAmountAbove:
 
-                        if (response.RefundRequest != null)
-                            response.RefundRequest.Error = "TRANSACTION_NOT_CONFIRMED";
+                            response.PaymentRequest.Error = "AMOUNT_ABOVE";
+
+                            break;
+                        case PaymentRequestErrorType.PaymentAmountBelow:
+
+                            response.PaymentRequest.Error = "AMOUNT_BELOW";
+
+                            break;
+                        case PaymentRequestErrorType.PaymentExpired:
+
+                            response.PaymentRequest.Error = "PAYMENT_EXPIRED";
+
+                            break;
+                        case PaymentRequestErrorType.RefundNotConfirmed:
+
+                            response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
+
+                            if (response.RefundRequest != null)
+                                response.RefundRequest.Error = "TRANSACTION_NOT_CONFIRMED";
+
+                            break;
+                        default:
+                            throw new Exception("Unknown payment request error type");
                     }
-                    else throw new Exception("Unknown payment request error description");
 
                     break;
                 case PaymentRequestStatus.RefundInProgress:
