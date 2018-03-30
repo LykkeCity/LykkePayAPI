@@ -41,8 +41,7 @@ namespace Lykke.Service.PayAPI.Models
 
             CreateMap<PaymentRequestRefundModel, RefundRequestResponseModel>(MemberList.Destination)
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.Timestamp.ToIsoDateTime()))
-                .ForMember(dest => dest.ExpirationDt, opt => opt.MapFrom(src => src.DueDate.ToIsoDateTime()))
-                .ForMember(dest => dest.Error, opt => opt.Ignore());
+                .ForMember(dest => dest.ExpirationDt, opt => opt.MapFrom(src => src.DueDate.ToIsoDateTime()));
 
             CreateMap<GetPaymentCallbackModel, GetPaymentCallbackResponseModel>(MemberList.Destination)
                 .ForMember(dest => dest.CallbackUrl, opt => opt.MapFrom(src => src.Url));

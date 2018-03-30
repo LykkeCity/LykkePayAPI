@@ -22,9 +22,6 @@ namespace Lykke.Service.PayAPI.Models
         public string ExpirationDt { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        [CanBeNull] public string Error { get; set; }
-
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         [CanBeNull] public IList<PaymentResponseTransactionModel> Transactions { get; set; }
     }
 }

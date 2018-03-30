@@ -63,13 +63,15 @@ namespace Lykke.Service.PayAPI.Controllers
             try
             {
                 var domainRequest =
-                    Mapper.Map<CreatePaymentRequest>(request, opt => opt.Items["MerchantId"] = _headersHelper.MerchantId);
+                    Mapper.Map<CreatePaymentRequest>(request,
+                        opt => opt.Items["MerchantId"] = _headersHelper.MerchantId);
 
                 CreatePaymentResponse createResponse =
                     await _paymentRequestService.CreatePaymentRequestAsync(domainRequest);
 
                 PaymentRequestDetailsModel paymentRequestDetails =
-                    await _paymentRequestService.GetPaymentRequestDetailsAsync(_headersHelper.MerchantId, createResponse.Id);
+                    await _paymentRequestService.GetPaymentRequestDetailsAsync(_headersHelper.MerchantId,
+                        createResponse.Id);
 
                 return Ok(paymentRequestDetails.ToStatusApiModel());
             }
