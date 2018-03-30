@@ -42,7 +42,7 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterInstance(_settings)
                 .As<IReloadingManager<AppSettings>>()
                 .SingleInstance();
-
+                
             builder.RegisterType<HealthService>()
                 .As<IHealthService>()
                 .SingleInstance();
@@ -103,7 +103,6 @@ namespace Lykke.Service.PayAPI.Modules
                     async () => (await assetsService.AssetPairGetAllAsync()).ToDictionary(itm => itm.Id)
                 );
             });
-
             builder.Populate(_services);
         }
     }

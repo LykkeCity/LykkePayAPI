@@ -5,6 +5,9 @@ using WooCommerceInvoiceModel = Lykke.Service.PayAPI.Models.WooCommerceInvoiceMo
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Lykke.Service.PayAPI.Models;
 using System.Net;
+using Lykke.Service.PayInvoice.Client;
+using Lykke.SettingsReader;
+using Lykke.Service.PayAPI.Core.Settings;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayInvoice.Client;
@@ -69,8 +72,6 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             return new JsonResult(response);
         }
-
-        
         [HttpPost("Status")]
         [SwaggerOperation("Status")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
