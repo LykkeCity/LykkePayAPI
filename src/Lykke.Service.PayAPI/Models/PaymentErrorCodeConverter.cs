@@ -23,6 +23,12 @@ namespace Lykke.Service.PayAPI.Models
                 case PaymentErrorType.RefundIsNotAvailable:
                     writer.WriteValue("REFUND_IS_NOT_AVAILABLE");
                     break;
+                case PaymentErrorType.InvalidSettlementAsset:
+                    writer.WriteValue("INVALID_SETTLEMENTASSET");
+                    break;
+                case PaymentErrorType.InvalidCallbackUrl:
+                    writer.WriteValue("INVALID_CALLBACKURL");
+                    break;
                 default:
                     throw new Exception("Unexpected payment error type");
             }

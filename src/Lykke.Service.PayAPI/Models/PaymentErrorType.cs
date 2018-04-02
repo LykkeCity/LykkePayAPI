@@ -8,6 +8,10 @@
 
         NoPaymentTransactions,
 
-        RefundIsNotAvailable
+        RefundIsNotAvailable,
+
+        InvalidSettlementAsset,
+
+        InvalidCallbackUrl
     }
 }

@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common;
 using Common.Log;
-using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
-using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayCallback.Client;
@@ -23,7 +21,7 @@ namespace Lykke.Service.PayAPI.Controllers
     [Authorize]
     [SignatureHeaders]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/paymentRequest")]
     public class PaymentRequestController : Controller
     {
         private readonly IPaymentRequestService _paymentRequestService;
@@ -51,13 +49,13 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [SwaggerOperation("CreatePaymentRequest")]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreatePaymentRequest([FromBody] CreatePaymentRequestModel request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new ErrorResponse().AddErrors(ModelState));
+            if (string.IsNullOrWhiteSpace(request.SettlementAsset))
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidSettlementAsset));
 
             try
             {
@@ -78,11 +76,6 @@ namespace Lykke.Service.PayAPI.Controllers
             {
                 await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
                     request.ToJson(), ex);
-
-                if (ex is ApiRequestException apiRequestException)
-                {
-                    return apiRequestException.GenerateErrorResponse();
-                }
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -96,18 +89,20 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpGet]
         [Route("{paymentRequestId}/status")]
         [SwaggerOperation("GetPaymentRequestStatus")]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPaymentRequestStatus(string paymentRequestId)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
-                return BadRequest(ErrorResponse.Create($"{nameof(paymentRequestId)} has invalid value"));
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidPaymentId));
 
             try
             {
                 var paymentRequestDetails =
-                    await _paymentRequestService.GetPaymentRequestDetailsAsync(_headersHelper.MerchantId, paymentRequestId);
+                    await _paymentRequestService.GetPaymentRequestDetailsAsync(_headersHelper.MerchantId,
+                        paymentRequestId);
 
                 return Ok(paymentRequestDetails.ToStatusApiModel());
             }
@@ -115,11 +110,6 @@ namespace Lykke.Service.PayAPI.Controllers
             {
                 await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentRequestStatus),
                     new {paymentRequestId}.ToJson(), ex);
-
-                if (ex is ApiRequestException apiRequestException)
-                {
-                    return apiRequestException.GenerateErrorResponse();
-                }
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -179,16 +169,17 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpPost]
         [Route("{paymentRequestId}/callback")]
         [SwaggerOperation("SetCallback")]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> SetCallbackUrl(string paymentRequestId, [FromQuery] string callbackUrl)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
-                return BadRequest(ErrorResponse.Create($"{nameof(paymentRequestId)} has invalid value"));
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidPaymentId));
 
-            if(string.IsNullOrWhiteSpace(callbackUrl))
-                return BadRequest(ErrorResponse.Create($"{nameof(callbackUrl)} has invalid value"));
+            if (string.IsNullOrWhiteSpace(callbackUrl))
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidCallbackUrl));
 
             try
             {
@@ -216,13 +207,13 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpGet]
         [Route("{paymentRequestId}/callback")]
         [SwaggerOperation("GetCallback")]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(GetPaymentCallbackResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetCallbackUrl(string paymentRequestId)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
-                return BadRequest(ErrorResponse.Create($"{nameof(paymentRequestId)} has invalid value"));
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidPaymentId));
 
             try
             {
@@ -237,7 +228,7 @@ namespace Lykke.Service.PayAPI.Controllers
                     new {paymentRequestId}.ToJson(), ex);
             }
 
-            return NotFound();
+            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
     }
 }
