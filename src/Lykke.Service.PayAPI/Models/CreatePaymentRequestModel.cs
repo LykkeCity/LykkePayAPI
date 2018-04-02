@@ -4,10 +4,8 @@ namespace Lykke.Service.PayAPI.Models
 {
     public class CreatePaymentRequestModel
     {
-        [Required]
         public string SettlementAsset { get; set; }
 
-        [Required]
         public decimal Amount { get; set; }
 
         public string PaymentAsset { get; set; }
