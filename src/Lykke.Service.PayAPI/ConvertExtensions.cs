@@ -3,9 +3,10 @@ using System.Linq;
 using AutoMapper;
 using Common;
 using Lykke.Service.PayAPI.Models;
+using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using Lykke.Service.PayInternal.Contract.PaymentRequest;
-using PaymentRequestErrorType = Lykke.Service.PayInternal.Client.Models.PaymentRequest.PaymentRequestErrorType;
+using PaymentRequestProcessingError = Lykke.Service.PayInternal.Client.Models.PaymentRequest.PaymentRequestProcessingError;
 using PaymentRequestStatus = Lykke.Service.PayInternal.Client.Models.PaymentRequest.PaymentRequestStatus;
 
 namespace Lykke.Service.PayAPI
@@ -50,30 +51,30 @@ namespace Lykke.Service.PayAPI
                     break;
                 case PaymentRequestStatus.Error:
 
-                    switch (src.Error)
+                    switch (src.ProcessingError)
                     {
-                        case PaymentRequestErrorType.PaymentAmountAbove:
+                        case PaymentRequestProcessingError.PaymentAmountAbove:
 
                             response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
 
                             response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentAmountAbove;
 
                             break;
-                        case PaymentRequestErrorType.PaymentAmountBelow:
+                        case PaymentRequestProcessingError.PaymentAmountBelow:
 
                             response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
 
                             response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentAmountBelow;
 
                             break;
-                        case PaymentRequestErrorType.PaymentExpired:
+                        case PaymentRequestProcessingError.PaymentExpired:
 
                             response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
 
                             response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentExpired;
 
                             break;
-                        case PaymentRequestErrorType.RefundNotConfirmed:
+                        case PaymentRequestProcessingError.RefundNotConfirmed:
 
                             response.PaymentStatus = PaymentRequestPublicStatuses.RefundError;
 
@@ -81,6 +82,21 @@ namespace Lykke.Service.PayAPI
 
                             if (response.RefundRequest != null)
                                 response.RefundRequest.Error = PaymentRequestErrorPublicCodes.TransactionNotConfirmed;
+
+                            break;
+                        case PaymentRequestProcessingError.UnknownPayment:
+
+                            response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
+
+                            break;
+                        case PaymentRequestProcessingError.UnknownRefund:
+
+                            response.PaymentStatus = PaymentRequestPublicStatuses.RefundError;
+
+                            response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
+
+                            if (response.RefundRequest != null)
+                                response.RefundRequest.Error = PaymentRequestErrorPublicCodes.RefundIsNotAvailable;
 
                             break;
                         default:
@@ -107,6 +123,27 @@ namespace Lykke.Service.PayAPI
             }
 
             return response;
+        }
+
+        public static PaymentErrorResponseModel ToErrorModel(this RefundErrorResponseException src)
+        {
+            switch (src.Error.Code)
+            {
+                case RefundErrorType.Unknown:
+                    return PaymentErrorResponseModel.Create(PaymentErrorType.RefundIsNotAvailable);
+                case RefundErrorType.InvalidDestinationAddress:
+                    return PaymentErrorResponseModel.Create(PaymentErrorType.InvalidDestinationAddress);
+                case RefundErrorType.MultitransactionNotSupported:
+                    return PaymentErrorResponseModel.Create(PaymentErrorType.RefundIsNotAvailable);
+                case RefundErrorType.NoPaymentTransactions:
+                    return PaymentErrorResponseModel.Create(PaymentErrorType.NoPaymentTransactions);
+                case RefundErrorType.NotAllowedInStatus:
+                    return PaymentErrorResponseModel.Create(PaymentErrorType.RefundIsNotAvailable);
+                case RefundErrorType.PaymentRequestNotFound:
+                    return PaymentErrorResponseModel.Create(PaymentErrorType.InvalidPaymentId);
+                default:
+                    throw new Exception("Unknown refund error type");
+            }
         }
     }
 }

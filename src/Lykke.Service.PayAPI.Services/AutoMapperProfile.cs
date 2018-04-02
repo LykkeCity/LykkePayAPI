@@ -17,10 +17,6 @@ namespace Lykke.Service.PayAPI.Services
                         dest.DueDate = (DateTime) resContext.Items["DueDate"]));
 
             CreateMap<RefundRequest, PayInternal.Client.Models.PaymentRequest.RefundRequestModel>();
-
-            CreateMap<PayInternal.Client.Models.PaymentRequest.RefundTransactionResponse, RefundTransactionResponse>();
-
-            CreateMap<PayInternal.Client.Models.PaymentRequest.RefundResponse, RefundResponse>();
         }
     }
 }
