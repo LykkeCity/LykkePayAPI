@@ -134,7 +134,7 @@ namespace Lykke.Service.PayAPI
                 case RefundErrorType.InvalidDestinationAddress:
                     return PaymentErrorResponseModel.Create(PaymentErrorType.InvalidDestinationAddress);
                 case RefundErrorType.MultitransactionNotSupported:
-                    return PaymentErrorResponseModel.Create(PaymentErrorType.RefundIsNotAvailable);
+                    return PaymentErrorResponseModel.Create(PaymentErrorType. RefundIsNotAvailable);
                 case RefundErrorType.NoPaymentTransactions:
                     return PaymentErrorResponseModel.Create(PaymentErrorType.NoPaymentTransactions);
                 case RefundErrorType.NotAllowedInStatus:
@@ -142,7 +142,7 @@ namespace Lykke.Service.PayAPI
                 case RefundErrorType.PaymentRequestNotFound:
                     return PaymentErrorResponseModel.Create(PaymentErrorType.InvalidPaymentId);
                 default:
-                    throw new Exception("Unknown refund error type");
+                    return PaymentErrorResponseModel.Create(PaymentErrorType.RefundIsNotAvailable);
             }
         }
     }
