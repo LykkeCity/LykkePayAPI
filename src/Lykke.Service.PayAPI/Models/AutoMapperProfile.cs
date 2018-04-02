@@ -4,8 +4,6 @@ using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
-using RefundResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundResponse;
-using RefundTransactionResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundTransactionResponse;
 
 namespace Lykke.Service.PayAPI.Models
 {
@@ -27,8 +25,6 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.AssetPair, opt => opt.MapFrom(src => src.AssetPairId));
 
             CreateMap<RefundTransactionResponse, RefundTransactionResponseModel>();
-
-            CreateMap<RefundResponse, RefundResponseModel>();
 
             CreateMap<PaymentRequestTransactionModel, PaymentResponseTransactionModel>(MemberList.Destination)
                 .ForMember(dest => dest.Timestamp, opt => opt.ResolveUsing(src => src.FirstSeen.ToIsoDateTime()))

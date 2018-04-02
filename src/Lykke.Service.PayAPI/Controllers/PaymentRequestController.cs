@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using CreatePaymentRequestModel = Lykke.Service.PayAPI.Models.CreatePaymentRequestModel;
-using RefundResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundResponse;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -135,25 +134,22 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpPost]
         [Route("{paymentRequestId}/refund")]
         [SwaggerOperation("Refund")]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(PaymentErrorResponseModel), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
-                return BadRequest(ErrorResponse.Create($"{nameof(paymentRequestId)} has invalid value"));
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidPaymentId));
 
             try
             {
-                RefundResponse refundResponse = await _paymentRequestService.RefundAsync(new RefundRequest
-                {
-                    MerchantId = _headersHelper.MerchantId,
-                    PaymentRequestId = paymentRequestId,
-                    DestinationAddress = destinationAddress
-                });
-
-                PaymentRequestDetailsModel paymentRequestDetails =
-                    await _paymentRequestService.GetPaymentRequestDetailsAsync(_headersHelper.MerchantId, refundResponse.PaymentRequestId);
+                PaymentRequestDetailsModel paymentRequestDetails = await _paymentRequestService.RefundAsync(
+                    new RefundRequest
+                    {
+                        MerchantId = _headersHelper.MerchantId,
+                        PaymentRequestId = paymentRequestId,
+                        DestinationAddress = destinationAddress
+                    });
 
                 return Ok(paymentRequestDetails.ToStatusApiModel());
             }
@@ -165,13 +161,13 @@ namespace Lykke.Service.PayAPI.Controllers
                     destinationAddress
                 }.ToJson(), ex);
 
-                if (ex is ApiRequestException apiRequestException)
+                if (ex is PayInternal.Client.Exceptions.RefundErrorResponseException refundEx)
                 {
-                    return apiRequestException.GenerateErrorResponse();
+                    return BadRequest(refundEx.ToErrorModel());
                 }
-            }
 
-            return StatusCode((int) HttpStatusCode.InternalServerError);
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.RefundIsNotAvailable));
+            }
         }
 
         /// <summary>
