@@ -231,9 +231,6 @@ namespace Lykke.Service.PayAPI.Controllers
                 {
                     if (errorEx.StatusCode == HttpStatusCode.NotFound)
                         return NotFound();
-
-                    if (errorEx.StatusCode == HttpStatusCode.BadRequest)
-                        return BadRequest(ErrorResponse.Create(errorEx.Message));
                 }
             }
 
