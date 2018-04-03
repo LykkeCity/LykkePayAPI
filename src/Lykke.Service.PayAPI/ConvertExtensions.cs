@@ -98,8 +98,8 @@ namespace Lykke.Service.PayAPI
 
                             response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
 
-                            if (response.RefundRequest != null)
-                                response.RefundRequest.Error = PaymentRequestErrorPublicCodes.RefundIsNotAvailable;
+                            response.Error = new ErrorResponseModel
+                                {Code = PaymentRequestErrorPublicCodes.RefundIsNotAvailable};
 
                             break;
                         default:
