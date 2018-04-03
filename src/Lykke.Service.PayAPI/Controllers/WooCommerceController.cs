@@ -17,7 +17,7 @@ namespace Lykke.Service.PayAPI.Controllers
     [Authorize]
     [SignatureHeaders]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/wooCommerce")]
     public class WooCommerceController : Controller
     {
         private readonly IReloadingManager<AppSettings> _settings;
@@ -31,7 +31,7 @@ namespace Lykke.Service.PayAPI.Controllers
             _settings = settings;
         }
 
-        [HttpPost("Create")]
+        [HttpPost("create")]
         [SwaggerOperation("Create")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
@@ -71,7 +71,7 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         
-        [HttpPost("Status")]
+        [HttpPost("status")]
         [SwaggerOperation("Status")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]

@@ -9,7 +9,6 @@ using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
-using RefundResponse = Lykke.Service.PayAPI.Core.Domain.PaymentRequest.RefundResponse;
 
 namespace Lykke.Service.PayAPI.Services
 {
@@ -47,7 +46,7 @@ namespace Lykke.Service.PayAPI.Services
 
                 checkout = await _payInternalClient.ChechoutAsync(request.MerchantId, payment.Id);
             }
-            catch (PayInternal.Client.ErrorResponseException ex)
+            catch (PayInternal.Client.Exceptions.DefaultErrorResponseException ex)
             {
                 throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
             }
@@ -63,7 +62,7 @@ namespace Lykke.Service.PayAPI.Services
                         CallbackUrl = request.CallbackUrl
                     });
                 }
-                catch (PayCallback.Client.ErrorResponseException ex)
+                catch (ErrorResponseException ex)
                 {
                     throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
                 }
@@ -87,24 +86,17 @@ namespace Lykke.Service.PayAPI.Services
             {
                 return await _payInternalClient.GetPaymentRequestDetailsAsync(merchantId, paymentRequestId);
             }
-            catch (PayInternal.Client.ErrorResponseException ex)
+            catch (PayInternal.Client.Exceptions.DefaultErrorResponseException ex)
             {
                 throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
             }
         }
 
-        public async Task<RefundResponse> RefundAsync(RefundRequest request)
+        public async Task<PaymentRequestDetailsModel> RefundAsync(RefundRequest request)
         {
-            try
-            {
-                var response = await _payInternalClient.RefundAsync(Mapper.Map<RefundRequestModel>(request));
+            await _payInternalClient.RefundAsync(Mapper.Map<RefundRequestModel>(request));
 
-                return Mapper.Map<RefundResponse>(response);
-            }
-            catch (PayInternal.Client.ErrorResponseException ex)
-            {
-                throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
-            }
+            return await _payInternalClient.GetPaymentRequestDetailsAsync(request.MerchantId, request.PaymentRequestId);
         }
     }
 }
