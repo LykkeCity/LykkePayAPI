@@ -9,6 +9,9 @@ namespace Lykke.Service.PayAPI.Models
 
         public string PaymentStatus { get; set; }
 
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [CanBeNull] public ErrorResponseModel Error { get; set; }
+
         public string OrderId { get; set; }
 
         public string PaymentAsset { get; set; }

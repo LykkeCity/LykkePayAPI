@@ -57,21 +57,24 @@ namespace Lykke.Service.PayAPI
 
                             response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
 
-                            response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentAmountAbove;
+                            response.Error = new ErrorResponseModel
+                                {Code = PaymentRequestErrorPublicCodes.PaymentAmountAbove};
 
                             break;
                         case PaymentRequestProcessingError.PaymentAmountBelow:
 
                             response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
 
-                            response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentAmountBelow;
+                            response.Error = new ErrorResponseModel
+                                {Code = PaymentRequestErrorPublicCodes.PaymentAmountBelow};
 
                             break;
                         case PaymentRequestProcessingError.PaymentExpired:
 
                             response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
 
-                            response.PaymentRequest.Error = PaymentRequestErrorPublicCodes.PaymentExpired;
+                            response.Error = new ErrorResponseModel
+                                {Code = PaymentRequestErrorPublicCodes.PaymentExpired};
 
                             break;
                         case PaymentRequestProcessingError.RefundNotConfirmed:
@@ -80,8 +83,8 @@ namespace Lykke.Service.PayAPI
 
                             response.RefundRequest = Mapper.Map<RefundRequestResponseModel>(src.Refund);
 
-                            if (response.RefundRequest != null)
-                                response.RefundRequest.Error = PaymentRequestErrorPublicCodes.TransactionNotConfirmed;
+                            response.Error = new ErrorResponseModel
+                                {Code = PaymentRequestErrorPublicCodes.TransactionNotConfirmed};
 
                             break;
                         case PaymentRequestProcessingError.UnknownPayment:
