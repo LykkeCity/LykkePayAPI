@@ -31,7 +31,7 @@ namespace Lykke.Service.PayAPI.Controllers
             _settings = settings;
         }
 
-        [HttpPost("Create")]
+        [HttpPost("create")]
         [SwaggerOperation("Create")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
@@ -71,7 +71,7 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         
-        [HttpPost("Status")]
+        [HttpPost("status")]
         [SwaggerOperation("Status")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
