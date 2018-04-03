@@ -210,6 +210,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(GetPaymentCallbackResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetCallbackUrl(string paymentRequestId)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
@@ -231,9 +232,6 @@ namespace Lykke.Service.PayAPI.Controllers
                 {
                     if (errorEx.StatusCode == HttpStatusCode.NotFound)
                         return NotFound();
-
-                    if (errorEx.StatusCode == HttpStatusCode.BadRequest)
-                        return BadRequest(ErrorResponse.Create(errorEx.Message));
                 }
             }
 
