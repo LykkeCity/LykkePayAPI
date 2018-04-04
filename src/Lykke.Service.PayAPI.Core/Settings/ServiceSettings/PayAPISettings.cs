@@ -7,5 +7,6 @@ namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
         public DbSettings Db { get; set; }
 
         public TimeSpan PaymentRequestDueDate { get; set; }
+        public string PayInvoicePortalUrl { get; set; }
     }
 }

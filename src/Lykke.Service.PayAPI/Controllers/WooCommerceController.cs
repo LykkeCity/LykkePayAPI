@@ -58,7 +58,7 @@ namespace Lykke.Service.PayAPI.Controllers
                     SettlementAssetId = model.Currency
                 });
                 response.InvoiceURL =
-                    $"{_settings.CurrentValue.PayInvoicePortal.SiteUrl}invoice/{invoice.Id}?callback={WebUtility.UrlEncode(model.CallbackUrl)}";
+                    $"{_settings.CurrentValue.PayAPI.PayInvoicePortalUrl}invoice/{invoice.Id}?callback={WebUtility.UrlEncode(model.CallbackUrl)}";
                 response.InvoiceId = invoice.Id;
                 response.ErrorCode = "0";
             }
