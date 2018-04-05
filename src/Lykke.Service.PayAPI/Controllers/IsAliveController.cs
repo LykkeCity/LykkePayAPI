@@ -8,8 +8,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Lykke.Service.PayAPI.Controllers
 {
     // NOTE: See https://lykkex.atlassian.net/wiki/spaces/LKEWALLET/pages/35755585/Add+your+app+to+Monitoring
-    [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/isAlive")]
+    [Route("api/isAlive")]
     public class IsAliveController : Controller
     {
         private readonly IHealthService _healthService;

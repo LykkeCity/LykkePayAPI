@@ -9,12 +9,23 @@ namespace Lykke.Service.PayAPI.Tests
     [TestClass]
     public class ControllersTest
     {
+        private IList<string> _excludeList;
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            _excludeList = new List<string>
+            {
+                "IsAliveController"
+            };
+        }
+
         [TestMethod]
         public void ApiVersionAttributeEnsure()
         {
             var controllerTypes = typeof(Startup).Assembly
                 .GetExportedTypes()
-                .Where(t => t.IsSubclassOf(typeof(Controller)))
+                .Where(t => t.IsSubclassOf(typeof(Controller)) && !_excludeList.Contains(t.Name))
                 .ToList();
 
 
