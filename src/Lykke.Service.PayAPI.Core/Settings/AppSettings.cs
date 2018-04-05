@@ -19,7 +19,6 @@ namespace Lykke.Service.PayAPI.Core.Settings
         public PayInternalServiceClientSettings PayInternalServiceClient { get; set; }
         public PayCallbackServiceClientSettings PayCallbackServiceClient { get; set; }
     }
-
     public class MarketProfileServiceClientSettings
     {
         [HttpCheck("api/isalive")]
