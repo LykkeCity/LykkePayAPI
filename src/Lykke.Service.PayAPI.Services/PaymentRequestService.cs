@@ -8,6 +8,7 @@ using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client;
+using Lykke.Service.PayInternal.Client.Models.Order;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 
 namespace Lykke.Service.PayAPI.Services
@@ -38,13 +39,17 @@ namespace Lykke.Service.PayAPI.Services
                 Mapper.Map<CreatePaymentRequestModel>(request, opt => opt.Items["DueDate"] = paymentDueDate);
 
             PaymentRequestModel payment;
-            PaymentRequestDetailsModel checkout;
+            OrderModel order;
 
             try
             {
                 payment = await _payInternalClient.CreatePaymentRequestAsync(createPaymentRequest);
 
-                checkout = await _payInternalClient.ChechoutAsync(request.MerchantId, payment.Id);
+                order = await _payInternalClient.ChechoutOrderAsync(new ChechoutRequestModel
+                {
+                    MerchantId = request.MerchantId,
+                    PaymentRequestId = payment.Id
+                });
             }
             catch (PayInternal.Client.Exceptions.DefaultErrorResponseException ex)
             {
@@ -72,11 +77,11 @@ namespace Lykke.Service.PayAPI.Services
             {
                 Id = payment.Id,
                 PaymentAssetId = payment.PaymentAssetId,
-                Amount = checkout.Order.PaymentAmount,
+                Amount = order.PaymentAmount,
                 OrderId = payment.OrderId,
                 Address = payment.WalletAddress,
                 Timestamp = requestTime.ToIsoDateTime(),
-                ExchangeRate = checkout.Order.ExchangeRate
+                ExchangeRate = order.ExchangeRate
             };
         }
 
