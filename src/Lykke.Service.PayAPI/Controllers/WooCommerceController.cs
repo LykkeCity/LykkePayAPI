@@ -47,8 +47,9 @@ namespace Lykke.Service.PayAPI.Controllers
             var response = new WooCommerceResponse();
             try
             {
-                var invoice = await _invoicesServiceClient.CreateInvoiceAsync(model.MerchantId, new PayInvoice.Client.Models.Invoice.CreateInvoiceModel
+                var invoice = await _invoicesServiceClient.CreateInvoiceAsync(new PayInvoice.Client.Models.Invoice.CreateInvoiceModel
                 {
+                    MerchantId = model.MerchantId,
                     Number = model.InvoiceNumber,
                     ClientName = model.ClientName,
                     ClientEmail = model.ClientEmail,
@@ -58,7 +59,7 @@ namespace Lykke.Service.PayAPI.Controllers
                     SettlementAssetId = model.Currency
                 });
                 response.InvoiceURL =
-                    $"{_settings.CurrentValue.PayAPI.PayInvoicePortalUrl}invoice/{invoice.Id}?callback={WebUtility.UrlEncode(model.CallbackUrl)}";
+                    $"{_settings.CurrentValue.PayAPI.PayInvoicePortalUrl.TrimEnd('/')}/invoice/{invoice.Id}?callback={WebUtility.UrlEncode(model.CallbackUrl)}";
                 response.InvoiceId = invoice.Id;
                 response.ErrorCode = "0";
             }
