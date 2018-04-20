@@ -49,6 +49,11 @@ namespace Lykke.Service.PayAPI
                     response.PaymentStatus = PaymentRequestPublicStatuses.PaymentInProgress;
 
                     break;
+                case PaymentRequestStatus.PastDue:
+
+                    response.PaymentStatus = PaymentRequestPublicStatuses.PaymenPastDue;
+
+                    break;
                 case PaymentRequestStatus.Error:
 
                     switch (src.ProcessingError)
