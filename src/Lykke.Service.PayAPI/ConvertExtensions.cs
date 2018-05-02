@@ -6,7 +6,8 @@ using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using Lykke.Service.PayInternal.Contract.PaymentRequest;
-using PaymentRequestProcessingError = Lykke.Service.PayInternal.Client.Models.PaymentRequest.PaymentRequestProcessingError;
+using PaymentRequestProcessingError =
+    Lykke.Service.PayInternal.Client.Models.PaymentRequest.PaymentRequestProcessingError;
 using PaymentRequestStatus = Lykke.Service.PayInternal.Client.Models.PaymentRequest.PaymentRequestStatus;
 
 namespace Lykke.Service.PayAPI
@@ -28,7 +29,9 @@ namespace Lykke.Service.PayAPI
                     CreatedAt = src.Timestamp.ToIsoDateTime(),
                     ExchangeRate = src.Order?.ExchangeRate,
                     ExpirationDt = src.DueDate.ToIsoDateTime(),
-                    Transactions = src.Transactions.Any() ? src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>).ToList() : null
+                    Transactions = src.Transactions.Any()
+                        ? src.Transactions.Select(Mapper.Map<PaymentResponseTransactionModel>).ToList()
+                        : null
                 }
             };
 
@@ -47,11 +50,6 @@ namespace Lykke.Service.PayAPI
                 case PaymentRequestStatus.InProcess:
 
                     response.PaymentStatus = PaymentRequestPublicStatuses.PaymentInProgress;
-
-                    break;
-                case PaymentRequestStatus.PastDue:
-
-                    response.PaymentStatus = PaymentRequestPublicStatuses.PaymenPastDue;
 
                     break;
                 case PaymentRequestStatus.Cancelled:
@@ -95,6 +93,14 @@ namespace Lykke.Service.PayAPI
 
                             response.Error = new ErrorResponseModel
                                 {Code = PaymentRequestErrorPublicCodes.TransactionNotConfirmed};
+
+                            break;
+                        case PaymentRequestProcessingError.LatePaid:
+
+                            response.PaymentStatus = PaymentRequestPublicStatuses.PaymentError;
+
+                            response.Error = new ErrorResponseModel
+                                {Code = PaymentRequestErrorPublicCodes.LatePaid};
 
                             break;
                         case PaymentRequestProcessingError.UnknownPayment:
@@ -147,7 +153,7 @@ namespace Lykke.Service.PayAPI
                 case RefundErrorType.InvalidDestinationAddress:
                     return PaymentErrorResponseModel.Create(PaymentErrorType.InvalidDestinationAddress);
                 case RefundErrorType.MultitransactionNotSupported:
-                    return PaymentErrorResponseModel.Create(PaymentErrorType. RefundIsNotAvailable);
+                    return PaymentErrorResponseModel.Create(PaymentErrorType.RefundIsNotAvailable);
                 case RefundErrorType.NoPaymentTransactions:
                     return PaymentErrorResponseModel.Create(PaymentErrorType.NoPaymentTransactions);
                 case RefundErrorType.NotAllowedInStatus:
