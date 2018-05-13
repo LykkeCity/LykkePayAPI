@@ -8,6 +8,10 @@ using Common.Log;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
+
+// ReSharper disable once RedundantUsingDirective
+using Lykke.MonitoringServiceApiCaller;
+
 using Lykke.Service.PayAPI.Core;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
@@ -22,9 +26,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace Lykke.Service.PayAPI
 {
@@ -34,6 +36,9 @@ namespace Lykke.Service.PayAPI
         public IContainer ApplicationContainer { get; private set; }
         public IConfigurationRoot Configuration { get; }
         public ILog Log { get; private set; }
+
+        // ReSharper disable once NotAccessedField.Local
+        private string _monitoringServiceUrl;
 
         public Startup(IHostingEnvironment env)
         {
@@ -91,6 +96,7 @@ namespace Lykke.Service.PayAPI
 
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();
+                _monitoringServiceUrl = appSettings.CurrentValue.MonitoringServiceClient?.MonitoringServiceUrl;
 
                 Log = CreateLogWithSlack(services, appSettings);
 
@@ -168,6 +174,10 @@ namespace Lykke.Service.PayAPI
                 await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
 
                 await Log.WriteMonitorAsync("", $"Env: {Program.EnvInfo}", "Started");
+#if !DEBUG
+                if (!string.IsNullOrEmpty(_monitoringServiceUrl))
+                    await AutoRegistrationInMonitoring.RegisterAsync(Configuration, _monitoringServiceUrl, Log);
+#endif
             }
             catch (Exception ex)
             {
