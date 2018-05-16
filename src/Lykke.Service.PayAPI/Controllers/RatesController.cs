@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
@@ -57,8 +56,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(RatesController), nameof(GetAssetPairRates),
-                    new {AssetPairId = assetPairId}.ToJson(), ex);
+                _log.WriteError(nameof(GetAssetPairRates), new {AssetPairId = assetPairId}, ex);
 
                 if (ex is ApiRequestException apiException)
                 {

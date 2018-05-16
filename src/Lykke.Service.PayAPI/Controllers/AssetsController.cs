@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using Common;
 using Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
@@ -52,12 +51,10 @@ namespace Lykke.Service.PayAPI.Controllers
                     await _payInternalClient.GetAvailableSettlementAssetsAsync(_headersHelper.MerchantId);
 
                 return Ok(Mapper.Map<AssetsResponseModel>(response));
-
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(AssetsController), nameof(GetSettlementAssets),
-                    new {_headersHelper.MerchantId}.ToJson(), ex);
+                _log.WriteError(nameof(GetSettlementAssets), new {_headersHelper.MerchantId}, ex);
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -78,18 +75,21 @@ namespace Lykke.Service.PayAPI.Controllers
             try
             {
                 AvailableAssetsResponse response =
-                    await _payInternalClient.GetAvailablePaymentAssetsAsync(_headersHelper.MerchantId, settlementAssetId);
+                    await _payInternalClient.GetAvailablePaymentAssetsAsync(_headersHelper.MerchantId,
+                        settlementAssetId);
 
                 return Ok(Mapper.Map<AssetsResponseModel>(response));
-
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(AssetsController), nameof(GetPaymentAssets),
-                    new { _headersHelper.MerchantId, settlementAssetId }.ToJson(), ex);
+                _log.WriteError(nameof(GetPaymentAssets), new
+                {
+                    _headersHelper.MerchantId,
+                    settlementAssetId
+                }, ex);
             }
 
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
     }
 }
