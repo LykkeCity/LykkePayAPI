@@ -3,6 +3,7 @@ using Common;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayCallback.Client.Models;
+using Lykke.Service.PayInternal.Client.Models.Asset;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 
 namespace Lykke.Service.PayAPI.Models
@@ -41,6 +42,8 @@ namespace Lykke.Service.PayAPI.Models
 
             CreateMap<GetPaymentCallbackModel, GetPaymentCallbackResponseModel>(MemberList.Destination)
                 .ForMember(dest => dest.CallbackUrl, opt => opt.MapFrom(src => src.Url));
+
+            CreateMap<AvailableAssetsResponse, AssetsResponseModel>(MemberList.Destination);
         }
     }
 }

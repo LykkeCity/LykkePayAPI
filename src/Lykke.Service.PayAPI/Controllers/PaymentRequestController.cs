@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using Common;
 using Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
@@ -74,8 +73,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(CreatePaymentRequest),
-                    request.ToJson(), ex);
+                _log.WriteError(nameof(CreatePaymentRequest), request, ex);
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -89,7 +87,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpGet]
         [Route("{paymentRequestId}/status")]
         [SwaggerOperation("GetPaymentRequestStatus")]
-
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
@@ -108,8 +105,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetPaymentRequestStatus),
-                    new {paymentRequestId}.ToJson(), ex);
+                _log.WriteError(nameof(GetPaymentRequestStatus), new {paymentRequestId}, ex);
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -125,7 +121,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [Route("{paymentRequestId}/refund")]
         [SwaggerOperation("Refund")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(PaymentErrorResponseModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
@@ -145,11 +141,11 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(Refund), new
+                _log.WriteError(nameof(Refund), new
                 {
                     paymentRequestId,
                     destinationAddress
-                }.ToJson(), ex);
+                }, ex);
 
                 if (ex is PayInternal.Client.Exceptions.RefundErrorResponseException refundEx)
                 {
@@ -169,7 +165,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpPost]
         [Route("{paymentRequestId}/callback")]
         [SwaggerOperation("SetCallback")]
-
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
@@ -194,11 +189,11 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(SetCallbackUrl), new
+                _log.WriteError(nameof(SetCallbackUrl), new
                 {
                     paymentRequestId,
                     callbackUrl
-                }.ToJson(), ex);
+                }, ex);
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -224,8 +219,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(PaymentRequestController), nameof(GetCallbackUrl),
-                    new {paymentRequestId}.ToJson(), ex);
+                _log.WriteError(nameof(GetCallbackUrl), new {paymentRequestId}, ex);
 
                 if (ex is ErrorResponseException errorEx)
                 {
@@ -234,7 +228,7 @@ namespace Lykke.Service.PayAPI.Controllers
                 }
             }
 
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
     }
 }
