@@ -74,7 +74,19 @@ namespace Lykke.Service.PayAPI
 
                     foreach (var description in provider.ApiVersionDescriptions)
                     {
-                        options.DefaultLykkeConfiguration(description.GroupName, "PayAPI");
+                        options.SwaggerDoc(
+                            $"{description.GroupName}",
+                            new Info
+                            {
+                                Version = description.GroupName,
+                                Title = "PayAPI"
+                            });
+
+                        options.DescribeAllEnumsAsStrings();
+                        options.EnableXmsEnumExtension();
+                        options.EnableXmlDocumentation();
+                        options.MakeResponseValueTypesRequired();
+                        // this filter produced null exception: options.OperationFilter<FormFileUploadOperationFilter>();
                     }
 
                     options.OperationFilter<SwaggerDefaultValues>();

@@ -36,11 +36,11 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <summary>
         /// Returns invoices by filter
         /// </summary>
-        /// <param name="merchantId">The merchant id</param>
-        /// <param name="clientMerchantId">The merchant id of the client</param>
-        /// <param name="statuses">The statuses</param>
+        /// <param name="merchantIds">The merchant ids (e.g. ?merchantIds=one&amp;merchantIds=two)</param>
+        /// <param name="clientMerchantIds">The merchant ids of the clients (e.g. ?clientMerchantIds=one&amp;clientMerchantIds=two)</param>
+        /// <param name="statuses">The statuses (e.g. ?statuses=one&amp;statuses=two)</param>
         /// <param name="dispute">The dispute attribute</param>
-        /// <param name="billingCategories">The billing categories</param>
+        /// <param name="billingCategories">The billing categories (e.g. ?billingCategories=one&amp;billingCategories=two)</param>
         /// <param name="greaterThan">The greater than number for filtering</param>
         /// <param name="lessThan">The less than number for filtering</param>
         /// <response code="200">A collection of invoices.</response>
@@ -50,11 +50,11 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetByFilter(string merchantId, string clientMerchantId, string statuses, bool? dispute, string billingCategories, int? greaterThan, int? lessThan)
+        public async Task<IActionResult> GetByFilter(IEnumerable<string> merchantIds, IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, int? greaterThan, int? lessThan)
         {
             try
             {
-                var response = await _payInvoiceClient.GetByFilter(merchantId, clientMerchantId, statuses, dispute, billingCategories, greaterThan, lessThan);
+                var response = await _payInvoiceClient.GetByFilter(merchantIds, clientMerchantIds, statuses, dispute, billingCategories, greaterThan, lessThan);
 
                 return Ok(response);
             }
@@ -64,7 +64,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.WriteError(nameof(GetByFilter), new { merchantId, clientMerchantId, statuses, billingCategories }, ex);
+                _log.WriteError(nameof(GetByFilter), new { merchantIds, clientMerchantIds, statuses, billingCategories }, ex);
             }
 
             return StatusCode((int)HttpStatusCode.InternalServerError);
