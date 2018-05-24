@@ -24,7 +24,7 @@ namespace Lykke.Service.PayAPI
             {
                 var host = new WebHostBuilder()
                     .UseKestrel()
-                    //.UseUrls("http://*:5000")
+                    .UseUrls("http://*:5000")
                     .UseContentRoot(Directory.GetCurrentDirectory())
                     .UseStartup<Startup>()
                     .UseApplicationInsights()
