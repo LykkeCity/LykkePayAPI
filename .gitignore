@@ -61,3 +61,5 @@ node_modules
 
 appsettings.Development.json_
 appsettings.json
+
+Lykke.Service.PayAPI.Client.xml
