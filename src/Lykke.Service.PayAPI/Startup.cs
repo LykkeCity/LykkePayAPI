@@ -29,6 +29,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Lykke.Service.PayAPI
 {
@@ -83,7 +84,19 @@ namespace Lykke.Service.PayAPI
 
                     foreach (var description in provider.ApiVersionDescriptions)
                     {
-                        options.DefaultLykkeConfiguration(description.GroupName, "PayAPI");
+                        options.SwaggerDoc(
+                            $"{description.GroupName}",
+                            new Info
+                            {
+                                Version = description.GroupName,
+                                Title = "PayAPI"
+                            });
+
+                        options.DescribeAllEnumsAsStrings();
+                        options.EnableXmsEnumExtension();
+                        options.EnableXmlDocumentation();
+                        options.MakeResponseValueTypesRequired();
+                        // this filter produced null exception: options.OperationFilter<FormFileUploadOperationFilter>();
                     }
 
                     options.OperationFilter<SwaggerDefaultValues>();
