@@ -36,6 +36,22 @@ namespace Lykke.Service.PayAPI
                     Type = "string"
                 });
             }
+
+            var isBearerAccess = filterPipeline.Select(filterInfo => filterInfo.Filter).Any(filter => filter is BearerHeaderAttribute);
+            if (isBearerAccess)
+            {
+                if (operation.Parameters == null)
+                    operation.Parameters = new List<IParameter>();
+
+                operation.Parameters.Add(new NonBodyParameter
+                {
+                    Name = "Authorization",
+                    In = "header",
+                    Description = "access token",
+                    Required = true,
+                    Type = "string"
+                });
+            }
         }
     }
 }
