@@ -97,6 +97,10 @@ namespace Lykke.Service.PayAPI.Modules
                 .As<IHeadersHelper>()
                 .SingleInstance();
 
+            builder.RegisterType<AuthService>()
+                .As<IAuthService>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.JwtSecurity));
+
             builder.Register(x =>
             {
                 var assetsService = x.Resolve<IComponentContext>().Resolve<IAssetsService>();
