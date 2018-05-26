@@ -5,6 +5,7 @@ namespace Lykke.Service.PayAPI.Models
     public class AuthRequestModel
     {
         [Required]
+        [EmailAddress]
         public string Email { get; set; }
 
         [Required]

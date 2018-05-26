@@ -2,6 +2,6 @@
 {
     public interface IAuthService
     {
-        string CreateToken();
+        string CreateToken(string email);
     }
 }
