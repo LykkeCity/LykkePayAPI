@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using Common;
 using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
+using Lykke.Service.PayAuth.Client;
+using Lykke.Service.PayAuth.Client.Models.Employees;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,10 +20,14 @@ namespace Lykke.Service.PayAPI.Controllers
     public class MobileController : Controller
     {
         private readonly IAuthService _authService;
+        private readonly IPayAuthClient _payAuthClient;
 
-        public MobileController([NotNull] IAuthService authService)
+        public MobileController(
+            [NotNull] IAuthService authService, 
+            [NotNull] IPayAuthClient payAuthClient)
         {
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+            _payAuthClient = payAuthClient ?? throw new ArgumentNullException(nameof(payAuthClient));
         }
 
         /// <summary>
@@ -37,16 +42,18 @@ namespace Lykke.Service.PayAPI.Controllers
         [ValidateModel]
         [ProducesResponseType(typeof(AuthResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
-        public IActionResult Auth([FromBody] AuthRequestModel request)
+        public async Task<IActionResult> Auth([FromBody] AuthRequestModel request)
         {
-            if (!request.Email.IsValidEmail())
-                return BadRequest(ErrorResponse.Create("Invalid email"));
+            ValidateResultModel validationResult =
+                await _payAuthClient.ValidatePasswordAsync(request.Email, request.Password);
 
-            //todo
+            if (!validationResult.Success)
+                return BadRequest(ErrorResponse.Create("Invalid email or password"));
+
             return Ok(new AuthResponseModel
             {
-                Token = _authService.CreateToken(),
-                FirstTime = true
+                Token = _authService.CreateToken(request.Email),
+                ForcePasswordUpdate = validationResult.ForcePasswordUpdate
             });
         }
 
@@ -65,7 +72,21 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequestModel request)
         {
-            throw new NotImplementedException();
+            string email = this.GetUserEmail();
+
+            ValidateResultModel validationResult =
+                await _payAuthClient.ValidatePasswordAsync(email, request.CurrentPasssword);
+
+            if (!validationResult.Success)
+                return BadRequest(ErrorResponse.Create("Invalid password"));
+
+            await _payAuthClient.UpdatePasswordHashAsync(new UpdatePasswordHashModel
+            {
+                Email = email,
+                PasswordHash = request.NewPassword
+            });
+
+            return Ok();
         }
 
         /// <summary>
@@ -82,7 +103,15 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdatePin([FromBody] UpdatePinRequestModel request)
         {
-            throw new NotImplementedException();
+            string email = this.GetUserEmail();
+
+            await _payAuthClient.UpdatePinHashAsync(new UpdatePinHashModel
+            {
+                Email = email,
+                PinHash = request.NewPinCode
+            });
+
+            return Ok();
         }
 
         /// <summary>
@@ -96,10 +125,13 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation(nameof(ValidatePin))]
         [ValidateModel]
         [ProducesResponseType(typeof(ValidatePinResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> ValidatePin([FromBody] ValidatePinRequestModel request)
         {
-            throw new NotImplementedException();
+            string email = this.GetUserEmail();
+
+            ValidateResultModel validationResult = await _payAuthClient.ValidatePinAsync(email, request.PinCode);
+
+            return Ok(new ValidatePinResponseModel {Passed = validationResult.Success});
         }
     }
 }

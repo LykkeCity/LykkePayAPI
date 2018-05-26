@@ -5,7 +5,7 @@ namespace Lykke.Service.PayAPI.Models
     public class UpdatePasswordRequestModel
     {
         [Required]
-        public string OldPasssword { get; set; }
+        public string CurrentPasssword { get; set; }
 
         [Required]
         public string NewPassword { get; set; }
