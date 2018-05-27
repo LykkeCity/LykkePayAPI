@@ -33,7 +33,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <summary>
         /// Authenticates user
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">Authorization request details</param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
@@ -60,7 +60,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <summary>
         /// Updates user password
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">Update password request details</param>
         /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
@@ -83,7 +83,7 @@ namespace Lykke.Service.PayAPI.Controllers
             await _payAuthClient.UpdatePasswordHashAsync(new UpdatePasswordHashModel
             {
                 Email = email,
-                PasswordHash = request.NewPassword
+                PasswordHash = request.NewPasswordHash
             });
 
             return Ok();
@@ -92,6 +92,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <summary>
         /// Updates pin code
         /// </summary>
+        /// <param name="request">Pin code update details</param>
         /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
@@ -108,7 +109,7 @@ namespace Lykke.Service.PayAPI.Controllers
             await _payAuthClient.UpdatePinHashAsync(new UpdatePinHashModel
             {
                 Email = email,
-                PinHash = request.NewPinCode
+                PinHash = request.NewPinCodeHash
             });
 
             return Ok();
@@ -117,6 +118,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <summary>
         /// Checks if pin is valid
         /// </summary>
+        /// <param name="request">Pin validation request details</param>
         /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
