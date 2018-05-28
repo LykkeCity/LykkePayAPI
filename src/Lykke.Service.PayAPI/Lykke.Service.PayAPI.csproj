@@ -45,7 +45,7 @@
     <PackageReference Include="Lykke.SettingsReader" Version="2.4.0" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.4" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.1" />
-	<PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.0.4" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.4" />
