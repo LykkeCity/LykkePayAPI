@@ -45,7 +45,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [BearerHeader]
         [HttpGet]
         [SwaggerOperation("InvoicesGetByFilter")]
-        [ProducesResponseType(typeof(IReadOnlyList<InvoiceModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetByFilter(IEnumerable<string> merchantIds, IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, int? greaterThan, int? lessThan)
@@ -54,7 +54,7 @@ namespace Lykke.Service.PayAPI.Controllers
             {
                 var response = await _payInvoiceClient.GetByFilter(merchantIds, clientMerchantIds, statuses, dispute, billingCategories, greaterThan, lessThan);
 
-                return Ok(response);
+                return Ok(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(response));
             }
             catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
             {
