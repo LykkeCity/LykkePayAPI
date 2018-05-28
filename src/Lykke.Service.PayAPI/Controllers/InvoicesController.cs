@@ -39,8 +39,8 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <param name="statuses">The statuses (e.g. ?statuses=one&amp;statuses=two)</param>
         /// <param name="dispute">The dispute attribute</param>
         /// <param name="billingCategories">The billing categories (e.g. ?billingCategories=one&amp;billingCategories=two)</param>
-        /// <param name="greaterThan">The greater than number for filtering</param>
-        /// <param name="lessThan">The less than number for filtering</param>
+        /// <param name="greaterThan">The greater than number for filtering (can be fractional)</param>
+        /// <param name="lessThan">The less than number for filtering (can be fractional)</param>
         /// <response code="200">A collection of invoices.</response>
         /// <response code="400">Problem occured.</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -50,7 +50,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetByFilter(IEnumerable<string> merchantIds, IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, int? greaterThan, int? lessThan)
+        public async Task<IActionResult> GetByFilter(IEnumerable<string> merchantIds, IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, decimal? greaterThan, decimal? lessThan)
         {
             try
             {
