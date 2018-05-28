@@ -72,6 +72,10 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequestModel request)
         {
+            if (request.CurrentPasssword.Equals(request.NewPasswordHash))
+                return BadRequest(
+                    ErrorResponse.Create("Your new password must be different from your previous password."));
+
             string email = this.GetUserEmail();
 
             ValidateResultModel validationResult =
