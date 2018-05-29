@@ -5,6 +5,7 @@ using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.Asset;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
+using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
 namespace Lykke.Service.PayAPI.Models
 {
@@ -44,6 +45,9 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.CallbackUrl, opt => opt.MapFrom(src => src.Url));
 
             CreateMap<AvailableAssetsResponse, AssetsResponseModel>(MemberList.Destination);
+
+            CreateMap<InvoiceModel, InvoiceResponseModel>(MemberList.Destination)
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }
 }
