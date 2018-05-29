@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -22,7 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -49,6 +50,8 @@ namespace Lykke.Service.PayAPI
         {
             try
             {
+                var appSettings = Configuration.LoadSettings<AppSettings>();
+
                 services.AddMvcCore().AddVersionedApiExplorer(opt =>
                 {
                     opt.GroupNameFormat = "'v'VVV";
@@ -99,10 +102,22 @@ namespace Lykke.Service.PayAPI
                         options.DefaultChallengeScheme = LykkePayConstants.AuthenticationScheme;
                     })
                     .AddScheme<LykkePayAuthOptions, LykkePayAuthHandler>(LykkePayConstants.AuthenticationScheme,
-                        LykkePayConstants.AuthenticationScheme, options => { });
+                        LykkePayConstants.AuthenticationScheme, options => { })
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidIssuer = appSettings.CurrentValue.PayAPI.JwtSecurity.Issuer,
+                            ValidateAudience = true,
+                            ValidAudience = appSettings.CurrentValue.PayAPI.JwtSecurity.Audience,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.CurrentValue.PayAPI.JwtSecurity.Key))
+                        };
+                    });
 
                 var builder = new ContainerBuilder();
-                var appSettings = Configuration.LoadSettings<AppSettings>();
 
                 Log = CreateLogWithSlack(services, appSettings);
 

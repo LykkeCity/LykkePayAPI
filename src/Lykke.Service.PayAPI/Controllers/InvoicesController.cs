@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
-using Lykke.Service.PayAPI.Core.Services;
-using Lykke.Service.PayAPI.Models;
-using Lykke.Service.PayInternal.Client;
-using Lykke.Service.PayInternal.Client.Models.Asset;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -19,7 +15,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Lykke.Service.PayAPI.Controllers
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/invoices")]
+    [Route("api/v{version:apiVersion}/mobile/invoices")]
     public class InvoicesController : Controller
     {
         private readonly IPayInvoiceClient _payInvoiceClient;
@@ -45,6 +41,8 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <param name="lessThan">The less than number for filtering (can be fractional)</param>
         /// <response code="200">A collection of invoices.</response>
         /// <response code="400">Problem occured.</response>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [BearerHeader]
         [HttpGet]
         [SwaggerOperation("InvoicesGetByFilter")]
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
