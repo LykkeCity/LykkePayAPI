@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
+using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
