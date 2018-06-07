@@ -11,6 +11,16 @@
         public string Token { get; set; }
 
         /// <summary>
+        /// Gets or sets employee id
+        /// </summary>
+        public string EmployeeId { get; set; }
+
+        /// <summary>
+        /// Gets or sets merchant id
+        /// </summary>
+        public string MerchantId { get; set; }
+
+        /// <summary>
         /// Gets or sets forcePasswordUpdate flag
         /// </summary>
         public bool ForcePasswordUpdate { get; set; }

@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using JetBrains.Annotations;
+using Lykke.Service.PayAPI.Core.Domain.Authentication;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Microsoft.IdentityModel.Tokens;
@@ -18,12 +19,16 @@ namespace Lykke.Service.PayAPI.Services
             _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
         }
 
-        public string CreateToken(string email)
+        public string CreateToken(string email, string employeeId, string merchantId)
         {
             var token = new JwtSecurityToken(
                 _securitySettings.Issuer,
                 _securitySettings.Audience,
-                claims: new[] {new Claim(JwtRegisteredClaimNames.Email, email)},
+                claims: new[] {
+                    new Claim(JwtRegisteredClaimNames.Email, email),
+                    new Claim(PrivateClaimTypes.EmployeeId, employeeId),
+                    new Claim(PrivateClaimTypes.MerchantId, merchantId)
+                },
                 expires: DateTime.UtcNow.Add(_securitySettings.TokenLifetime),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_securitySettings.Key)),
