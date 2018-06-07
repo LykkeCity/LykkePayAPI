@@ -53,7 +53,8 @@ namespace Lykke.Service.PayAPI.Controllers
             return Ok(new AuthResponseModel
             {
                 Token = _authService.CreateToken(request.Email),
-                ForcePasswordUpdate = validationResult.ForcePasswordUpdate
+                ForcePasswordUpdate = validationResult.ForcePasswordUpdate,
+                ForcePinUpdate = validationResult.ForcePinUpdate
             });
         }
 
