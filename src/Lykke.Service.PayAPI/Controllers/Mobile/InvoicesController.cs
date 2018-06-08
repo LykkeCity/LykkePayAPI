@@ -106,10 +106,13 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
             try
             {
+                var response = await _payInvoiceClient.GetByFilter(Enumerable.Empty<string>(), new string[] { merchantId }, statuses, dispute, billingCategories, greaterThan, lessThan);
+
                 //TODO: get group merchants
                 IEnumerable<string> groupMerchants = new List<string> { "Begun1" };
 
-                var response = await _payInvoiceClient.GetByFilter(Enumerable.Empty<string>(), new string[] { merchantId }, statuses, dispute, billingCategories, greaterThan, lessThan);
+                // should be only from merchants inside group
+                response = response.Where(x => groupMerchants.Contains(x.MerchantId)).ToList();
 
                 return Ok(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(response));
             }
