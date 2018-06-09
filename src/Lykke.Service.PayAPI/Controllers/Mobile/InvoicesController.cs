@@ -61,15 +61,22 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
             try
             {
-                //TODO: get group merchants
-                IEnumerable<string> groupMerchants = new List<string> { "Begun1" };
+                IReadOnlyList<string> groupMerchants = await _merchantService.GetGroupMerchants(merchantId);
 
-                foreach (var clientMerchantId in clientMerchantIds)
+                // should be only from merchants inside group
+                if (clientMerchantIds.Any())
                 {
-                    if (!groupMerchants.Contains(clientMerchantId))
+                    foreach (var clientMerchantId in clientMerchantIds)
                     {
-                        return BadRequest($"ClientMerchantId {clientMerchantId} is not in the group");
+                        if (!groupMerchants.Contains(clientMerchantId))
+                        {
+                            return BadRequest(ErrorResponse.Create($"ClientMerchantId {clientMerchantId} is not in the group"));
+                        }
                     }
+                }
+                else
+                {
+                    clientMerchantIds = groupMerchants;
                 }
 
                 var invoices = await _payInvoiceClient.GetByFilter(new string[] { merchantId }, clientMerchantIds, statuses, dispute, billingCategories, greaterThan, lessThan);
@@ -93,6 +100,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <summary>
         /// Returns invoices by filter
         /// </summary>
+        /// <param name="clientMerchantIds">The merchant ids of the clients (e.g. ?clientMerchantIds=one&amp;clientMerchantIds=two)</param>
         /// <param name="statuses">The statuses (e.g. ?statuses=one&amp;statuses=two)</param>
         /// <param name="dispute">The dispute attribute</param>
         /// <param name="billingCategories">The billing categories (e.g. ?billingCategories=one&amp;billingCategories=two)</param>
@@ -108,19 +116,31 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetInboxByFilter(IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, IEnumerable<string> settlementAssets, decimal? greaterThan, decimal? lessThan)
+        public async Task<IActionResult> GetInboxByFilter(IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, IEnumerable<string> settlementAssets, decimal? greaterThan, decimal? lessThan)
         {
             var merchantId = this.GetUserMerchantId();
 
             try
             {
-                var invoices = await _payInvoiceClient.GetByFilter(Enumerable.Empty<string>(), new string[] { merchantId }, statuses, dispute, billingCategories, greaterThan, lessThan);
-
-                //TODO: get group merchants
-                IEnumerable<string> groupMerchants = new List<string> { "Begun1" };
+                IReadOnlyList<string> groupMerchants = await _merchantService.GetGroupMerchants(merchantId);
 
                 // should be only from merchants inside group
-                invoices = invoices.Where(x => groupMerchants.Contains(x.MerchantId)).ToList();
+                if (clientMerchantIds.Any())
+                {
+                    foreach (var clientMerchantId in clientMerchantIds)
+                    {
+                        if (!groupMerchants.Contains(clientMerchantId))
+                        {
+                            return BadRequest(ErrorResponse.Create($"ClientMerchantId {clientMerchantId} is not in the group"));
+                        }
+                    }
+                }
+                else
+                {
+                    clientMerchantIds = groupMerchants;
+                }
+
+                var invoices = await _payInvoiceClient.GetByFilter(clientMerchantIds, new string[] { merchantId }, statuses, dispute, billingCategories, greaterThan, lessThan);
 
                 var result = Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets));
                 await FillAdditionalData(result);

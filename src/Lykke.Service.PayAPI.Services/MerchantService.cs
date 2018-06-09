@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Common.Cache;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayInternal.Client;
+using Lykke.Service.PayInternal.Client.Models.MerchantGroups;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Lykke.Service.PayAPI.Services
@@ -38,6 +39,18 @@ namespace Lykke.Service.PayAPI.Services
                 );
 
             return merchantName;
+        }
+
+        public async Task<IReadOnlyList<string>> GetGroupMerchants(string merchantId)
+        {
+            MerchantsByUsageResponse response = await _payInternalClient.GetMerchantsByUsageAsync(
+                new GetMerchantsByUsageRequest
+                {
+                    MerchantId = merchantId,
+                    MerchantGroupUse = MerchantGroupUse.Billing
+                });
+
+            return response.Merchants.ToList();
         }
     }
 }
