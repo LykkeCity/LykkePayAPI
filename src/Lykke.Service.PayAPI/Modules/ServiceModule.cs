@@ -100,6 +100,10 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<AuthService>()
                 .As<IAuthService>()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.JwtSecurity));
+            
+            builder.RegisterType<MerchantService>()
+                .As<IMerchantService>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods));
 
             builder.Register(x =>
             {

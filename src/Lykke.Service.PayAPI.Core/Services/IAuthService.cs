@@ -2,6 +2,6 @@
 {
     public interface IAuthService
     {
-        string CreateToken(string email);
+        string CreateToken(string email, string employeeId, string merchantId);
     }
 }

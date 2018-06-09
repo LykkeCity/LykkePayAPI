@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Lykke.Service.PayAPI.Controllers
+namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/mobile")]
@@ -52,7 +52,9 @@ namespace Lykke.Service.PayAPI.Controllers
 
             return Ok(new AuthResponseModel
             {
-                Token = _authService.CreateToken(request.Email),
+                Token = _authService.CreateToken(request.Email, validationResult.EmployeeId, validationResult.MerchantId),
+                EmployeeId = validationResult.EmployeeId,
+                MerchantId = validationResult.MerchantId,
                 ForcePasswordUpdate = validationResult.ForcePasswordUpdate,
                 ForcePinUpdate = validationResult.ForcePinUpdate
             });
