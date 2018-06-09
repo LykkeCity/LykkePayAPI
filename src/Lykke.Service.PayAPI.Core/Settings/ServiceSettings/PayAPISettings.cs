@@ -8,6 +8,7 @@ namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
         public TimeSpan PaymentRequestDueDate { get; set; }
         public string PayInvoicePortalUrl { get; set; }
         public JwtSecuritySettings JwtSecurity { get; set; }
+        public CacheExpirationPeriodsSettings CacheExpirationPeriods { get; set; }
     }
 
     public class JwtSecuritySettings

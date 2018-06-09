@@ -7,6 +7,7 @@ using AutoMapper;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
+using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
@@ -21,13 +22,16 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Route("api/v{version:apiVersion}/mobile/invoices")]
     public class InvoicesController : Controller
     {
+        private readonly IMerchantService _merchantService;
         private readonly IPayInvoiceClient _payInvoiceClient;
         private readonly ILog _log;
 
         public InvoicesController(
+            IMerchantService merchantService,
             IPayInvoiceClient payInvoiceClient,
             ILog log)
         {
+            _merchantService = merchantService;
             _payInvoiceClient = payInvoiceClient ?? throw new ArgumentNullException(nameof(payInvoiceClient));
             _log = log.CreateComponentScope(nameof(InvoicesController)) ?? throw new ArgumentNullException(nameof(log));
         }
@@ -70,7 +74,9 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
                 var invoices = await _payInvoiceClient.GetByFilter(new string[] { merchantId }, clientMerchantIds, statuses, dispute, billingCategories, greaterThan, lessThan);
 
-                return Ok(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets)));
+                var result = Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets));
+                await FillAdditionalData(result);
+                return Ok(result);
             }
             catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -116,7 +122,9 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 // should be only from merchants inside group
                 invoices = invoices.Where(x => groupMerchants.Contains(x.MerchantId)).ToList();
 
-                return Ok(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets)));
+                var result = Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets));
+                await FillAdditionalData(result);
+                return Ok(result);
             }
             catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -128,6 +136,14 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
 
             return StatusCode((int)HttpStatusCode.InternalServerError);
+        }
+
+        private async Task FillAdditionalData(IReadOnlyList<InvoiceResponseModel> result)
+        {
+            foreach (var invoice in result)
+            {
+                invoice.MerchantName = await _merchantService.GetMerchantName(invoice.MerchantId);
+            }
         }
 
         private IReadOnlyList<InvoiceModel> FilterBySettlementAssets(IReadOnlyList<InvoiceModel> invoices, IEnumerable<string> settlementAssets)
