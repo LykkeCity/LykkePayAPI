@@ -47,7 +47,8 @@ namespace Lykke.Service.PayAPI.Models
             CreateMap<AvailableAssetsResponse, AssetsResponseModel>(MemberList.Destination);
 
             CreateMap<InvoiceModel, InvoiceResponseModel>(MemberList.Destination)
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.MerchantName, opt => opt.Ignore());
         }
     }
 }
