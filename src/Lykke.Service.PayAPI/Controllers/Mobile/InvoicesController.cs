@@ -61,7 +61,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
             try
             {
-                IReadOnlyList<string> groupMerchants = await _merchantService.GetGroupMerchants(merchantId);
+                IReadOnlyList<string> groupMerchants = await _merchantService.GetGroupMerchantsAsync(merchantId);
 
                 // should be only from merchants inside group
                 if (clientMerchantIds.Any())
@@ -122,7 +122,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
             try
             {
-                IReadOnlyList<string> groupMerchants = await _merchantService.GetGroupMerchants(merchantId);
+                IReadOnlyList<string> groupMerchants = await _merchantService.GetGroupMerchantsAsync(merchantId);
 
                 // should be only from merchants inside group
                 if (clientMerchantIds.Any())
@@ -162,7 +162,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         {
             foreach (var invoice in result)
             {
-                invoice.MerchantName = await _merchantService.GetMerchantName(invoice.MerchantId);
+                invoice.MerchantName = await _merchantService.GetMerchantNameAsync(invoice.MerchantId);
             }
         }
 

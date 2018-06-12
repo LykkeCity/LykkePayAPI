@@ -26,7 +26,7 @@ namespace Lykke.Service.PayAPI.Services
             _cacheExpirationPeriods = cacheExpirationPeriods;
         }
 
-        public async Task<string> GetMerchantName(string merchantId)
+        public async Task<string> GetMerchantNameAsync(string merchantId)
         {
             var merchantName = await _merchantNamesCache.GetOrAddAsync
                 (
@@ -41,7 +41,7 @@ namespace Lykke.Service.PayAPI.Services
             return merchantName;
         }
 
-        public async Task<IReadOnlyList<string>> GetGroupMerchants(string merchantId)
+        public async Task<IReadOnlyList<string>> GetGroupMerchantsAsync(string merchantId)
         {
             MerchantsByUsageResponse response = await _payInternalClient.GetMerchantsByUsageAsync(
                 new GetMerchantsByUsageRequest
