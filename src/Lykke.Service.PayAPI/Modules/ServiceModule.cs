@@ -100,6 +100,10 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<AuthService>()
                 .As<IAuthService>()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.JwtSecurity));
+            
+            builder.RegisterType<MerchantService>()
+                .As<IMerchantService>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods));
 
             builder.Register(x =>
             {
@@ -109,6 +113,9 @@ namespace Lykke.Service.PayAPI.Modules
                     async () => (await assetsService.AssetPairGetAllAsync()).ToDictionary(itm => itm.Id)
                 );
             });
+            builder.RegisterType<MerchantWalletsService>()
+                .As<IMerchantWalletsService>();
+
             builder.Populate(_services);
         }
     }

@@ -11,6 +11,7 @@ using Lykke.Service.PayAPI.Core.Services;
 
 namespace Lykke.Service.PayAPI.Services
 {
+    //todo: update implementation to use new assetPairRates controller from PayInternal service. Exclude marketProfileService.
     public class RatesService : IRatesService
     {
         private readonly ILykkeMarketProfile _marketProfileService;
