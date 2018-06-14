@@ -112,6 +112,9 @@ namespace Lykke.Service.PayAPI.Modules
                 );
             });
 
+            builder.RegisterType<MerchantWalletsService>()
+                .As<IMerchantWalletsService>();
+
             builder.Populate(_services);
         }
     }

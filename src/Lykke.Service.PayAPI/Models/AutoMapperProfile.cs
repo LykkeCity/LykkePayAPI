@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Common;
+using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayCallback.Client.Models;
@@ -49,6 +50,9 @@ namespace Lykke.Service.PayAPI.Models
             CreateMap<InvoiceModel, InvoiceResponseModel>(MemberList.Destination)
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.MerchantName, opt => opt.Ignore());
+
+            CreateMap<MerchantWalletBalanceLine, MerchantWalletConvertedBalanceResponse>(MemberList.Destination)
+                .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.MerchantWalletId));
         }
     }
 }
