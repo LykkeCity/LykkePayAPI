@@ -11,6 +11,7 @@ using Lykke.Service.PayAuth.Client.Models.Employees;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Refit;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
@@ -34,25 +35,40 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// Authenticates user
         /// </summary>
         /// <param name="request">Authorization request details</param>
-        /// <returns></returns>
+        /// <response code="200">Authorization succedded</response>
+        /// <response code="400">Invalid email or password</response>
         [AllowAnonymous]
         [HttpPost]
         [Route("auth")]
         [SwaggerOperation(nameof(Auth))]
-        [ValidateModel]
         [ProducesResponseType(typeof(AuthResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ValidateModel]
         public async Task<IActionResult> Auth([FromBody] AuthRequestModel request)
         {
-            ValidateResultModel validationResult =
-                await _payAuthClient.ValidatePasswordAsync(request.Email, request.Password);
+            ValidateResultModel validationResult;
+
+            try
+            {
+                validationResult = await _payAuthClient.ValidatePasswordAsync(request.Email, request.Password);
+            }
+            catch (ErrorResponseException e)
+            {
+                var apiException = e.InnerException as ApiException;
+
+                if (apiException?.StatusCode == HttpStatusCode.BadRequest)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                throw;
+            }
 
             if (!validationResult.Success)
                 return BadRequest(ErrorResponse.Create("Invalid email or password"));
 
             return Ok(new AuthResponseModel
             {
-                Token = _authService.CreateToken(request.Email, validationResult.EmployeeId, validationResult.MerchantId),
+                Token = _authService.CreateToken(request.Email, validationResult.EmployeeId,
+                    validationResult.MerchantId),
                 EmployeeId = validationResult.EmployeeId,
                 MerchantId = validationResult.MerchantId,
                 ForcePasswordUpdate = validationResult.ForcePasswordUpdate,
@@ -64,15 +80,16 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// Updates user password
         /// </summary>
         /// <param name="request">Update password request details</param>
-        /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        /// <response code="200">Password updated successfully</response>
+        /// <response code="400">Invalid email, password or password must be different from previous password</response>
+        [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpPost]
         [Route("password")]
         [SwaggerOperation(nameof(UpdatePassword))]
-        [ValidateModel]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ValidateModel]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequestModel request)
         {
             if (request.CurrentPasssword.Equals(request.NewPasswordHash))
@@ -81,8 +98,21 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
             string email = this.GetUserEmail();
 
-            ValidateResultModel validationResult =
-                await _payAuthClient.ValidatePasswordAsync(email, request.CurrentPasssword);
+            ValidateResultModel validationResult;
+
+            try
+            {
+                validationResult = await _payAuthClient.ValidatePasswordAsync(email, request.CurrentPasssword);
+            }
+            catch (ErrorResponseException e)
+            {
+                var apiException = e.InnerException as ApiException;
+
+                if (apiException?.StatusCode == HttpStatusCode.BadRequest)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                throw;
+            }
 
             if (!validationResult.Success)
                 return BadRequest(ErrorResponse.Create("Invalid password"));
@@ -100,24 +130,37 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// Updates pin code
         /// </summary>
         /// <param name="request">Pin code update details</param>
-        /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        /// <response code="200">Pin updated successfully</response>
+        /// <response code="400">Email is invalid or there is no credentials</response>
+        [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpPost]
         [Route("pin")]
         [SwaggerOperation(nameof(UpdatePin))]
-        [ValidateModel]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ValidateModel]
         public async Task<IActionResult> UpdatePin([FromBody] UpdatePinRequestModel request)
         {
             string email = this.GetUserEmail();
 
-            await _payAuthClient.UpdatePinHashAsync(new UpdatePinHashModel
+            try
             {
-                Email = email,
-                PinHash = request.NewPinCodeHash
-            });
+                await _payAuthClient.UpdatePinHashAsync(new UpdatePinHashModel
+                {
+                    Email = email,
+                    PinHash = request.NewPinCodeHash
+                });
+            }
+            catch (ErrorResponseException e)
+            {
+                var apiException = e.InnerException as ApiException;
+
+                if (apiException?.StatusCode == HttpStatusCode.BadRequest)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                throw;
+            }
 
             return Ok();
         }
@@ -126,19 +169,35 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// Checks if pin is valid
         /// </summary>
         /// <param name="request">Pin validation request details</param>
-        /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        /// <response code="200">The pin has been successfully validated</response>
+        /// <response code="400">Email is invalid</response>
+        [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpPost]
         [Route("pin/validation")]
         [SwaggerOperation(nameof(ValidatePin))]
-        [ValidateModel]
         [ProducesResponseType(typeof(ValidatePinResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ValidateModel]
         public async Task<IActionResult> ValidatePin([FromBody] ValidatePinRequestModel request)
         {
             string email = this.GetUserEmail();
 
-            ValidateResultModel validationResult = await _payAuthClient.ValidatePinAsync(email, request.PinCode);
+            ValidateResultModel validationResult;
+
+            try
+            {
+                validationResult = await _payAuthClient.ValidatePinAsync(email, request.PinCode);
+            }
+            catch (ErrorResponseException e)
+            {
+                var apiException = e.InnerException as ApiException;
+
+                if (apiException?.StatusCode == HttpStatusCode.BadRequest)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                throw;
+            }
 
             return Ok(new ValidatePinResponseModel {Passed = validationResult.Success});
         }

@@ -11,7 +11,7 @@ namespace Lykke.Service.PayAPI.Models
         /// Gets or sets email
         /// </summary>
         [Required]
-        [EmailAddress]
+        [Validation.EmailAddress]
         public string Email { get; set; }
 
         /// <summary>
