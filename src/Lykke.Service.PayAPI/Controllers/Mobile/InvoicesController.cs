@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
+using Lykke.Service.PayAPI.Validation;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -174,6 +176,83 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             invoices = invoices.Where(x => settlementAssets.Contains(x.SettlementAssetId)).ToList();
 
             return invoices;
+        }
+
+        /// <summary>
+        /// Pay one or multiple invoices with certain amount
+        /// </summary>
+        /// <param name="model">Invoices ids and amount to pay</param>
+        /// <response code="200">Accepted for further processing</response>
+        /// <response code="400">Problem occured</response>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [BearerHeader]
+        [HttpPost("pay")]
+        [SwaggerOperation("PayInvoices")]
+        [ValidateModel]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.Accepted)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> PayInvoices([FromBody] PayInvoicesRequestModel model)
+        {
+            var merchantId = this.GetUserMerchantId();
+
+            try
+            {
+                await _payInvoiceClient.PayInvoicesAsync(new PayInvoicesRequest
+                {
+                    MerchantId = merchantId,
+                    InvoicesIds = model.InvoicesIds,
+                    Amount = model.AmountInBaseAsset
+                });
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return NotFound(ex.Error);
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(ex.Error);
+            }
+
+            return Accepted(true);
+        }
+
+        /// <summary>
+        /// Get sum for paying invoices
+        /// </summary>
+        /// <param name="invoicesIds">The invoices ids (e.g. ?invoicesIds=one&amp;invoicesIds=two)</param>
+        /// <response code="200">Sum for paying invoices</response>
+        /// <response code="400">Problem occured</response>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [BearerHeader]
+        [HttpGet("sum")]
+        [SwaggerOperation("GetSumToPayInvoices")]
+        [ValidateModel]
+        [ProducesResponseType(typeof(decimal), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetSumToPayInvoices([NotEmptyCollection] IEnumerable<string> invoicesIds)
+        {
+            var merchantId = this.GetUserMerchantId();
+            decimal result = 0;
+
+            try
+            {
+                result = await _payInvoiceClient.GetSumToPayInvoicesAsync(new GetSumToPayInvoicesRequest
+                {
+                    MerchantId = merchantId,
+                    InvoicesIds = invoicesIds
+                });
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return NotFound(ex.Error);
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(ex.Error);
+            }
+
+            return Accepted(result);
         }
     }
 }
