@@ -10,6 +10,7 @@ using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
+using Lykke.Service.PayAPI.Models.Invoice;
 using Lykke.Service.PayAPI.Validation;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
@@ -227,7 +228,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [HttpGet("sum")]
         [SwaggerOperation("GetSumToPayInvoices")]
         [ValidateModel]
-        [ProducesResponseType(typeof(decimal), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetSumToPayResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetSumToPayInvoices([NotEmptyCollection] IEnumerable<string> invoicesIds)
@@ -252,7 +253,10 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 return BadRequest(ex.Error);
             }
 
-            return Accepted(result);
+            return Accepted(new GetSumToPayResponse
+            {
+                AmountToPay = result
+            });
         }
     }
 }
