@@ -116,6 +116,10 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<MerchantWalletsService>()
                 .As<IMerchantWalletsService>();
 
+            builder.RegisterType<InvoiceService>()
+                .As<IInvoiceService>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.IataApi));
+
             builder.Populate(_services);
         }
     }
