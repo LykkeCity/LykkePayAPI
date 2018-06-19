@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -18,11 +19,16 @@ namespace Lykke.Service.PayAPI.Services
     public class InvoiceService : IInvoiceService, IDisposable
     {
         private readonly HttpClient _httpClientIataApi;
+        private readonly CacheExpirationPeriodsSettings _cacheExpirationPeriodsSettings;
+        private readonly InvoiceSettings _invoiceSettings;
+        private readonly OnDemandDataCache<IReadOnlyList<string>> _iataBillingCategories;
         private readonly OnDemandDataCache<InvoiceIataSpecificData> _invoiceIataSpecificDataCache;
         private readonly ILog _log;
 
         public InvoiceService(
             IataApiSettings iataApiSettings,
+            CacheExpirationPeriodsSettings cacheExpirationPeriodsSettings,
+            InvoiceSettings invoiceSettings,
             IMemoryCache memoryCache,
             ILog log)
         {
@@ -41,9 +47,51 @@ namespace Lykke.Service.PayAPI.Services
                     }
                 }
             };
-            
+
+            _cacheExpirationPeriodsSettings = cacheExpirationPeriodsSettings;
+            _invoiceSettings = invoiceSettings;
+            _iataBillingCategories = new OnDemandDataCache<IReadOnlyList<string>>(memoryCache);
             _invoiceIataSpecificDataCache = new OnDemandDataCache<InvoiceIataSpecificData>(memoryCache);
             _log = log;
+        }
+
+        public async Task<IReadOnlyDictionary<string, string>> GetIataBillingCategoriesAsync()
+        {
+            var iataBillingCategories = await _iataBillingCategories.GetOrAddAsync
+                (
+                    "IataBillingCategories",
+                    async x => {
+                        try
+                        {
+                            var response = await _httpClientIataApi.GetAsync("/api/v1/invoices/billingCategories");
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                string value = await response.Content.ReadAsStringAsync();
+                                var deserializedResponse = JsonConvert.DeserializeObject<IReadOnlyList<string>>(value);
+                                return deserializedResponse;
+                            }
+                            else
+                            {
+                                _log.WriteWarning(nameof(GetIataBillingCategoriesAsync), null, "Not success status code");
+                                return null;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _log.WriteError(nameof(GetIataBillingCategoriesAsync), null, ex);
+                            return null;
+                        }
+                    },
+                    _cacheExpirationPeriodsSettings.IataBillingCategories
+                );
+
+            return iataBillingCategories?.ToDictionary(x => x, x => x);
+        }
+
+        public IReadOnlyDictionary<string, string> GetIataAssets()
+        {
+            return _invoiceSettings.AssetsMap.Values.ToDictionary(x => x.Key.ToUpperInvariant(), x => x.Value);
         }
 
         public async Task<InvoiceIataSpecificData> GetIataSpecificDataAsync(string invoiceId)

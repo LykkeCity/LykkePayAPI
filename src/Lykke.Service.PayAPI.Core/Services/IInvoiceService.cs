@@ -8,6 +8,8 @@ namespace Lykke.Service.PayAPI.Core.Services
 {
     public interface IInvoiceService
     {
+        Task<IReadOnlyDictionary<string, string>> GetIataBillingCategoriesAsync();
+        IReadOnlyDictionary<string, string> GetIataAssets();
         Task<InvoiceIataSpecificData> GetIataSpecificDataAsync(string invoiceId);
     }
 }

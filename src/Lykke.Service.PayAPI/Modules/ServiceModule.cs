@@ -117,6 +117,8 @@ namespace Lykke.Service.PayAPI.Modules
 
             builder.RegisterType<InvoiceService>()
                 .As<IInvoiceService>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Invoice))
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods))
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.IataApi));
 
             builder.Populate(_services);
