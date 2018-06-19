@@ -83,7 +83,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
                 var result = Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets));
                 await FillAdditionalData(result);
-                return Ok(result);
+                return Ok(result.OrderByDescending(x => x.CreatedDate));
             }
             catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -144,7 +144,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
                 var result = Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets));
                 await FillAdditionalData(result);
-                return Ok(result);
+                return Ok(result.OrderByDescending(x => x.CreatedDate));
             }
             catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
             {
