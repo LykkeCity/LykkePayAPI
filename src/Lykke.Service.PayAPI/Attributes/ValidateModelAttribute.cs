@@ -20,6 +20,9 @@ namespace Lykke.Service.PayAPI.Attributes
 
                 foreach (var parameter in parameters)
                 {
+                    if (context.ActionArguments.Count == 0)
+                        continue;
+
                     var argument = context.ActionArguments[parameter.Name];
 
                     EvaluateValidationAttributes(parameter, argument, context.ModelState);
