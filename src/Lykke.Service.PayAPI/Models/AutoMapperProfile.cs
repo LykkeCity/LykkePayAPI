@@ -49,6 +49,9 @@ namespace Lykke.Service.PayAPI.Models
 
             CreateMap<InvoiceModel, InvoiceResponseModel>(MemberList.Destination)
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.IataInvoiceDate, opt => opt.Ignore())
+                .ForMember(dest => dest.SettlementMonthPeriod, opt => opt.Ignore())
+                .ForMember(dest => dest.LogoUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.MerchantName, opt => opt.Ignore());
 
             CreateMap<MerchantWalletBalanceLine, MerchantWalletConvertedBalanceResponse>(MemberList.Destination)

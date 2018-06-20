@@ -16,5 +16,20 @@ namespace Lykke.Service.PayAPI.Models
         /// Status name
         /// </summary>
         public new string Status { get; set; }
+
+        /// <summary>
+        /// IATA invoice date
+        /// </summary>
+        public string IataInvoiceDate { get; set; }
+
+        /// <summary>
+        /// Settlement month period
+        /// </summary>
+        public string SettlementMonthPeriod { get; set; }
+
+        /// <summary>
+        /// Logo blob url of the merchant
+        /// </summary>
+        public string LogoUrl { get; set; }
     }
 }
