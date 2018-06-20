@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Lykke.Service.PayAuth.Client;
 using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayInvoice.Client;
+using Lykke.Service.IataApi.Client;
 
 namespace Lykke.Service.PayAPI.Modules
 {
@@ -83,6 +84,11 @@ namespace Lykke.Service.PayAPI.Modules
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayCallbackServiceClient))
                 .SingleInstance();
 
+            builder.RegisterType<IataApiClient>()
+                .As<IIataApiClient>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.IataApiServiceClient))
+                .SingleInstance();
+
             builder.RegisterType<PaymentRequestService>()
                 .As<IPaymentRequestService>()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.PaymentRequestDueDate));
@@ -116,11 +122,10 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<MerchantWalletsService>()
                 .As<IMerchantWalletsService>();
 
-            builder.RegisterType<InvoiceService>()
-                .As<IInvoiceService>()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Invoice))
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods))
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.IataApi));
+            builder.RegisterType<IataService>()
+                .As<IIataService>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata))
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods));
 
             builder.Populate(_services);
         }
