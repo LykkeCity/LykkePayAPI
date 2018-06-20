@@ -111,8 +111,7 @@ namespace Lykke.Service.PayAPI.Controllers
                 result = new CurrentUserInfoResponse
                 {
                     MerchantName = await _merchantService.GetMerchantNameAsync(merchantId),
-                    //TODO: implement getting logo url later
-                    MerchantLogoUrl = "https://lkedevmerchant.blob.core.windows.net/merchantfiles/iata_256.jpg",
+                    MerchantLogoUrl = await _merchantService.GetMerchantLogoUrlAsync(merchantId),
                     FirstName = employee.FirstName,
                     LastName = employee.LastName,
                     Email = employee.Email

@@ -202,8 +202,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                     {
                         Id = item.Id,
                         Value = item.Value,
-                        //TODO: implement getting logo url later
-                        MerchantLogoUrl = "https://lkedevmerchant.blob.core.windows.net/merchantfiles/iata_256.jpg"
+                        MerchantLogoUrl = await _merchantService.GetMerchantLogoUrlAsync(item.Id)
                     });
                 }
 
@@ -240,8 +239,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                     invoice.SettlementMonthPeriod = iataSpecificData.SettlementMonthPeriod;
                 }
 
-                //TODO: implement getting logo url later
-                invoice.LogoUrl = "https://lkedevmerchant.blob.core.windows.net/merchantfiles/iata_256.jpg";
+                invoice.LogoUrl = await _merchantService.GetMerchantLogoUrlAsync(invoice.MerchantId);
             }
         }
 
