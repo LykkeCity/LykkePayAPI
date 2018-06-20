@@ -194,7 +194,20 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                     }
                 }
 
-                filter.GroupMerchants = merchantsDictionary.ToListOfFilterItems();
+                var groupMerchantsFilterItems = new List<MerchantFilterItemModel>();
+
+                foreach (var item in merchantsDictionary.ToListOfFilterItems())
+                {
+                    groupMerchantsFilterItems.Add(new MerchantFilterItemModel
+                    {
+                        Id = item.Id,
+                        Value = item.Value,
+                        //TODO: implement getting logo url later
+                        MerchantLogoUrl = "https://lkedevmerchant.blob.core.windows.net/merchantfiles/iata_256.jpg"
+                    });
+                }
+
+                filter.GroupMerchants = groupMerchantsFilterItems;
 
                 filter.BillingCategories = (await _invoiceService.GetIataBillingCategoriesAsync()).ToListOfFilterItems();
 
