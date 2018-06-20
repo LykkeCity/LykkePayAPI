@@ -100,16 +100,23 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// </summary>
         /// <response code="200">A details of the history operation.</response>
         /// <response code="400">Problem occured.</response>        
+        /// <response code="404">History operation is not found.</response>        
         [HttpGet]
         [SwaggerOperation("HistoryDetails")]
         [ProducesResponseType(typeof(HistoryOperationModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Details(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest($"Identificator of the history operation (parameter \"{nameof(id)}\") is invalid..");
+            }
+
             var model = _models.FirstOrDefault(m => string.Equals(id, m.Id, StringComparison.OrdinalIgnoreCase));
             if (model == null)
             {
-                return BadRequest("History operation is not found.");
+                return NotFound();
             }
 
             return Ok(model);
@@ -119,18 +126,25 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// Returns details of the invoice history operation.
         /// </summary>
         /// <response code="200">A details of the history operation.</response>
-        /// <response code="400">Problem occured.</response>        
+        /// <response code="400">Problem occured.</response>
+        /// <response code="404">History operation is not found.</response>        
         [HttpGet]
         [SwaggerOperation("InvoiceHistoryDetails")]
         [ProducesResponseType(typeof(HistoryOperationInvoiceModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult InvoiceDetails(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest($"Identificator of the history operation (parameter \"{nameof(id)}\") is invalid..");
+            }
+
             var model = _models.FirstOrDefault(m => string.Equals(id, m.Id, StringComparison.OrdinalIgnoreCase))
                 as HistoryOperationInvoiceModel;
             if (model == null)
             {
-                return BadRequest("History operation is not found.");
+                return NotFound();
             }
 
             return Ok(model);
