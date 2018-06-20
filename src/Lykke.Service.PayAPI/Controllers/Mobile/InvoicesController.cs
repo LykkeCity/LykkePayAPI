@@ -25,18 +25,18 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Route("api/v{version:apiVersion}/mobile/invoices")]
     public class InvoicesController : Controller
     {
-        private readonly IInvoiceService _invoiceService;
+        private readonly IIataService _iataService;
         private readonly IMerchantService _merchantService;
         private readonly IPayInvoiceClient _payInvoiceClient;
         private readonly ILog _log;
 
         public InvoicesController(
-            IInvoiceService invoiceService,
+            IIataService iataService,
             IMerchantService merchantService,
             IPayInvoiceClient payInvoiceClient,
             ILog log)
         {
-            _invoiceService = invoiceService;
+            _iataService = iataService;
             _merchantService = merchantService;
             _payInvoiceClient = payInvoiceClient ?? throw new ArgumentNullException(nameof(payInvoiceClient));
             _log = log.CreateComponentScope(nameof(InvoicesController)) ?? throw new ArgumentNullException(nameof(log));
@@ -210,9 +210,9 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
                 filter.GroupMerchants = groupMerchantsFilterItems;
 
-                filter.BillingCategories = (await _invoiceService.GetIataBillingCategoriesAsync()).ToListOfFilterItems();
+                filter.BillingCategories = (await _iataService.GetIataBillingCategoriesAsync()).ToListOfFilterItems();
 
-                filter.SettlementAssets = _invoiceService.GetIataAssets().ToListOfFilterItems();
+                filter.SettlementAssets = _iataService.GetIataAssets().ToListOfFilterItems();
 
                 return Ok(filter);
             }
@@ -234,7 +234,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             {
                 invoice.MerchantName = await _merchantService.GetMerchantNameAsync(invoice.MerchantId);
 
-                var iataSpecificData = await _invoiceService.GetIataSpecificDataAsync(invoice.Id);
+                var iataSpecificData = await _iataService.GetIataSpecificDataAsync(invoice.Id);
                 if (iataSpecificData != null)
                 {
                     invoice.IataInvoiceDate = iataSpecificData.IataInvoiceDate;
