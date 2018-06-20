@@ -8,10 +8,16 @@ namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
         public DbSettings Db { get; set; }
         public TimeSpan PaymentRequestDueDate { get; set; }
         public string PayInvoicePortalUrl { get; set; }
+        public MerchantSettings Merchant { get; set; }
         public JwtSecuritySettings JwtSecurity { get; set; }
         public CacheExpirationPeriodsSettings CacheExpirationPeriods { get; set; }
         public IataApiSettings IataApi { get; set; }
         public InvoiceSettings Invoice { get; set; }
+    }
+
+    public class MerchantSettings
+    {
+        public string MerchantDefaultLogoUrl { get; set; }
     }
 
     public class JwtSecuritySettings
