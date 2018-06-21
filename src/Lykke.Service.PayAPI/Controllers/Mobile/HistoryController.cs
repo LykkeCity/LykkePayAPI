@@ -27,6 +27,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             new HistoryOperationModel
             {
                 Id = "59f2c4bc-8edb-41e5-be25-b63c7729b885",
+                MerchantName = "British Airways",
                 MerchantLogoUrl = "https://lkedevmerchant.blob.core.windows.net/merchantfiles/iata_256.jpg",
                 Title = "USD Incoming transfer",
                 CreatedOn = new DateTime(2015,12,08,15,46,02),
@@ -41,6 +42,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             new HistoryOperationModel
             {
                 Id = "0970e655-88ea-444e-a46f-476ba9ca1e32",
+                MerchantName = "British Airways",
                 MerchantLogoUrl = "https://lkedevmerchant.blob.core.windows.net/merchantfiles/iata_256.jpg",
                 Title = "CHF Buy",
                 CreatedOn = new DateTime(2015,12,09,14,35,03),
@@ -58,6 +60,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             new HistoryOperationModel
             {
                 Id = "1bce8215-63e7-4bcb-8ac5-7572dba9cf5d",
+                MerchantName = "British Airways",
                 MerchantLogoUrl = "https://lkedevmerchant.blob.core.windows.net/merchantfiles/iata_256.jpg",
                 Title = "USD Sell",
                 CreatedOn = new DateTime(2015,12,10,13,24,04),
