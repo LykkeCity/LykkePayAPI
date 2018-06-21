@@ -3,6 +3,7 @@ using Common;
 using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
+using Lykke.Service.PayAPI.Models.Invoice;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.Asset;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
@@ -53,6 +54,10 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.SettlementMonthPeriod, opt => opt.Ignore())
                 .ForMember(dest => dest.LogoUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.MerchantName, opt => opt.Ignore());
+
+            CreateMap<InvoiceResponseModel, InvoiceMarkedDisputeResponse>(MemberList.Destination)
+                .ForMember(dest => dest.DisputeRaisedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.DisputeReason, opt => opt.Ignore());
 
             CreateMap<MerchantWalletBalanceLine, MerchantWalletConvertedBalanceResponse>(MemberList.Destination)
                 .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.MerchantWalletId));
