@@ -110,7 +110,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                return BadRequest($"Identificator of the history operation (parameter \"{nameof(id)}\") is invalid..");
+                return NotFound($"Identificator of the history operation (parameter \"{nameof(id)}\") is invalid..");
             }
 
             var model = _models.FirstOrDefault(m => string.Equals(id, m.Id, StringComparison.OrdinalIgnoreCase));
@@ -137,7 +137,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                return BadRequest($"Identificator of the history operation (parameter \"{nameof(id)}\") is invalid..");
+                return NotFound($"Identificator of the history operation (parameter \"{nameof(id)}\") is invalid..");
             }
 
             var model = _models.FirstOrDefault(m => string.Equals(id, m.Id, StringComparison.OrdinalIgnoreCase))
