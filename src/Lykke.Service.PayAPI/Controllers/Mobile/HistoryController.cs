@@ -38,7 +38,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 BlockConfirmations=9,
                 TxHash="12JhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RvdmVua29AdGVzdC5ydSIsIkVtcGxveWVlSWQiOiJiYWI3Yzg3NC03ZjY0LTQ3YmQtYjg3Mi0yODU4MDY1Y2RjMTAiLCJNZXJjaGFudElkIjoicGVtNiIsImV4cCI6MTUyOTU5NzY4MywiaXNzIjoiaHR0cDovL2x5a2tlLXBheS1hcGkubHlra2UtYXBpLnN2Yy5jbHVzdGVyLmxvY2FsIiwiYXVkIjoiaHR0cDovL2x5a2tlLXBheS1hcGkubHlra2UtYXBpLnN2Yy5jbHVzdGVyLmxvY2FsIn0.8p3IpujS1qZr8qvzwr_QS8WRusL-wcoCKWL0t4jiWGM"
             },
-            new HistoryOperationInvoiceModel
+            new HistoryOperationModel
             {
                 Id = "0970e655-88ea-444e-a46f-476ba9ca1e32",
                 MerchantLogoUrl = "https://lkedevmerchant.blob.core.windows.net/merchantfiles/iata_256.jpg",
@@ -114,34 +114,6 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
 
             var model = _models.FirstOrDefault(m => string.Equals(id, m.Id, StringComparison.OrdinalIgnoreCase));
-            if (model == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(model);
-        }
-
-        /// <summary>
-        /// Returns details of the invoice history operation.
-        /// </summary>
-        /// <response code="200">A details of the history operation.</response>
-        /// <response code="400">Problem occured.</response>
-        /// <response code="404">History operation is not found.</response>        
-        [HttpGet]
-        [SwaggerOperation("InvoiceHistoryDetails")]
-        [ProducesResponseType(typeof(HistoryOperationInvoiceModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult InvoiceDetails(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return NotFound($"Identificator of the history operation (parameter \"{nameof(id)}\") is invalid..");
-            }
-
-            var model = _models.FirstOrDefault(m => string.Equals(id, m.Id, StringComparison.OrdinalIgnoreCase))
-                as HistoryOperationInvoiceModel;
             if (model == null)
             {
                 return NotFound();
