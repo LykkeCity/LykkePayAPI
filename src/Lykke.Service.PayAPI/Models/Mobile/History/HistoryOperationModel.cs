@@ -7,6 +7,8 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
     {
         public string Id { get; set; }
 
+        public string MerchantName { get; set; }
+
         public string MerchantLogoUrl { get; set; }
 
         public string Title { get; set; }
