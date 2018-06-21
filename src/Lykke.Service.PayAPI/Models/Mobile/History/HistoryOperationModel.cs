@@ -1,4 +1,5 @@
 ﻿using System;
+using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
 namespace Lykke.Service.PayAPI.Models.Mobile.History
 {
@@ -25,5 +26,11 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
         public int BlockHeight { get; set; }
 
         public int BlockConfirmations { get; set; }
+
+        public string InvoiceNumber { get; set; }
+
+        public string BillingCategory { get; set; }
+
+        public InvoiceStatus? InvoiceStatus { get; set; }
     }
 }
