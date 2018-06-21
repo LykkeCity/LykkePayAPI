@@ -228,6 +228,148 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
+        /// <summary>
+        /// Mark dispute
+        /// </summary>
+        /// <param name="model">The model</param>
+        /// <response code="200">Success</response>
+        /// <response code="404">Not found</response>
+        /// <response code="400">Invalid model</response>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [BearerHeader]
+        [HttpPost]
+        [Route("dispute/mark")]
+        [SwaggerOperation(nameof(MarkDispute))]
+        [ValidateModel]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> MarkDispute([FromBody] Models.Invoice.MarkInvoiceDisputeRequest model)
+        {
+            var employeeId = this.GetUserEmployeeId();
+
+            try
+            {
+                await _payInvoiceClient.MarkDisputeAsync(new PayInvoice.Client.Models.Invoice.MarkInvoiceDisputeRequest
+                {
+                    InvoiceId = model.InvoiceId,
+                    Reason = model.Reason,
+                    EmployeeId = employeeId
+                });
+
+                return Ok();
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return NotFound(ex.Error);
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(ex.Error);
+            }
+        }
+
+        /// <summary>
+        /// Cancel dispute
+        /// </summary>
+        /// <param name="model">The model</param>
+        /// <response code="200">Success</response>
+        /// <response code="404">Not found</response>
+        /// <response code="400">Invalid model</response>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [BearerHeader]
+        [HttpPost]
+        [Route("dispute/cancel")]
+        [SwaggerOperation(nameof(CancelDispute))]
+        [ValidateModel]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> CancelDispute([FromBody] Models.Invoice.CancelInvoiceDisputeRequest model)
+        {
+            var employeeId = this.GetUserEmployeeId();
+
+            try
+            {
+                await _payInvoiceClient.CancelDisputeAsync(new PayInvoice.Client.Models.Invoice.CancelInvoiceDisputeRequest
+                {
+                    InvoiceId = model.InvoiceId,
+                    EmployeeId = employeeId
+                });
+
+                return Ok();
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return NotFound(ex.Error);
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(ex.Error);
+            }
+        }
+
+        /// <summary>
+        /// Get list of my invoices which are marked as Dispute
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="404">Not found</response>
+        /// <response code="400">Problem occured</response>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [BearerHeader]
+        [HttpGet]
+        [Route("dispute/list")]
+        [SwaggerOperation(nameof(GetMyInvoicesMarkedDispute))]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetMyInvoicesMarkedDispute()
+        {
+            var merchantId = this.GetUserMerchantId();
+
+            try
+            {
+                IReadOnlyList<string> groupMerchants = await _merchantService.GetGroupMerchantsAsync(merchantId);
+
+                var disputeInvoices = await _payInvoiceClient.GetByFilter(new string[] { merchantId }, groupMerchants, null, dispute: true, null, null, null);
+
+                var result = Mapper.Map<IReadOnlyList<InvoiceMarkedDisputeResponse>>(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(disputeInvoices));
+
+                await FillAdditionalData(result);
+
+                // Fill dispute info
+                foreach (var invoice in result)
+                {
+                    var info = await GetInvoiceDisputeInfo(invoice.Id);
+
+                    if (info != null)
+                    {
+                        invoice.DisputeRaisedAt = info.CreatedAt;
+                        invoice.DisputeReason = info.Reason;
+                    }
+                }
+
+                return Ok(result.OrderByDescending(x => x.CreatedDate));
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(ex.Error);
+            }
+        }
+
+        private async Task<InvoiceDisputeInfoResponse> GetInvoiceDisputeInfo(string invoiceId)
+        {
+            try
+            {
+                var info = await _payInvoiceClient.GetInvoiceDisputeInfoAsync(invoiceId);
+                return info;
+            }
+            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
+
         private async Task FillAdditionalData(IReadOnlyList<InvoiceResponseModel> result)
         {
             foreach (var invoice in result)
