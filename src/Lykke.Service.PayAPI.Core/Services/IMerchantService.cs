@@ -8,5 +8,6 @@ namespace Lykke.Service.PayAPI.Core.Services
         Task<string> GetMerchantNameAsync(string merchantId);
         Task<string> GetMerchantLogoUrlAsync(string merchantId);
         Task<IReadOnlyList<string>> GetGroupMerchantsAsync(string merchantId);
+        Task<string> GetBaseAssetAsync(string merchantId);
     }
 }
