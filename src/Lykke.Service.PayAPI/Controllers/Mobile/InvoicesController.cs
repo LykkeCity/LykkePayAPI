@@ -10,6 +10,8 @@ using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayAPI.Models.Invoice;
+using Lykke.Service.PayInternal.Client;
+using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,17 +27,20 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     {
         private readonly IIataService _iataService;
         private readonly IMerchantService _merchantService;
+        private readonly IPayInternalClient _payInternalClient;
         private readonly IPayInvoiceClient _payInvoiceClient;
         private readonly ILog _log;
 
         public InvoicesController(
             IIataService iataService,
             IMerchantService merchantService,
+            IPayInternalClient payInternalClient,
             IPayInvoiceClient payInvoiceClient,
             ILog log)
         {
             _iataService = iataService;
             _merchantService = merchantService;
+            _payInternalClient = payInternalClient;
             _payInvoiceClient = payInvoiceClient ?? throw new ArgumentNullException(nameof(payInvoiceClient));
             _log = log.CreateComponentScope(nameof(InvoicesController)) ?? throw new ArgumentNullException(nameof(log));
         }
@@ -57,6 +62,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [HttpGet("mine")]
         [SwaggerOperation("InvoicesGetMineByFilter")]
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetMineByFilter(IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, IEnumerable<string> settlementAssets, decimal? greaterThan, decimal? lessThan)
@@ -83,15 +89,31 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                     clientMerchantIds = groupMerchants;
                 }
 
-                var invoices = await _payInvoiceClient.GetByFilter(new string[] { merchantId }, clientMerchantIds, statuses, dispute, billingCategories, greaterThan, lessThan);
+                var invoices = await _payInvoiceClient.GetByFilter(new string[] { merchantId }, clientMerchantIds, statuses, dispute, billingCategories, null, null);
 
                 var result = Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets));
+
                 await FillAdditionalData(result);
+
+                result = await FilterByAmountInBaseAsset(result, greaterThan, lessThan, merchantId);
+
                 return Ok(result.OrderByDescending(x => x.CreatedDate));
             }
-            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            catch (DefaultErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                return BadRequest(ex.Error);
+                return NotFound(ex.Error);
+            }
+            catch (ErrorResponseException ex)
+            {
+                switch (ex.StatusCode)
+                {
+                    case HttpStatusCode.NotFound:
+                        return NotFound(ex.Error);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(ex.Error);
+                    default:
+                        throw;
+                }
             }
             catch (Exception ex)
             {
@@ -118,6 +140,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [HttpGet("inbox")]
         [SwaggerOperation("InvoicesGetInboxByFilter")]
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetInboxByFilter(IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, IEnumerable<string> settlementAssets, decimal? greaterThan, decimal? lessThan)
@@ -144,15 +167,31 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                     clientMerchantIds = groupMerchants;
                 }
 
-                var invoices = await _payInvoiceClient.GetByFilter(clientMerchantIds, new string[] { merchantId }, statuses, dispute, billingCategories, greaterThan, lessThan);
+                var invoices = await _payInvoiceClient.GetByFilter(clientMerchantIds, new string[] { merchantId }, statuses, dispute, billingCategories, null, null);
 
                 var result = Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(FilterBySettlementAssets(invoices, settlementAssets));
+
                 await FillAdditionalData(result);
+
+                result = await FilterByAmountInBaseAsset(result, greaterThan, lessThan, merchantId);
+
                 return Ok(result.OrderByDescending(x => x.CreatedDate));
             }
-            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            catch (DefaultErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                return BadRequest(ex.Error);
+                return NotFound(ex.Error);
+            }
+            catch (ErrorResponseException ex)
+            {
+                switch (ex.StatusCode)
+                {
+                    case HttpStatusCode.NotFound:
+                        return NotFound(ex.Error);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(ex.Error);
+                    default:
+                        throw;
+                }
             }
             catch (Exception ex)
             {
@@ -172,6 +211,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [HttpGet("filter")]
         [SwaggerOperation("GetFilterForCurrentMerchant")]
         [ProducesResponseType(typeof(FilterOfMerchantResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetFilterForCurrentMerchant()
@@ -212,11 +252,31 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
                 filter.SettlementAssets = _iataService.GetIataAssets().ToListOfFilterItems();
 
+                #region MaxRangeInBaseAsset
+                var invoices = await _payInvoiceClient.GetByFilter(groupMerchants, new string[] { merchantId }, null, null, null, null, null);
+
+                var calculatedInvoices = await CalcSettlementAmountInBaseAsset(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(invoices), merchantId);
+
+                filter.MaxRangeInBaseAsset = Math.Ceiling(calculatedInvoices.Max(x => x.SettlementAmountInBaseAsset));
+                #endregion
+
                 return Ok(filter);
             }
-            catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            catch (DefaultErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                return BadRequest(ex.Error);
+                return NotFound(ex.Error);
+            }
+            catch (ErrorResponseException ex)
+            {
+                switch (ex.StatusCode)
+                {
+                    case HttpStatusCode.NotFound:
+                        return NotFound(ex.Error);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(ex.Error);
+                    default:
+                        throw;
+                }
             }
             catch (Exception ex)
             {
@@ -366,6 +426,66 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private async Task<IReadOnlyList<InvoiceResponseModel>> FilterByAmountInBaseAsset(IReadOnlyList<InvoiceResponseModel> invoices, decimal? greaterThan, decimal? lessThan, string merchantId)
+        {
+            if (greaterThan == null && lessThan == null)
+                return invoices;
+
+            var calculatedInvoices = await CalcSettlementAmountInBaseAsset(invoices, merchantId);
+
+            if (greaterThan.HasValue)
+            {
+                calculatedInvoices = calculatedInvoices.Where(x => x.SettlementAmountInBaseAsset >= greaterThan).ToList();
+            }
+
+            if (lessThan.HasValue)
+            {
+                calculatedInvoices = calculatedInvoices.Where(x => x.SettlementAmountInBaseAsset <= lessThan).ToList();
+            }
+
+            return calculatedInvoices;
+        }
+
+        private async Task<IReadOnlyList<InvoiceResponseModel>> CalcSettlementAmountInBaseAsset(IReadOnlyList<InvoiceResponseModel> invoices, string merchantId)
+        {
+            var baseAsset = await _payInvoiceClient.GetBaseAssetAsync(merchantId);
+
+            var invoiceSettlementAssets = invoices.Select(x => x.SettlementAssetId).Distinct();
+
+            var rates = new Dictionary<string, decimal>();
+
+            foreach (var settlementAsset in invoiceSettlementAssets)
+            {
+                if (baseAsset == settlementAsset)
+                {
+                    rates.Add(settlementAsset, 1);
+                }
+                else
+                {
+                    //the response example is
+                    /*
+                     "BaseAssetId": "IATAUSDT2",
+                     "QuotingAssetId": "IATAEURT2",
+                     "BidPrice": 0.87,
+                    */
+                    var assetRateResponse = await _payInternalClient.GetCurrentAssetPairRateAsync(settlementAsset, baseAsset);
+                    rates.Add(settlementAsset, assetRateResponse.BidPrice);
+                }
+            }
+
+            foreach (var invoice in invoices)
+            {
+                invoice.SettlementAmountInBaseAsset = invoice.SettlementAssetId == baseAsset
+                    ? invoice.Amount
+                    : invoice.Amount * rates[invoice.SettlementAssetId];
+            }
+
+            return invoices;
         }
 
         private async Task FillAdditionalData(IReadOnlyList<InvoiceResponseModel> result)

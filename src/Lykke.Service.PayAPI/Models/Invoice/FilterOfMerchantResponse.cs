@@ -11,5 +11,7 @@ namespace Lykke.Service.PayAPI.Models.Invoice
         public IReadOnlyList<FilterItemModel> BillingCategories { get; set; }
 
         public IReadOnlyList<FilterItemModel> SettlementAssets { get; set; }
+
+        public decimal MaxRangeInBaseAsset { get; set; }
     }
 }
