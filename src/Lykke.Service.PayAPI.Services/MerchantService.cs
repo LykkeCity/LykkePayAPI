@@ -6,6 +6,7 @@ using Lykke.Common.Cache;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayInternal.Client;
+using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInternal.Client.Models.MerchantGroups;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.MerchantSetting;
@@ -19,6 +20,7 @@ namespace Lykke.Service.PayAPI.Services
         private readonly IPayInvoiceClient _payInvoiceClient;
         private readonly MerchantSettings _merchantSettings;
         private readonly OnDemandDataCache<string> _merchantNamesCache;
+        private readonly OnDemandDataCache<string> _merchantLogoUrlsCache;
         private readonly CacheExpirationPeriodsSettings _cacheExpirationPeriods;
 
         public MerchantService(
@@ -32,6 +34,7 @@ namespace Lykke.Service.PayAPI.Services
             _payInvoiceClient = payInvoiceClient;
             _merchantSettings = merchantSettings;
             _merchantNamesCache = new OnDemandDataCache<string>(memoryCache);
+            _merchantLogoUrlsCache = new OnDemandDataCache<string>(memoryCache);
             _cacheExpirationPeriods = cacheExpirationPeriods;
         }
 
@@ -52,8 +55,21 @@ namespace Lykke.Service.PayAPI.Services
 
         public async Task<string> GetMerchantLogoUrlAsync(string merchantId)
         {
-            //TODO: implement getting logo url later from PayInternal service
-            var merchantLogoUrl = await Task.FromResult(_merchantSettings.MerchantDefaultLogoUrl);
+            var merchantLogoUrl = await _merchantLogoUrlsCache.GetOrAddAsync
+                (
+                    $"MerchantLogoUrl-{merchantId}",
+                    async x => {
+                        try
+                        {
+                            return await _payInternalClient.GetMerchantLogoUrl(merchantId);
+                        }
+                        catch (DefaultErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            return _merchantSettings.MerchantDefaultLogoUrl;
+                        }
+                    },
+                    _cacheExpirationPeriods.MerchantLogoUrl
+                );
 
             return merchantLogoUrl;
         }
