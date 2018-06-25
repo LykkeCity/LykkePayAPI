@@ -8,10 +8,15 @@ namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
         public DbSettings Db { get; set; }
         public TimeSpan PaymentRequestDueDate { get; set; }
         public string PayInvoicePortalUrl { get; set; }
+        public MerchantSettings Merchant { get; set; }
         public JwtSecuritySettings JwtSecurity { get; set; }
         public CacheExpirationPeriodsSettings CacheExpirationPeriods { get; set; }
-        public IataApiSettings IataApi { get; set; }
-        public InvoiceSettings Invoice { get; set; }
+        public IataSettings Iata { get; set; }
+    }
+
+    public class MerchantSettings
+    {
+        public string MerchantDefaultLogoUrl { get; set; }
     }
 
     public class JwtSecuritySettings
@@ -22,13 +27,7 @@ namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
         public TimeSpan TokenLifetime { get; set; }
     }
 
-    public class IataApiSettings
-    {
-        public string Url { get; set; }
-        public string LykkeStaffKey { get; set; }
-    }
-
-    public class InvoiceSettings
+    public class IataSettings
     {
         public AssetsMapSettings AssetsMap { get; set; }
     }

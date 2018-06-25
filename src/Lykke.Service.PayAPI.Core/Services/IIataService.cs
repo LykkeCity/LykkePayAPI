@@ -6,7 +6,7 @@ using Lykke.Service.PayAPI.Core.Domain.Invoice;
 
 namespace Lykke.Service.PayAPI.Core.Services
 {
-    public interface IInvoiceService
+    public interface IIataService
     {
         Task<IReadOnlyDictionary<string, string>> GetIataBillingCategoriesAsync();
         IReadOnlyDictionary<string, string> GetIataAssets();

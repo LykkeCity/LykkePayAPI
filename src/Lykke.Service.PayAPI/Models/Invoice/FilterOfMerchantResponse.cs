@@ -6,7 +6,7 @@ namespace Lykke.Service.PayAPI.Models.Invoice
 {
     public class FilterOfMerchantResponse
     {
-        public IReadOnlyList<FilterItemModel> GroupMerchants { get; set; }
+        public IReadOnlyList<MerchantFilterItemModel> GroupMerchants { get; set; }
 
         public IReadOnlyList<FilterItemModel> BillingCategories { get; set; }
 
