@@ -54,6 +54,7 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.IataInvoiceDate, opt => opt.Ignore())
                 .ForMember(dest => dest.SettlementMonthPeriod, opt => opt.Ignore())
                 .ForMember(dest => dest.LogoUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.SettlementAmountInBaseAsset, opt => opt.Ignore())
                 .ForMember(dest => dest.MerchantName, opt => opt.Ignore());
 
             CreateMap<InvoiceResponseModel, InvoiceMarkedDisputeResponse>(MemberList.Destination)

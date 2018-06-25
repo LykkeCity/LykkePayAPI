@@ -31,5 +31,7 @@ namespace Lykke.Service.PayAPI.Models
         /// Logo blob url of the merchant
         /// </summary>
         public string LogoUrl { get; set; }
+
+        public decimal SettlementAmountInBaseAsset { get; set; }
     }
 }
