@@ -119,12 +119,25 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
             if (!string.IsNullOrEmpty(historyOperation.InvoiceId))
             {
-                var invoice = await _payInvoiceClient.GetInvoiceAsync(historyOperation.InvoiceId);
-                if (invoice != null)
+                try
                 {
-                    result.InvoiceNumber = invoice.Number;
-                    result.BillingCategory = invoice.BillingCategory;
-                    result.InvoiceStatus = invoice.Status;
+                    var invoice = await _payInvoiceClient.GetInvoiceAsync(historyOperation.InvoiceId);
+                    if (invoice != null)
+                    {
+                        result.InvoiceNumber = invoice.Number;
+                        result.BillingCategory = invoice.BillingCategory;
+                        result.InvoiceStatus = invoice.Status;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var apiEx = ex.InnerException as Refit.ApiException;
+                    if (apiEx?.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        return NotFound("Invoice is not found.");
+                    }
+
+                    throw;
                 }
             }
 
