@@ -76,7 +76,11 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             foreach (var historyOperation in historyOperations)
             {
                 var result = Mapper.Map<HistoryOperationViewModel>(historyOperation);
-                string logoKey = historyOperation.OppositeMerchantId ?? merchantId;
+
+                string logoKey = string.IsNullOrEmpty(historyOperation.OppositeMerchantId)
+                    ? merchantId
+                    : historyOperation.OppositeMerchantId;
+
                 result.MerchantLogoUrl = merchantLogoUrlTasks[logoKey].Result;
                 results.Add(result);
             }
@@ -106,7 +110,10 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
             var result = Mapper.Map<HistoryOperationModel>(historyOperation);
 
-            string detailsMerchantId = historyOperation.OppositeMerchantId ?? merchantId;
+            string detailsMerchantId = string.IsNullOrEmpty(historyOperation.OppositeMerchantId)
+                ? merchantId
+                : historyOperation.OppositeMerchantId;
+
             result.MerchantName = await _merchantService.GetMerchantNameAsync(detailsMerchantId);
             result.MerchantLogoUrl = await _merchantService.GetMerchantLogoUrlAsync(detailsMerchantId);
 
