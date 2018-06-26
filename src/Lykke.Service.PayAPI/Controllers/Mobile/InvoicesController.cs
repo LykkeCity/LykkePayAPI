@@ -395,7 +395,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
                 var result = Mapper.Map<IReadOnlyList<InvoiceMarkedDisputeResponse>>(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(disputeInvoices));
 
-                await FillAdditionalData(result);
+                await FillAdditionalData(result, isDispute: true);
 
                 // Fill dispute info
                 foreach (var invoice in result)
@@ -490,7 +490,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             return invoices;
         }
 
-        private async Task FillAdditionalData(IReadOnlyList<InvoiceResponseModel> result)
+        private async Task FillAdditionalData(IReadOnlyList<InvoiceResponseModel> result, bool isDispute = false)
         {
             foreach (var invoice in result)
             {
@@ -503,7 +503,9 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                     invoice.SettlementMonthPeriod = iataSpecificData.SettlementMonthPeriod;
                 }
 
-                invoice.LogoUrl = await _merchantService.GetMerchantLogoUrlAsync(invoice.MerchantId);
+                invoice.LogoUrl = isDispute
+                    ? await _merchantService.GetMerchantLogoUrlAsync(invoice.ClientName)
+                    : await _merchantService.GetMerchantLogoUrlAsync(invoice.MerchantId);
             }
         }
 
