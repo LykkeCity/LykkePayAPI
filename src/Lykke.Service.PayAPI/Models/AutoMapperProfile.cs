@@ -4,6 +4,7 @@ using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Models.Invoice;
+using Lykke.Service.PayAPI.Models.Mobile.History;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.Asset;
 using Lykke.Service.PayInternal.Client.Models.Exchange;
@@ -72,6 +73,24 @@ namespace Lykke.Service.PayAPI.Models
                         dest.MerchantId = (string) resContext.Items["MerchantId"]));
 
             CreateMap<PayInternal.Client.Models.Exchange.ExchangeResponse, ExchangeResponse>(MemberList.Destination);
+
+            CreateMobileHistoryMaps();
+        }
+
+        private void CreateMobileHistoryMaps()
+        {
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationViewModel>()
+                .ForMember(dest => dest.MerchantLogoUrl, opt => opt.Ignore());
+
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperationModel>()
+                .ForMember(dest => dest.MerchantLogoUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.MerchantName, opt => opt.Ignore())
+                .ForMember(dest => dest.BlockHeight, opt => opt.Ignore())
+                .ForMember(dest => dest.BlockConfirmations, opt => opt.Ignore())
+                .ForMember(dest => dest.InvoiceNumber, opt => opt.Ignore())
+                .ForMember(dest => dest.BillingCategory, opt => opt.Ignore())
+                .ForMember(dest => dest.InvoiceStatus, opt => opt.Ignore())
+                .ForMember(dest => dest.ExplorerUrl, opt => opt.Ignore());
         }
     }
 }

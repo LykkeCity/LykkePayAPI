@@ -16,6 +16,6 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
 
         public string AssetId { get; set; }
 
-        public HistoryOperationType Type { get; set; }
+        public string Type { get; set; }
     }
 }
