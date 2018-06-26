@@ -17,6 +17,7 @@ using Lykke.Service.PayAuth.Client;
 using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.IataApi.Client;
+using Lykke.Service.PayHistory.Client;
 
 namespace Lykke.Service.PayAPI.Modules
 {
@@ -126,6 +127,12 @@ namespace Lykke.Service.PayAPI.Modules
                 .As<IIataService>()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata))
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods));
+
+            builder.RegisterPayHistoryClient(_settings.CurrentValue.PayHistoryServiceClient, _log);
+            builder.RegisterType<ExplorerUrlResolver>()
+                .As<IExplorerUrlResolver>()
+                .WithParameter("transactionUrl", _settings.CurrentValue.PayAPI.TransactionUrl)
+                .SingleInstance();
 
             builder.Populate(_services);
         }
