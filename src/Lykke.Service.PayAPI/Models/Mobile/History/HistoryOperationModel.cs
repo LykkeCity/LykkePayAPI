@@ -19,11 +19,13 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
 
         public string AssetId { get; set; }
 
-        public HistoryOperationType Type { get; set; }
+        public string Type { get; set; }
 
         public string EmployeeEmail { get; set; }
 
         public string TxHash { get; set; }
+
+        public string ExplorerUrl { get; set; }
 
         public int BlockHeight { get; set; }
 
