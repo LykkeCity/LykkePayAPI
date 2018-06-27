@@ -5,24 +5,11 @@ namespace Lykke.Service.PayAPI.Models
     /// <summary>
     /// Exchange operation details
     /// </summary>
-    public class ExchangeModel
+    public class ExchangeModel: PreExchangeModel
     {
         /// <summary>
-        /// Gets or sets source asset id
+        /// Gets or sets Expected Rate
         /// </summary>
-        [Required]
-        public string SourceAssetId { get; set; }
-
-        /// <summary>
-        /// Gets or sets source amount
-        /// </summary>
-        [Required]
-        public decimal SourceAmount { get; set; }
-
-        /// <summary>
-        /// Gets or sets destination asset id
-        /// </summary>
-        [Required]
-        public string DestAssetId { get; set; }
+        public decimal ExpectedRate { get; set; }
     }
 }
