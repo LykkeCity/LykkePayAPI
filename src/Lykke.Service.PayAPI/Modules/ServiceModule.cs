@@ -6,6 +6,7 @@ using Common;
 using Common.Log;
 using Lykke.Service.Assets.Client;
 using Lykke.Service.Assets.Client.Models;
+using Lykke.Service.EthereumCore.Client;
 using Lykke.Service.MarketProfile.Client;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
@@ -129,13 +130,28 @@ namespace Lykke.Service.PayAPI.Modules
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata))
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods));
 
+            RegisterHistory(builder);
+
+            builder.Populate(_services);
+        }
+
+        private void RegisterHistory(ContainerBuilder builder)
+        {
             builder.RegisterPayHistoryClient(_settings.CurrentValue.PayHistoryServiceClient, _log);
+
             builder.RegisterType<ExplorerUrlResolver>()
                 .As<IExplorerUrlResolver>()
                 .WithParameter("transactionUrl", _settings.CurrentValue.PayAPI.TransactionUrl)
                 .SingleInstance();
 
-            builder.Populate(_services);
+            builder.RegisterType<EthereumCoreClient>()
+                .As<IEthereumCoreClient>()
+                .WithParameter("serviceUrl", _settings.CurrentValue.EthereumServiceClient.ServiceUrl)
+                .SingleInstance();
+
+            builder.RegisterType<PayHistoryService>()
+                .As<IPayHistoryService>()
+                .SingleInstance();
         }
     }
 }

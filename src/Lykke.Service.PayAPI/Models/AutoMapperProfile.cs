@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common;
 using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
+using Lykke.Service.PayAPI.Core.Domain.PayHistory;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Models.Invoice;
@@ -84,10 +85,11 @@ namespace Lykke.Service.PayAPI.Models
 
         private void CreateMobileHistoryMaps()
         {
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationViewModel>()
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>()
                 .ForMember(dest => dest.MerchantLogoUrl, opt => opt.Ignore());
+            CreateMap<HistoryOperationView, HistoryOperationViewModel>();
 
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperationModel>()
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>()
                 .ForMember(dest => dest.MerchantLogoUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.MerchantName, opt => opt.Ignore())
                 .ForMember(dest => dest.BlockHeight, opt => opt.Ignore())
@@ -96,6 +98,7 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.BillingCategory, opt => opt.Ignore())
                 .ForMember(dest => dest.InvoiceStatus, opt => opt.Ignore())
                 .ForMember(dest => dest.ExplorerUrl, opt => opt.Ignore());
+            CreateMap<HistoryOperation, HistoryOperationModel>();
         }
     }
 }
