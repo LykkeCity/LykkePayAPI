@@ -72,6 +72,11 @@ namespace Lykke.Service.PayAPI.Models
                     opt => opt.ResolveUsing((src, dest, destMember, resContext) =>
                         dest.MerchantId = (string) resContext.Items["MerchantId"]));
 
+            CreateMap<PreExchangeModel, PreExchangeRequest>(MemberList.Destination)
+                .ForMember(dest => dest.MerchantId,
+                    opt => opt.ResolveUsing((src, dest, destMember, resContext) =>
+                        dest.MerchantId = (string)resContext.Items["MerchantId"]));
+
             CreateMap<PayInternal.Client.Models.Exchange.ExchangeResponse, ExchangeResponse>(MemberList.Destination);
 
             CreateMobileHistoryMaps();
