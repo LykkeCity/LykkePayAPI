@@ -20,7 +20,7 @@ using ExchangeClientResponse = Lykke.Service.PayInternal.Client.Models.Exchange.
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/mobile/exchange")]
+    [Route("api/v{version:apiVersion}/mobile/exchange/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [BearerHeader]
     public class ExchangeController : Controller
@@ -57,6 +57,38 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 var clientRequest = Mapper.Map<ExchangeRequest>(request, opt => opt.Items["MerchantId"] = merchantId);
 
                 ExchangeClientResponse response = await _payInternalClient.ExchangeAsync(clientRequest);
+
+                return Ok(Mapper.Map<ExchangeResponse>(response));
+            }
+            catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.BadRequest)
+            {
+                _log.WriteError(nameof(Execute), request, e);
+
+                return BadRequest(ErrorResponse.Create(e.Message));
+            }
+        }
+
+        /// <summary>
+        /// Returns current exchange rate
+        /// </summary>
+        /// <param name="request">PreExchange operation request details</param>
+        /// <returns></returns>
+        /// <response code="200">PreExchange operation completed successfully</response>
+        /// <response code="400">Bad request</response>
+        [HttpPost]
+        [SwaggerOperation(nameof(PreExchange))]
+        [ProducesResponseType(typeof(ExchangeResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ExchangeResponse), (int)HttpStatusCode.BadRequest)]
+        [ValidateModel]
+        public async Task<IActionResult> PreExchange([FromBody] PreExchangeModel request)
+        {
+            string merchantId = this.GetUserMerchantId();
+
+            try
+            {
+                var clientRequest = Mapper.Map<PreExchangeRequest>(request, opt => opt.Items["MerchantId"] = merchantId);
+
+                ExchangeClientResponse response = await _payInternalClient.PreExchangeAsync(clientRequest);
 
                 return Ok(Mapper.Map<ExchangeResponse>(response));
             }
