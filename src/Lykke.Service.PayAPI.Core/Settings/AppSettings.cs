@@ -7,6 +7,7 @@ using Lykke.SettingsReader.Attributes;
 using Lykke.Service.PayInternal.Client;
 using Lykke.Service.IataApi.Client;
 using Lykke.Service.PayHistory.Client;
+using Lykke.Service.EthereumCore.Client;
 
 namespace Lykke.Service.PayAPI.Core.Settings
 {
@@ -22,6 +23,7 @@ namespace Lykke.Service.PayAPI.Core.Settings
         public PayInvoiceServiceClientSettings PayInvoiceServiceClient { get; set; }
         public IataApiServiceClientSettings IataApiServiceClient { get; set; }
         public PayHistoryServiceClientSettings PayHistoryServiceClient { get; set; }
+        public EthereumServiceClientSettings EthereumServiceClient { get; set; }
     }
 
     public class MarketProfileServiceClientSettings

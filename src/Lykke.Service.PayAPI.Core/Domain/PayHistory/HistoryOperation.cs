@@ -1,9 +1,8 @@
-﻿using System;
-using Lykke.Service.PayInvoice.Client.Models.Invoice;
+﻿using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
-namespace Lykke.Service.PayAPI.Models.Mobile.History
+namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
 {
-    public class HistoryOperationModel: HistoryOperationViewModel
+    public class HistoryOperation : HistoryOperationView
     {
         public string MerchantName { get; set; }
 
@@ -13,9 +12,9 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
 
         public string ExplorerUrl { get; set; }
 
-        public int BlockHeight { get; set; }
+        public long BlockHeight { get; set; }
 
-        public int BlockConfirmations { get; set; }
+        public long BlockConfirmations { get; set; }
 
         public string InvoiceNumber { get; set; }
 

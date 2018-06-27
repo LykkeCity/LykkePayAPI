@@ -11,6 +11,7 @@
     <PackageReference Include="Lykke.Common" Version="6.8.6" />
     <PackageReference Include="Lykke.Contracts" Version="1.0.50" />
     <PackageReference Include="Lykke.Service.Assets.Client" Version="4.0.1" />
+    <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.11" />
     <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.0.22" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.19" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.5" />

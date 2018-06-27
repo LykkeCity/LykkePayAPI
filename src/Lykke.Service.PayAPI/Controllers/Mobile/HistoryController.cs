@@ -5,9 +5,7 @@ using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Filters;
 using Lykke.Service.PayAPI.Models.Mobile.History;
-using Lykke.Service.PayHistory.Client;
 using Lykke.Service.PayHistory.Client.Publisher;
-using Lykke.Service.PayInvoice.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +13,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -29,21 +26,11 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     public class HistoryController : Controller
     {
         private readonly ILog _log;
-        private readonly IPayHistoryClient _payHistoryClient;
-        private readonly IMerchantService _merchantService;
-        private readonly IPayInvoiceClient _payInvoiceClient;
-        private readonly IExplorerUrlResolver _explorerUrlResolver;
+        private readonly IPayHistoryService _payHistoryService;
 
-        public HistoryController(IPayHistoryClient payHistoryClient,
-            IMerchantService merchantService,
-            IPayInvoiceClient payInvoiceClient,
-            IExplorerUrlResolver explorerUrlResolver,
-            ILog log)
+        public HistoryController(IPayHistoryService payHistoryService, ILog log)
         {
-            _payHistoryClient = payHistoryClient;
-            _merchantService = merchantService;
-            _payInvoiceClient = payInvoiceClient;
-            _explorerUrlResolver = explorerUrlResolver;
+            _payHistoryService = payHistoryService;
             _log = log.CreateComponentScope(nameof(HistoryController)) ?? throw new ArgumentNullException(nameof(log));
         }
 
@@ -59,31 +46,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         public async Task<IActionResult> Index()
         {
             var merchantId = this.GetUserMerchantId();
-
-            var historyOperations = (await _payHistoryClient.GetHistoryAsync(merchantId)).ToArray();
-
-            var merchantIds = historyOperations.Select(o => o.OppositeMerchantId).Where(id => !string.IsNullOrEmpty(id))
-                .Distinct().ToList();
-            if (!merchantIds.Contains(merchantId, StringComparer.OrdinalIgnoreCase))
-            {
-                merchantIds.Add(merchantId);
-            }
-
-            var merchantLogoUrlTasks = merchantIds.ToDictionary(id=>id, id => _merchantService.GetMerchantLogoUrlAsync(id));
-            await Task.WhenAll(merchantLogoUrlTasks.Values);
-            
-            var results = new List<HistoryOperationViewModel>();
-            foreach (var historyOperation in historyOperations)
-            {
-                var result = Mapper.Map<HistoryOperationViewModel>(historyOperation);
-
-                string logoKey = string.IsNullOrEmpty(historyOperation.OppositeMerchantId)
-                    ? merchantId
-                    : historyOperation.OppositeMerchantId;
-
-                result.MerchantLogoUrl = merchantLogoUrlTasks[logoKey].Result;
-                results.Add(result);
-            }
+            var historyOperations = await _payHistoryService.GetHistoryAsync(merchantId);
+            var results = Mapper.Map<IReadOnlyList<HistoryOperationViewModel>>(historyOperations);
             return Ok(results);
         }
 
@@ -102,50 +66,13 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         {
             var merchantId = this.GetUserMerchantId();
 
-            var historyOperation = await _payHistoryClient.GetDetailsAsync(merchantId, id);
+            var historyOperation = await _payHistoryService.GetDetailsAsync(merchantId, id);
             if (historyOperation == null)
             {
                 return NotFound();
             }
 
             var result = Mapper.Map<HistoryOperationModel>(historyOperation);
-
-            string detailsMerchantId = string.IsNullOrEmpty(historyOperation.OppositeMerchantId)
-                ? merchantId
-                : historyOperation.OppositeMerchantId;
-
-            result.MerchantName = await _merchantService.GetMerchantNameAsync(detailsMerchantId);
-            result.MerchantLogoUrl = await _merchantService.GetMerchantLogoUrlAsync(detailsMerchantId);
-
-            if (!string.IsNullOrEmpty(historyOperation.InvoiceId))
-            {
-                try
-                {
-                    var invoice = await _payInvoiceClient.GetInvoiceAsync(historyOperation.InvoiceId);
-                    if (invoice != null)
-                    {
-                        result.InvoiceNumber = invoice.Number;
-                        result.BillingCategory = invoice.BillingCategory;
-                        result.InvoiceStatus = invoice.Status;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var apiEx = ex.InnerException as Refit.ApiException;
-                    if (apiEx?.StatusCode == HttpStatusCode.NotFound)
-                    {
-                        return NotFound("Invoice is not found.");
-                    }
-
-                    throw;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(historyOperation.TxHash))
-            {
-                result.ExplorerUrl = _explorerUrlResolver.GetExplorerUrl(historyOperation.TxHash);
-            }
-
             return Ok(result);
         }
     }
