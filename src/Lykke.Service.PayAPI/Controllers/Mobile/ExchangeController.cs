@@ -11,8 +11,8 @@ using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInternal.Client.Models.Exchange;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Refit;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using ExchangeResponse = Lykke.Service.PayAPI.Models.ExchangeResponse;
 using ExchangeClientResponse = Lykke.Service.PayInternal.Client.Models.Exchange.ExchangeResponse;
@@ -20,8 +20,8 @@ using ExchangeClientResponse = Lykke.Service.PayInternal.Client.Models.Exchange.
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/mobile/exchange")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("api/v{version:apiVersion}/mobile/exchange/[action]")]
+    [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [BearerHeader]
     public class ExchangeController : Controller
     {
@@ -62,8 +62,48 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.BadRequest)
             {
-                _log.WriteError(nameof(Execute), request, e);
+                var apiException = e.InnerException as ApiException;
 
+                if (apiException?.StatusCode == HttpStatusCode.BadRequest)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                _log.WriteError(nameof(Execute), request, e);
+                return BadRequest(ErrorResponse.Create(e.Message));
+            }
+        }
+
+        /// <summary>
+        /// Returns current exchange rate
+        /// </summary>
+        /// <param name="request">PreExchange operation request details</param>
+        /// <returns></returns>
+        /// <response code="200">PreExchange operation completed successfully</response>
+        /// <response code="400">Bad request</response>
+        [HttpPost]
+        [SwaggerOperation(nameof(PreExchange))]
+        [ProducesResponseType(typeof(ExchangeResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ExchangeResponse), (int)HttpStatusCode.BadRequest)]
+        [ValidateModel]
+        public async Task<IActionResult> PreExchange([FromBody] PreExchangeModel request)
+        {
+            string merchantId = this.GetUserMerchantId();
+
+            try
+            {
+                var clientRequest = Mapper.Map<PreExchangeRequest>(request, opt => opt.Items["MerchantId"] = merchantId);
+
+                ExchangeClientResponse response = await _payInternalClient.PreExchangeAsync(clientRequest);
+
+                return Ok(Mapper.Map<ExchangeResponse>(response));
+            }
+            catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var apiException = e.InnerException as ApiException;
+
+                if (apiException?.StatusCode == HttpStatusCode.BadRequest)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                _log.WriteError(nameof(Execute), request, e);
                 return BadRequest(ErrorResponse.Create(e.Message));
             }
         }
