@@ -26,12 +26,13 @@ namespace Lykke.Service.PayAPI.Services
         private readonly IExplorerUrlResolver _explorerUrlResolver;
         private readonly IEthereumCoreClient _ethereumCoreClient;
         private readonly IIataService _iataService;
+        private readonly IHistoryOperationTitleProvider _historyOperationTitleProvider;
         private readonly ILog _log;
 
         public PayHistoryService(IPayHistoryClient payHistoryClient, ILog log,
             IMerchantService merchantService, IPayInvoiceClient payInvoiceClient,
             IExplorerUrlResolver explorerUrlResolver, IEthereumCoreClient ethereumCoreClient,
-            IIataService iataService)
+            IIataService iataService, IHistoryOperationTitleProvider historyOperationTitleProvider)
         {
             _payHistoryClient = payHistoryClient;
             _merchantService = merchantService;
@@ -39,6 +40,7 @@ namespace Lykke.Service.PayAPI.Services
             _explorerUrlResolver = explorerUrlResolver;
             _ethereumCoreClient = ethereumCoreClient;
             _iataService = iataService;
+            _historyOperationTitleProvider = historyOperationTitleProvider;
             _log = log;
         }
 
@@ -48,7 +50,8 @@ namespace Lykke.Service.PayAPI.Services
 
             var merchantLogosTask = GetMerchantLogosAsync(merchantId, historyOperations);
             var iataSpecificDataTask = GetIataSpecificDataAsync(historyOperations);
-            await Task.WhenAll(merchantLogosTask, iataSpecificDataTask);
+            var titlesTask = GetTitlesAsync(historyOperations);
+            await Task.WhenAll(merchantLogosTask, iataSpecificDataTask, titlesTask);
 
             var results = new List<HistoryOperationView>();
             foreach (var historyOperation in historyOperations)
@@ -63,7 +66,7 @@ namespace Lykke.Service.PayAPI.Services
                 result.SettlementMonthPeriod =
                     iataSpecificDataTask.Result[historyOperation.InvoiceId]?.SettlementMonthPeriod;
                 result.IataInvoiceDate = iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate;
-
+                result.Title = titlesTask.Result[historyOperation.Id];
                 results.Add(result);
             }
 
@@ -95,6 +98,15 @@ namespace Lykke.Service.PayAPI.Services
             return iataSpecificDataTasks.ToDictionary(p => p.Key, p => p.Value.Result);
         }
 
+        private async Task<Dictionary<string, string>> GetTitlesAsync(HistoryOperationViewModel[] historyOperations)
+        {
+            var titleTasks = historyOperations.ToDictionary(o => o.Id,
+                o => _historyOperationTitleProvider.GetTitleAsync(o.AssetId, o.Type.ToString()));
+            await Task.WhenAll(titleTasks.Values);
+
+            return titleTasks.ToDictionary(p => p.Key, p => p.Value.Result);
+        }
+
         public async Task<HistoryOperation> GetDetailsAsync(string merchantId, string id)
         {
             var historyOperation = await _payHistoryClient.GetDetailsAsync(merchantId, id);
@@ -111,7 +123,8 @@ namespace Lykke.Service.PayAPI.Services
 
             try
             {
-                await Task.WhenAll(FillFromMerchantServiceAsync(result, detailsMerchantId),
+                await Task.WhenAll(FillTitleAsync(result),
+                    FillFromMerchantServiceAsync(result, detailsMerchantId),
                     FillByInvoiceAsync(result, historyOperation.InvoiceId),
                     FillByTxHashAsync(result));
             }
@@ -133,6 +146,12 @@ namespace Lykke.Service.PayAPI.Services
             }
 
             return result;
+        }
+
+        private async Task FillTitleAsync(HistoryOperation historyOperation)
+        {
+            historyOperation.Title = await 
+                _historyOperationTitleProvider.GetTitleAsync(historyOperation.AssetId, historyOperation.Type);
         }
 
         private async Task FillFromMerchantServiceAsync(HistoryOperation historyOperation, string merchantId)

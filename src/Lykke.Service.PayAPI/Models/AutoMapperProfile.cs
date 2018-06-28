@@ -85,24 +85,16 @@ namespace Lykke.Service.PayAPI.Models
 
         private void CreateMobileHistoryMaps()
         {
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>()
-                .ForMember(dest => dest.MerchantLogoUrl, opt => opt.Ignore())
-                .ForMember(dest => dest.IataInvoiceDate, opt => opt.Ignore())
-                .ForMember(dest => dest.SettlementMonthPeriod, opt => opt.Ignore());
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>(MemberList.Source)
+                .ForSourceMember(s => s.InvoiceId, s => s.Ignore())
+                .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore());
 
             CreateMap<HistoryOperationView, HistoryOperationViewModel>();
 
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>()
-                .ForMember(dest => dest.MerchantLogoUrl, opt => opt.Ignore())
-                .ForMember(dest => dest.MerchantName, opt => opt.Ignore())
-                .ForMember(dest => dest.BlockHeight, opt => opt.Ignore())
-                .ForMember(dest => dest.BlockConfirmations, opt => opt.Ignore())
-                .ForMember(dest => dest.InvoiceNumber, opt => opt.Ignore())
-                .ForMember(dest => dest.BillingCategory, opt => opt.Ignore())
-                .ForMember(dest => dest.InvoiceStatus, opt => opt.Ignore())
-                .ForMember(dest => dest.ExplorerUrl, opt => opt.Ignore())
-                .ForMember(dest => dest.IataInvoiceDate, opt => opt.Ignore())
-                .ForMember(dest => dest.SettlementMonthPeriod, opt => opt.Ignore());
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(MemberList.Source)
+                .ForSourceMember(s=>s.InvoiceId, s=>s.Ignore())
+                .ForSourceMember(s => s.MerchantId, s => s.Ignore())
+                .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore());
 
             CreateMap<HistoryOperation, HistoryOperationModel>();
         }
