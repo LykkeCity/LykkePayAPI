@@ -71,7 +71,10 @@ namespace Lykke.Service.PayAPI.Models
         private void CreateMobileHistoryMaps()
         {
             CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>()
-                .ForMember(dest => dest.MerchantLogoUrl, opt => opt.Ignore());
+                .ForMember(dest => dest.MerchantLogoUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.IataInvoiceDate, opt => opt.Ignore())
+                .ForMember(dest => dest.SettlementMonthPeriod, opt => opt.Ignore());
+
             CreateMap<HistoryOperationView, HistoryOperationViewModel>();
 
             CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>()
@@ -82,7 +85,10 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.InvoiceNumber, opt => opt.Ignore())
                 .ForMember(dest => dest.BillingCategory, opt => opt.Ignore())
                 .ForMember(dest => dest.InvoiceStatus, opt => opt.Ignore())
-                .ForMember(dest => dest.ExplorerUrl, opt => opt.Ignore());
+                .ForMember(dest => dest.ExplorerUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.IataInvoiceDate, opt => opt.Ignore())
+                .ForMember(dest => dest.SettlementMonthPeriod, opt => opt.Ignore());
+
             CreateMap<HistoryOperation, HistoryOperationModel>();
         }
     }

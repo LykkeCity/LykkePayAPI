@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Lykke.Service.PayAPI.Core.Domain.Invoice;
+using Lykke.Service.PayHistory.Client.AutorestClient.Models;
 
 namespace Lykke.Service.PayAPI.Services
 {
@@ -23,17 +25,20 @@ namespace Lykke.Service.PayAPI.Services
         private readonly IPayInvoiceClient _payInvoiceClient;
         private readonly IExplorerUrlResolver _explorerUrlResolver;
         private readonly IEthereumCoreClient _ethereumCoreClient;
+        private readonly IIataService _iataService;
         private readonly ILog _log;
 
         public PayHistoryService(IPayHistoryClient payHistoryClient, ILog log,
             IMerchantService merchantService, IPayInvoiceClient payInvoiceClient,
-            IExplorerUrlResolver explorerUrlResolver, IEthereumCoreClient ethereumCoreClient)
+            IExplorerUrlResolver explorerUrlResolver, IEthereumCoreClient ethereumCoreClient,
+            IIataService iataService)
         {
             _payHistoryClient = payHistoryClient;
             _merchantService = merchantService;
             _payInvoiceClient = payInvoiceClient;
             _explorerUrlResolver = explorerUrlResolver;
             _ethereumCoreClient = ethereumCoreClient;
+            _iataService = iataService;
             _log = log;
         }
 
@@ -41,16 +46,9 @@ namespace Lykke.Service.PayAPI.Services
         {
             var historyOperations = (await _payHistoryClient.GetHistoryAsync(merchantId)).ToArray();
 
-            var merchantIds = historyOperations.Select(o => o.OppositeMerchantId).Where(id => !string.IsNullOrEmpty(id))
-                .Distinct().ToList();
-            if (!merchantIds.Contains(merchantId, StringComparer.OrdinalIgnoreCase))
-            {
-                merchantIds.Add(merchantId);
-            }
-
-            var merchantLogoUrlTasks =
-                merchantIds.ToDictionary(id => id, id => _merchantService.GetMerchantLogoUrlAsync(id));
-            await Task.WhenAll(merchantLogoUrlTasks.Values);
+            var merchantLogosTask = GetMerchantLogosAsync(merchantId, historyOperations);
+            var iataSpecificDataTask = GetIataSpecificDataAsync(historyOperations);
+            await Task.WhenAll(merchantLogosTask, iataSpecificDataTask);
 
             var results = new List<HistoryOperationView>();
             foreach (var historyOperation in historyOperations)
@@ -61,11 +59,40 @@ namespace Lykke.Service.PayAPI.Services
                     ? merchantId
                     : historyOperation.OppositeMerchantId;
 
-                result.MerchantLogoUrl = merchantLogoUrlTasks[logoKey].Result;
+                result.MerchantLogoUrl = merchantLogosTask.Result[logoKey];
+                result.SettlementMonthPeriod =
+                    iataSpecificDataTask.Result[historyOperation.InvoiceId]?.SettlementMonthPeriod;
+                result.IataInvoiceDate = iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate;
+
                 results.Add(result);
             }
 
             return results;
+        }
+
+        private async Task<Dictionary<string,string>> GetMerchantLogosAsync(string merchantId, HistoryOperationViewModel[] historyOperations)
+        {
+            var merchantIds = historyOperations.Select(o => o.OppositeMerchantId).Where(id => !string.IsNullOrEmpty(id))
+                .Distinct().ToList();
+            if (!merchantIds.Contains(merchantId, StringComparer.OrdinalIgnoreCase))
+            {
+                merchantIds.Add(merchantId);
+            }
+            var merchantLogoUrlTasks =
+                merchantIds.ToDictionary(id => id, id => _merchantService.GetMerchantLogoUrlAsync(id));
+
+            await Task.WhenAll(merchantLogoUrlTasks.Values);
+
+            return merchantLogoUrlTasks.ToDictionary(p => p.Key, p => p.Value.Result);
+        }
+
+        private async Task<Dictionary<string, InvoiceIataSpecificData>> GetIataSpecificDataAsync(HistoryOperationViewModel[] historyOperations)
+        {
+            var iataSpecificDataTasks = historyOperations.Where(o => !string.IsNullOrEmpty(o.InvoiceId)).Select(o => o.InvoiceId).Distinct()
+                .ToDictionary(i => i, i => _iataService.GetIataSpecificDataAsync(i));
+            await Task.WhenAll(iataSpecificDataTasks.Values);
+
+            return iataSpecificDataTasks.ToDictionary(p => p.Key, p => p.Value.Result);
         }
 
         public async Task<HistoryOperation> GetDetailsAsync(string merchantId, string id)
@@ -85,8 +112,8 @@ namespace Lykke.Service.PayAPI.Services
             try
             {
                 await Task.WhenAll(FillFromMerchantServiceAsync(result, detailsMerchantId),
-                    FillFromPayInvoiceAsync(result, historyOperation.InvoiceId),
-                    FillFromEthereumCoreAsync(result));
+                    FillByInvoiceAsync(result, historyOperation.InvoiceId),
+                    FillByTxHashAsync(result));
             }
             catch (EthereumCoreApiException ex)
             {
@@ -119,21 +146,25 @@ namespace Lykke.Service.PayAPI.Services
             historyOperation.MerchantLogoUrl = getMerchantLogoUrlTask.Result;
         }
 
-        private async Task FillFromPayInvoiceAsync(HistoryOperation historyOperation, string invoiceId)
+        private async Task FillByInvoiceAsync(HistoryOperation historyOperation, string invoiceId)
         {
             if (string.IsNullOrEmpty(invoiceId))
             {
                 return;
             }
 
-            InvoiceModel invoice = await _payInvoiceClient.GetInvoiceAsync(invoiceId);
+            var invoiceTask = _payInvoiceClient.GetInvoiceAsync(invoiceId);
+            var iataSpecificDataTask = _iataService.GetIataSpecificDataAsync(invoiceId);
+            await Task.WhenAll(invoiceTask, iataSpecificDataTask);
 
-            historyOperation.InvoiceNumber = invoice?.Number;
-            historyOperation.BillingCategory = invoice?.BillingCategory;
-            historyOperation.InvoiceStatus = invoice?.Status;
+            historyOperation.InvoiceNumber = invoiceTask.Result?.Number;
+            historyOperation.BillingCategory = invoiceTask.Result?.BillingCategory;
+            historyOperation.InvoiceStatus = invoiceTask.Result?.Status;
+            historyOperation.SettlementMonthPeriod = iataSpecificDataTask.Result?.SettlementMonthPeriod;
+            historyOperation.IataInvoiceDate = iataSpecificDataTask.Result?.IataInvoiceDate;
         }
 
-        private async Task FillFromEthereumCoreAsync(HistoryOperation historyOperation)
+        private async Task FillByTxHashAsync(HistoryOperation historyOperation)
         {
             if (string.IsNullOrEmpty(historyOperation.TxHash))
             {
