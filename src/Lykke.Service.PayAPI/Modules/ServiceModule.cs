@@ -151,6 +151,19 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<PayHistoryService>()
                 .As<IPayHistoryService>()
                 .SingleInstance();
+
+            builder.RegisterType<HistoryOperationTitleProvider>()
+                .As<IHistoryOperationTitleProvider>()
+                .SingleInstance();
+
+            builder.Register(x =>
+            {
+                var assetsService = x.Resolve<IComponentContext>().Resolve<IAssetsService>();
+
+                return new CachedDataDictionary<string, Asset>(
+                    async () => (await assetsService.AssetGetAllAsync()).ToDictionary(itm => itm.Id)
+                );
+            });
         }
     }
 }

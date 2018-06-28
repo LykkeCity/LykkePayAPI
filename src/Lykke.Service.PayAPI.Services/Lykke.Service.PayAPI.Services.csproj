@@ -20,4 +20,19 @@
     <ProjectReference Include="..\Lykke.Service.PayAPI.Core\Lykke.Service.PayAPI.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="HistoryOperationType.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>HistoryOperationType.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="HistoryOperationType.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>HistoryOperationType.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
