@@ -20,7 +20,7 @@ namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
 
         public string Type { get; set; }
 
-        public string IataInvoiceDate { get; set; }
+        public DateTime? IataInvoiceDate { get; set; }
 
         public string SettlementMonthPeriod { get; set; }
     }

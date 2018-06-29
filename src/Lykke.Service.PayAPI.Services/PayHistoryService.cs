@@ -10,6 +10,7 @@ using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -65,7 +66,7 @@ namespace Lykke.Service.PayAPI.Services
                 result.MerchantLogoUrl = merchantLogosTask.Result[logoKey];
                 result.SettlementMonthPeriod =
                     iataSpecificDataTask.Result[historyOperation.InvoiceId]?.SettlementMonthPeriod;
-                result.IataInvoiceDate = iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate;
+                result.IataInvoiceDate = ParseIataInvoiceDate(iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate);
                 result.Title = titlesTask.Result[historyOperation.Id];
                 results.Add(result);
             }
@@ -105,6 +106,17 @@ namespace Lykke.Service.PayAPI.Services
             await Task.WhenAll(titleTasks.Values);
 
             return titleTasks.ToDictionary(p => p.Key, p => p.Value.Result);
+        }
+
+        private DateTime? ParseIataInvoiceDate(string iataInvoiceDate)
+        {
+            if (DateTime.TryParseExact(iataInvoiceDate, "yyyy-MM-dd", CultureInfo.InvariantCulture.DateTimeFormat,
+                DateTimeStyles.None, out var result))
+            {
+                return result;
+            }
+
+            return null;
         }
 
         public async Task<HistoryOperation> GetDetailsAsync(string merchantId, string id)
@@ -180,7 +192,7 @@ namespace Lykke.Service.PayAPI.Services
             historyOperation.BillingCategory = invoiceTask.Result?.BillingCategory;
             historyOperation.InvoiceStatus = invoiceTask.Result?.Status;
             historyOperation.SettlementMonthPeriod = iataSpecificDataTask.Result?.SettlementMonthPeriod;
-            historyOperation.IataInvoiceDate = iataSpecificDataTask.Result?.IataInvoiceDate;
+            historyOperation.IataInvoiceDate = ParseIataInvoiceDate(iataSpecificDataTask.Result?.IataInvoiceDate);
         }
 
         private async Task FillByTxHashAsync(HistoryOperation historyOperation)
