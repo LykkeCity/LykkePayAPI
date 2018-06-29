@@ -63,11 +63,18 @@ namespace Lykke.Service.PayAPI.Services
                     ? merchantId
                     : historyOperation.OppositeMerchantId;
 
+
                 result.MerchantLogoUrl = merchantLogosTask.Result[logoKey];
-                result.SettlementMonthPeriod =
-                    iataSpecificDataTask.Result[historyOperation.InvoiceId]?.SettlementMonthPeriod;
-                result.IataInvoiceDate = ParseIataInvoiceDate(iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate);
                 result.Title = titlesTask.Result[historyOperation.Id];
+
+                if (!string.IsNullOrEmpty(historyOperation.InvoiceId))
+                {
+                    result.SettlementMonthPeriod =
+                        iataSpecificDataTask.Result[historyOperation.InvoiceId]?.SettlementMonthPeriod;
+                    result.IataInvoiceDate =
+                        ParseIataInvoiceDate(iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate);
+                }
+                
                 results.Add(result);
             }
 
