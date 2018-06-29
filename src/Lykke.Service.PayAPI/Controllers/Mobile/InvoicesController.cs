@@ -534,13 +534,11 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> PayInvoices([FromBody] PayInvoicesRequestModel model)
         {
-            var merchantId = this.GetUserMerchantId();
-
             try
             {
                 await _payInvoiceClient.PayInvoicesAsync(new PayInvoicesRequest
                 {
-                    MerchantId = merchantId,
+                    EmployeeId = this.GetUserEmployeeId(),
                     InvoicesIds = model.InvoicesIds,
                     Amount = model.AmountInBaseAsset
                 });
@@ -573,14 +571,13 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetSumToPayInvoices([NotEmptyCollection] IEnumerable<string> invoicesIds)
         {
-            var merchantId = this.GetUserMerchantId();
             decimal result = 0;
 
             try
             {
                 result = await _payInvoiceClient.GetSumToPayInvoicesAsync(new GetSumToPayInvoicesRequest
                 {
-                    MerchantId = merchantId,
+                    EmployeeId = this.GetUserEmployeeId(),
                     InvoicesIds = invoicesIds
                 });
             }
