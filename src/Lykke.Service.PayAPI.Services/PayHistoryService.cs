@@ -232,6 +232,7 @@ namespace Lykke.Service.PayAPI.Services
             historyOperation.ExplorerUrl = _explorerUrlResolver.GetExplorerUrl(historyOperation.TxHash);
             historyOperation.BlockHeight = getTransactionTask.Result.BlockNumber;
             historyOperation.BlockConfirmations = getBlockTask.Result.LatestBlockNumber - historyOperation.BlockHeight;
+            historyOperation.TimeStamp = getTransactionTask.Result.BlockTimeUtc;
         }
     }
 }
