@@ -6,7 +6,9 @@ namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
     {
         public string MerchantName { get; set; }
 
-        public string EmployeeEmail { get; set; }
+        public string PaidBy { get; set; }
+
+        public string SoldBy { get; set; }
 
         public string TxHash { get; set; }
 

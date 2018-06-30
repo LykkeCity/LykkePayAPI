@@ -94,6 +94,7 @@ namespace Lykke.Service.PayAPI.Models
             CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(MemberList.Source)
                 .ForSourceMember(s=>s.InvoiceId, s=>s.Ignore())
                 .ForSourceMember(s => s.MerchantId, s => s.Ignore())
+                .ForSourceMember(s => s.EmployeeEmail, s => s.Ignore())
                 .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore());
 
             CreateMap<HistoryOperation, HistoryOperationModel>();
