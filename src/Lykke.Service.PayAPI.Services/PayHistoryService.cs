@@ -138,10 +138,11 @@ namespace Lykke.Service.PayAPI.Services
 
             string detailsMerchantId = string.IsNullOrEmpty(historyOperation.OppositeMerchantId)
                 ? merchantId
-                : historyOperation.OppositeMerchantId;
+                : historyOperation.OppositeMerchantId;            
 
             try
             {
+                FillEmployeeEmail(historyOperation, result);
                 await Task.WhenAll(FillTitleAsync(result),
                     FillFromMerchantServiceAsync(result, detailsMerchantId),
                     FillByInvoiceAsync(result, historyOperation.InvoiceId),
@@ -165,6 +166,20 @@ namespace Lykke.Service.PayAPI.Services
             }
 
             return result;
+        }
+
+        private void FillEmployeeEmail(HistoryOperationModel model, HistoryOperation result)
+        {
+            if(string.IsNullOrEmpty(model.InvoiceId))
+            {
+                result.SoldBy = model.EmployeeEmail;
+            }
+            else
+            {
+                result.PaidBy = model.EmployeeEmail;
+            }
+            
+
         }
 
         private async Task FillTitleAsync(HistoryOperation historyOperation)
