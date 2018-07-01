@@ -15,7 +15,9 @@ using Microsoft.AspNetCore.Mvc;
 using Refit;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using ExchangeResponse = Lykke.Service.PayAPI.Models.ExchangeResponse;
+using AssetRateResponse = Lykke.Service.PayAPI.Models.AssetRateResponse;
 using ExchangeClientResponse = Lykke.Service.PayInternal.Client.Models.Exchange.ExchangeResponse;
+using AssetRateClientResponse = Lykke.Service.PayInternal.Client.Models.AssetRates.AssetRateResponse;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -37,6 +39,64 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
+        /// Returns current exchange rate for the asset pair
+        /// </summary>
+        /// <param name="baseAssetId">Base asset id</param>
+        /// <param name="quotingAssetId">Quoting asset id</param>
+        /// <response code="200">Asset pair rate</response>
+        /// <response code="400">Bad request</response>
+        [HttpGet]
+        [Route("{baseAssetId}/{quotingAssetId}")]
+        [SwaggerOperation(nameof(GetRate))]
+        [ProducesResponseType(typeof(AssetRateResponse), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetRate(string baseAssetId, string quotingAssetId)
+        {
+            baseAssetId = Uri.UnescapeDataString(baseAssetId);
+
+            quotingAssetId = Uri.UnescapeDataString(quotingAssetId);
+
+            try
+            {
+                AssetRateClientResponse response =
+                    await _payInternalClient.GetCurrentAssetPairRateAsync(baseAssetId, quotingAssetId);
+
+                return Ok(Mapper.Map<AssetRateResponse>(response));
+            }
+            catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var apiException = e.InnerException as ApiException;
+
+                if (apiException?.StatusCode == HttpStatusCode.BadRequest)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                _log.WriteError(nameof(GetRate), new
+                {
+                    baseAssetId,
+                    quotingAssetId
+                }, e);
+
+                return BadRequest(ErrorResponse.Create(e.Message));
+            }
+            catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.NotFound)
+            {
+                var apiException = e.InnerException as ApiException;
+
+                if (apiException?.StatusCode == HttpStatusCode.NotFound)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                _log.WriteError(nameof(GetRate), new
+                {
+                    baseAssetId,
+                    quotingAssetId
+                }, e);
+
+                return NotFound(ErrorResponse.Create(e.Message));
+            }
+        }
+
+        /// <summary>
         /// Executes exchange operation
         /// </summary>
         /// <param name="request">Exchange operation request details</param>
@@ -46,7 +106,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [HttpPost]
         [SwaggerOperation(nameof(Execute))]
         [ProducesResponseType(typeof(ExchangeResponse), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ExchangeResponse), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]
         public async Task<IActionResult> Execute([FromBody] ExchangeModel request)
         {
@@ -82,7 +142,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [HttpPost]
         [SwaggerOperation(nameof(PreExchange))]
         [ProducesResponseType(typeof(ExchangeResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ExchangeResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]
         public async Task<IActionResult> PreExchange([FromBody] PreExchangeModel request)
         {

@@ -68,6 +68,9 @@ namespace Lykke.Service.PayAPI.Models
                         dest.MerchantId = (string)resContext.Items["MerchantId"]));
 
             CreateMap<PayInternal.Client.Models.Exchange.ExchangeResponse, ExchangeResponse>(MemberList.Destination);
+
+            CreateMap<PayInternal.Client.Models.AssetRates.AssetRateResponse, AssetRateResponse>(MemberList
+                .Destination);
         }
     }
 }
