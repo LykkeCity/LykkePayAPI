@@ -11,6 +11,8 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
 
         public string SoldBy { get; set; }
 
+        public DateTime? TimeStamp { get; set; }
+
         public string TxHash { get; set; }
 
         public string ExplorerUrl { get; set; }

@@ -1,4 +1,5 @@
-﻿using Lykke.Service.PayInvoice.Client.Models.Invoice;
+﻿using System;
+using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
 namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
 {
@@ -11,6 +12,8 @@ namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
         public string SoldBy { get; set; }
 
         public string TxHash { get; set; }
+
+        public DateTime? TimeStamp { get; set; }
 
         public string ExplorerUrl { get; set; }
 
