@@ -16,11 +16,15 @@ using System.Net;
 using System.Threading.Tasks;
 using Lykke.Service.PayAPI.Core.Domain.Invoice;
 using Lykke.Service.PayHistory.Client.AutorestClient.Models;
+using MoreLinq;
+using System.Collections.Concurrent;
 
 namespace Lykke.Service.PayAPI.Services
 {
     public class PayHistoryService : IPayHistoryService
     {
+        private const int BatchPieceSize = 15;
+
         private readonly IPayHistoryClient _payHistoryClient;
         private readonly IMerchantService _merchantService;
         private readonly IPayInvoiceClient _payInvoiceClient;
@@ -81,7 +85,7 @@ namespace Lykke.Service.PayAPI.Services
             return results;
         }
 
-        private async Task<Dictionary<string,string>> GetMerchantLogosAsync(string merchantId, HistoryOperationViewModel[] historyOperations)
+        private async Task<IDictionary<string,string>> GetMerchantLogosAsync(string merchantId, HistoryOperationViewModel[] historyOperations)
         {
             var merchantIds = historyOperations.Select(o => o.OppositeMerchantId).Where(id => !string.IsNullOrEmpty(id))
                 .Distinct().ToList();
@@ -89,30 +93,43 @@ namespace Lykke.Service.PayAPI.Services
             {
                 merchantIds.Add(merchantId);
             }
-            var merchantLogoUrlTasks =
-                merchantIds.ToDictionary(id => id, id => _merchantService.GetMerchantLogoUrlAsync(id));
 
-            await Task.WhenAll(merchantLogoUrlTasks.Values);
+            var results = new ConcurrentDictionary<string, string>();
+            foreach (var batch in merchantIds.Batch(BatchPieceSize))
+            {
+                await Task.WhenAll(batch.Select(id =>
+                    _merchantService.GetMerchantLogoUrlAsync(id).ContinueWith(t => results[id] = t.Result)));
+            }
 
-            return merchantLogoUrlTasks.ToDictionary(p => p.Key, p => p.Value.Result);
+            return results;
         }
 
-        private async Task<Dictionary<string, InvoiceIataSpecificData>> GetIataSpecificDataAsync(HistoryOperationViewModel[] historyOperations)
+        private async Task<IDictionary<string, InvoiceIataSpecificData>> GetIataSpecificDataAsync(HistoryOperationViewModel[] historyOperations)
         {
-            var iataSpecificDataTasks = historyOperations.Where(o => !string.IsNullOrEmpty(o.InvoiceId)).Select(o => o.InvoiceId).Distinct()
-                .ToDictionary(i => i, i => _iataService.GetIataSpecificDataAsync(i));
-            await Task.WhenAll(iataSpecificDataTasks.Values);
+            var invoiceIds = historyOperations.Where(o => !string.IsNullOrEmpty(o.InvoiceId)).Select(o => o.InvoiceId)
+                .Distinct();
 
-            return iataSpecificDataTasks.ToDictionary(p => p.Key, p => p.Value.Result);
+            var results = new ConcurrentDictionary<string, InvoiceIataSpecificData>();
+            foreach (var batch in invoiceIds.Batch(BatchPieceSize))
+            {
+                await Task.WhenAll(batch.Select(id =>
+                    _iataService.GetIataSpecificDataAsync(id).ContinueWith(t => results[id] = t.Result)));
+            }
+
+            return results;
         }
 
-        private async Task<Dictionary<string, string>> GetTitlesAsync(HistoryOperationViewModel[] historyOperations)
+        private async Task<IDictionary<string, string>> GetTitlesAsync(HistoryOperationViewModel[] historyOperations)
         {
-            var titleTasks = historyOperations.ToDictionary(o => o.Id,
-                o => _historyOperationTitleProvider.GetTitleAsync(o.AssetId, o.Type.ToString()));
-            await Task.WhenAll(titleTasks.Values);
+            var results = new ConcurrentDictionary<string, string>();
+            foreach (var batch in historyOperations.Batch(BatchPieceSize))
+            {
+                await Task.WhenAll(batch.Select(o =>
+                    _historyOperationTitleProvider.GetTitleAsync(o.AssetId, o.Type.ToString())
+                        .ContinueWith(t => results[o.Id] = t.Result)));
+            }
 
-            return titleTasks.ToDictionary(p => p.Key, p => p.Value.Result);
+            return results;
         }
 
         private DateTime? ParseIataInvoiceDate(string iataInvoiceDate)
