@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Common;
 using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
+using Lykke.Service.PayAPI.Core.Domain.PayHistory;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Models.Invoice;
+using Lykke.Service.PayAPI.Models.Mobile.History;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.Asset;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
@@ -62,6 +64,25 @@ namespace Lykke.Service.PayAPI.Models
 
             CreateMap<MerchantWalletBalanceLine, MerchantWalletConvertedBalanceResponse>(MemberList.Destination)
                 .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.MerchantWalletId));
+
+            CreateMobileHistoryMaps();
+        }
+
+        private void CreateMobileHistoryMaps()
+        {
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>(MemberList.Source)
+                .ForSourceMember(s => s.InvoiceId, s => s.Ignore())
+                .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore());
+
+            CreateMap<HistoryOperationView, HistoryOperationViewModel>();
+
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(MemberList.Source)
+                .ForSourceMember(s=>s.InvoiceId, s=>s.Ignore())
+                .ForSourceMember(s => s.MerchantId, s => s.Ignore())
+                .ForSourceMember(s => s.EmployeeEmail, s => s.Ignore())
+                .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore());
+
+            CreateMap<HistoryOperation, HistoryOperationModel>();
         }
     }
 }

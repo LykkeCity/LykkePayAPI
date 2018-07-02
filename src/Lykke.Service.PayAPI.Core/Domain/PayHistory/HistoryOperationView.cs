@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Lykke.Service.PayAPI.Models.Mobile.History
+namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
 {
-    public class HistoryOperationViewModel
+    public class HistoryOperationView
     {
         public string Id { get; set; }
 
