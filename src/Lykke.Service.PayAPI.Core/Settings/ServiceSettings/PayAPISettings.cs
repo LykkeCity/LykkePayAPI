@@ -31,10 +31,16 @@ namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
     public class IataSettings
     {
         public AssetsMapSettings AssetsMap { get; set; }
+        public CashoutAssetsSettings CashoutAssets { get; set; }
     }
 
     public class AssetsMapSettings
     {
         public IDictionary<string, string> Values { get; set; }
+    }
+
+    public class CashoutAssetsSettings
+    {
+        public IReadOnlyList<string> Assets { get; set; }
     }
 }
