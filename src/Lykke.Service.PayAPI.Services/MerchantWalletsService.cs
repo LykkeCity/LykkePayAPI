@@ -50,7 +50,11 @@ namespace Lykke.Service.PayAPI.Services
             {
                 decimal assetPairRate = 0;
 
-                if (!string.IsNullOrWhiteSpace(convertAssetId))
+                if (merchantWalletBalanceResponse.AssetDisplayId.Equals(convertAssetId))
+                {
+                    assetPairRate = 1;
+                }
+                else if (!string.IsNullOrWhiteSpace(convertAssetId))
                 {
                     try
                     {
