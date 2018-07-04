@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using AutoMapper;
 using JetBrains.Annotations;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
+using Lykke.Service.PayAPI.Models.Mobile.Assets;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,10 +33,12 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [HttpGet]
         [Route("cashout")]
         [SwaggerOperation(nameof(GetCashoutAssets))]
-        [ProducesResponseType(typeof(IReadOnlyList<string>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IReadOnlyList<CashoutAssetResponse>), (int) HttpStatusCode.OK)]
         public IActionResult GetCashoutAssets()
         {
-            return Ok(_assetSettingsService.GetCashoutAssets());
+            var assets = Mapper.Map<IReadOnlyList<CashoutAssetResponse>>(_assetSettingsService.GetCashoutAssets());
+
+            return Ok(assets);
         }
     }
 }
