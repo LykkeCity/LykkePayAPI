@@ -11,6 +11,8 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
 
         public string SoldBy { get; set; }
 
+        public string RequestedBy { get; set; }
+
         public DateTime? TimeStamp { get; set; }
 
         public string TxHash { get; set; }
@@ -25,6 +27,6 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
 
         public string BillingCategory { get; set; }
 
-        public InvoiceStatus? InvoiceStatus { get; set; }
+        public string InvoiceStatus { get; set; }
     }
 }
