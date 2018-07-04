@@ -1,33 +1,75 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
+using Common.Log;
+using JetBrains.Annotations;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Models.Mobile.Cashout;
+using Lykke.Service.PayInternal.Client;
+using Lykke.Service.PayInternal.Client.Exceptions;
+using Lykke.Service.PayInternal.Client.Models.Cashout;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Refit;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
     [ApiVersion("1.0")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [BearerHeader]
     [Route("api/v{version:apiVersion}/mobile/cashout")]
-    public class CashoutController : ControllerBase
+    public class CashoutController : Controller
     {
+        private readonly IPayInternalClient _payInternalClient;
+        private readonly ILog _log;
+
+        public CashoutController(
+            [NotNull] IPayInternalClient payInternalClient, 
+            [NotNull] ILog log)
+        {
+            _payInternalClient = payInternalClient ?? throw new ArgumentNullException(nameof(payInternalClient));
+            _log = log.CreateComponentScope(nameof(CashoutController)) ?? throw new ArgumentNullException(nameof(log));
+        }
+
         /// <summary>
         /// Executes cashout request
         /// </summary>
         /// <param name="request">Cashout request details</param>
         /// <response code="200">Cashout operation has been successfully executed</response>
+        /// <response code="400">Bad request</response>
         [HttpPost]
         [SwaggerOperation(nameof(Execute))]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CashoutResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]
         public async Task<IActionResult> Execute([FromBody] CashoutModel request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var clientRequest = Mapper.Map<CashoutRequest>(request, opt =>
+                {
+                    opt.Items["MerchantId"] = this.GetUserMerchantId();
+                    opt.Items["EmployeeEmail"] = this.GetUserEmail();
+                });
+
+                CashoutResponse response = await _payInternalClient.CashoutAsync(clientRequest);
+
+                return Ok(Mapper.Map<CashoutResponseModel>(response));
+            }
+            catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var apiException = e.InnerException as ApiException;
+
+                if (apiException?.StatusCode == HttpStatusCode.BadRequest)
+                    return BadRequest(apiException.GetContentAs<ErrorResponse>());
+
+                _log.WriteError(nameof(Execute), request, e);
+
+                return BadRequest(ErrorResponse.Create(e.Message));
+            }
         }
     }
 }

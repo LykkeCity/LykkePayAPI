@@ -7,9 +7,11 @@ using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Models.Invoice;
 using Lykke.Service.PayAPI.Models.Mobile.Assets;
+using Lykke.Service.PayAPI.Models.Mobile.Cashout;
 using Lykke.Service.PayAPI.Models.Mobile.History;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.Asset;
+using Lykke.Service.PayInternal.Client.Models.Cashout;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
@@ -68,6 +70,20 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.MerchantWalletId));
 
             CreateMap<CashoutAsset, CashoutAssetResponse>(MemberList.Destination);
+
+            CreateMap<CashoutModel, CashoutRequest>(MemberList.Destination)
+                .ForMember(dest => dest.MerchantId,
+                    opt => opt.ResolveUsing((src, dest, destMember, resContext) =>
+                        dest.MerchantId = (string) resContext.Items["MerchantId"]))
+                .ForMember(dest => dest.EmployeeEmail,
+                    opt => opt.ResolveUsing((src, dest, destMember, resContext) =>
+                        dest.EmployeeEmail = (string) resContext.Items["EmployeeEmail"]))
+                .ForMember(dest => dest.DesiredAsset, opt => opt.MapFrom(src => src.DesiredCashoutAsset))
+                .ForMember(dest => dest.SourceAmount, opt => opt.MapFrom(src => src.Amount))
+                .ForMember(dest => dest.SourceAssetId, opt => opt.MapFrom(src => src.AssetId))
+                .ForMember(dest => dest.SourceMerchantWalletId, opt => opt.Ignore());
+
+            CreateMap<CashoutResponse, CashoutResponseModel>(MemberList.Destination);
 
             CreateMobileHistoryMaps();
         }
