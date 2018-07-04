@@ -12,6 +12,7 @@ namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
         public JwtSecuritySettings JwtSecurity { get; set; }
         public CacheExpirationPeriodsSettings CacheExpirationPeriods { get; set; }
         public IataSettings Iata { get; set; }
+        public string TransactionUrl { get; set; }
     }
 
     public class MerchantSettings

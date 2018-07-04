@@ -32,6 +32,7 @@
     <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.7.1" />
     <PackageReference Include="Lykke.Contracts" Version="1.0.51" />
     <PackageReference Include="Lykke.Logs" Version="5.1.0" />
+    <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.11" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.19" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.5" />
     <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.14" />
