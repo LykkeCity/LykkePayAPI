@@ -61,6 +61,15 @@ namespace Lykke.Service.PayAPI.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cash Out in.
+        /// </summary>
+        internal static string CashOut {
+            get {
+                return ResourceManager.GetString("CashOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Incoming exchange.
         /// </summary>
         internal static string IncomingExchange {

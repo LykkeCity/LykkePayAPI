@@ -1,4 +1,5 @@
-﻿using Lykke.Service.Assets.Client.Models;
+﻿using System;
+using Lykke.Service.Assets.Client.Models;
 using Lykke.Service.PayAPI.Core.Services;
 using System.Threading.Tasks;
 
@@ -8,7 +9,14 @@ namespace Lykke.Service.PayAPI.Services
     {
         public async Task<string> GetTitleAsync(string assetId, string type)
         {
-            return $"{assetId} {GetTypeTitle(type)}";
+            if (string.Equals(type, PayHistory.Core.Domain.HistoryOperationType.CashOut.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return $"{GetTypeTitle(type)} {assetId}";
+            }
+            else
+            {
+                return $"{assetId} {GetTypeTitle(type)}";
+            }            
         }
 
         private string GetTypeTitle(string type)

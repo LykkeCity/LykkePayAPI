@@ -187,7 +187,11 @@ namespace Lykke.Service.PayAPI.Services
 
         private void FillEmployeeEmail(HistoryOperationModel model, HistoryOperation result)
         {
-            if(string.IsNullOrEmpty(model.InvoiceId))
+            if (model.Type == PayHistory.Client.AutorestClient.Models.HistoryOperationType.CashOut)
+            {
+                result.RequestedBy = model.EmployeeEmail;
+            }
+            else if(string.IsNullOrEmpty(model.InvoiceId))
             {
                 result.SoldBy = model.EmployeeEmail;
             }
@@ -195,8 +199,6 @@ namespace Lykke.Service.PayAPI.Services
             {
                 result.PaidBy = model.EmployeeEmail;
             }
-            
-
         }
 
         private async Task FillTitleAsync(HistoryOperation historyOperation)
@@ -229,7 +231,6 @@ namespace Lykke.Service.PayAPI.Services
 
             historyOperation.InvoiceNumber = invoiceTask.Result?.Number;
             historyOperation.BillingCategory = invoiceTask.Result?.BillingCategory;
-            historyOperation.InvoiceStatus = invoiceTask.Result?.Status;
             historyOperation.SettlementMonthPeriod = iataSpecificDataTask.Result?.SettlementMonthPeriod;
             historyOperation.IataInvoiceDate = ParseIataInvoiceDate(iataSpecificDataTask.Result?.IataInvoiceDate);
         }
