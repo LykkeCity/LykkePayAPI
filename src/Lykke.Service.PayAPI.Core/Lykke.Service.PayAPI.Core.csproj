@@ -8,16 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="6.8.6" />
-    <PackageReference Include="Lykke.Contracts" Version="1.0.50" />
+    <PackageReference Include="Lykke.Common" Version="7.0.1" />
+    <PackageReference Include="Lykke.Contracts" Version="1.0.51" />
     <PackageReference Include="Lykke.Service.Assets.Client" Version="4.0.1" />
+    <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.1.0" />
     <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.11" />
-    <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.0.22" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.19" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.5" />
     <PackageReference Include="Lykke.Service.PayHistory.Client" Version="1.0.2" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.7" />
-    <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="4.7.0" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.14" />
+    <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="5.0.0" />
     <PackageReference Include="Lykke.Service.IataApi.Client" Version="1.0.1" />
     <PackageReference Include="Lykke.SettingsReader" Version="2.4.0" />
   </ItemGroup>
