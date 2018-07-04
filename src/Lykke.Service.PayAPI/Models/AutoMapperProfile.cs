@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Common;
+using Lykke.Service.PayAPI.Core.Domain.Assets;
 using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
 using Lykke.Service.PayAPI.Core.Domain.PayHistory;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Models.Invoice;
+using Lykke.Service.PayAPI.Models.Mobile.Assets;
 using Lykke.Service.PayAPI.Models.Mobile.History;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.Asset;
@@ -64,6 +66,8 @@ namespace Lykke.Service.PayAPI.Models
 
             CreateMap<MerchantWalletBalanceLine, MerchantWalletConvertedBalanceResponse>(MemberList.Destination)
                 .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.MerchantWalletId));
+
+            CreateMap<CashoutAsset, CashoutAssetResponse>(MemberList.Destination);
 
             CreateMobileHistoryMaps();
         }
