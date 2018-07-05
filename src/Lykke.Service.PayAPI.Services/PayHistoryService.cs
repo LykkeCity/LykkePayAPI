@@ -2,22 +2,21 @@
 using Common;
 using Common.Log;
 using Lykke.Service.EthereumCore.Client.Models;
+using Lykke.Service.PayAPI.Core.Domain.Invoice;
 using Lykke.Service.PayAPI.Core.Domain.PayHistory;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayHistory.Client;
+using Lykke.Service.PayHistory.Client.AutorestClient.Models;
 using Lykke.Service.PayInvoice.Client;
-using Lykke.Service.PayInvoice.Client.Models.Invoice;
+using MoreLinq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Lykke.Service.PayAPI.Core.Domain.Invoice;
-using Lykke.Service.PayHistory.Client.AutorestClient.Models;
-using MoreLinq;
-using System.Collections.Concurrent;
 
 namespace Lykke.Service.PayAPI.Services
 {
@@ -53,7 +52,7 @@ namespace Lykke.Service.PayAPI.Services
         {
             var historyOperations = (await _payHistoryClient.GetHistoryAsync(merchantId)).ToArray();
 
-            var merchantLogosTask = GetMerchantLogosAsync(merchantId, historyOperations);
+            var merchantLogosTask = GetMerchantLogosAsync(historyOperations, merchantId);
             var iataSpecificDataTask = GetIataSpecificDataAsync(historyOperations);
             var titlesTask = GetTitlesAsync(historyOperations);
             await Task.WhenAll(merchantLogosTask, iataSpecificDataTask, titlesTask);
@@ -66,7 +65,6 @@ namespace Lykke.Service.PayAPI.Services
                 string logoKey = string.IsNullOrEmpty(historyOperation.OppositeMerchantId)
                     ? merchantId
                     : historyOperation.OppositeMerchantId;
-
 
                 result.MerchantLogoUrl = merchantLogosTask.Result[logoKey];
                 result.Title = titlesTask.Result[historyOperation.Id];
@@ -85,11 +83,47 @@ namespace Lykke.Service.PayAPI.Services
             return results;
         }
 
-        private async Task<IDictionary<string,string>> GetMerchantLogosAsync(string merchantId, HistoryOperationViewModel[] historyOperations)
+        public async Task<IReadOnlyList<HistoryOperationView>> GetHistoryByInvoiceAsync(string invoiceId)
+        {
+            var historyOperations = (await _payHistoryClient.GetHistoryByInvoiceAsync(invoiceId)).ToArray();
+
+            var merchantLogosTask = GetMerchantLogosAsync(historyOperations);
+            var iataSpecificDataTask = GetIataSpecificDataAsync(historyOperations);
+            var titlesTask = GetTitlesAsync(historyOperations);
+            await Task.WhenAll(merchantLogosTask, iataSpecificDataTask, titlesTask);
+
+            var results = new List<HistoryOperationView>();
+            foreach (var historyOperation in historyOperations)
+            {
+                var result = Mapper.Map<HistoryOperationView>(historyOperation);
+
+                if(merchantLogosTask.Result.TryGetValue(historyOperation.OppositeMerchantId, out var logoUrl))
+                {
+                    result.MerchantLogoUrl = logoUrl;
+                }
+                
+                result.Title = titlesTask.Result[historyOperation.Id];
+
+                if (!string.IsNullOrEmpty(historyOperation.InvoiceId))
+                {
+                    result.SettlementMonthPeriod =
+                        iataSpecificDataTask.Result[historyOperation.InvoiceId]?.SettlementMonthPeriod;
+                    result.IataInvoiceDate =
+                        ParseIataInvoiceDate(iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate);
+                }
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        private async Task<IDictionary<string,string>> GetMerchantLogosAsync(HistoryOperationViewModel[] historyOperations, string merchantId = null)
         {
             var merchantIds = historyOperations.Select(o => o.OppositeMerchantId).Where(id => !string.IsNullOrEmpty(id))
                 .Distinct().ToList();
-            if (!merchantIds.Contains(merchantId, StringComparer.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(merchantId) 
+                && !merchantIds.Contains(merchantId, StringComparer.OrdinalIgnoreCase))
             {
                 merchantIds.Add(merchantId);
             }
