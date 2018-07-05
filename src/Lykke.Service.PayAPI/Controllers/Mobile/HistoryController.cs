@@ -75,5 +75,21 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             var result = Mapper.Map<HistoryOperationModel>(historyOperation);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Returns latest payment details of the history operation.
+        /// </summary>
+        /// <response code="200">A details of the history operation.</response>
+        /// <response code="400">Problem occured.</response>        
+        /// <response code="404">History operation is not found.</response>  
+        [HttpGet]
+        [SwaggerOperation("InvoiceLatestPaymentDetails")]
+        [ProducesResponseType(typeof(HistoryOperationModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        public async Task<IActionResult> InvoiceLatestPaymentDetails([Required, PartitionOrRowKey] string invoiceId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
