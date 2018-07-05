@@ -61,7 +61,16 @@ namespace Lykke.Service.PayAPI.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incoming exchange.
+        ///   Looks up a localized string similar to Cash Out in {0}.
+        /// </summary>
+        internal static string CashOut {
+            get {
+                return ResourceManager.GetString("CashOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Incoming exchange.
         /// </summary>
         internal static string IncomingExchange {
             get {
@@ -70,7 +79,7 @@ namespace Lykke.Service.PayAPI.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incoming invoice payment.
+        ///   Looks up a localized string similar to {0} Incoming invoice payment.
         /// </summary>
         internal static string IncomingInvoicePayment {
             get {
@@ -88,7 +97,7 @@ namespace Lykke.Service.PayAPI.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outgoing exchange.
+        ///   Looks up a localized string similar to {0} Outgoing exchange.
         /// </summary>
         internal static string OutgoingExchange {
             get {
@@ -97,7 +106,7 @@ namespace Lykke.Service.PayAPI.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outgoing invoice payment.
+        ///   Looks up a localized string similar to {0} Outgoing invoice payment.
         /// </summary>
         internal static string OutgoingInvoicePayment {
             get {
@@ -106,7 +115,7 @@ namespace Lykke.Service.PayAPI.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Recharge.
+        ///   Looks up a localized string similar to Cash In {0}.
         /// </summary>
         internal static string Recharge {
             get {
@@ -115,7 +124,7 @@ namespace Lykke.Service.PayAPI.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Withdrawal.
+        ///   Looks up a localized string similar to {0} Withdrawal.
         /// </summary>
         internal static string Withdrawal {
             get {
