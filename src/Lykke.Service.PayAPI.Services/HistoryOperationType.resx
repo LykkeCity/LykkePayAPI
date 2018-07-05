@@ -118,27 +118,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CashOut" xml:space="preserve">
-    <value>Cash Out in</value>
+    <value>Cash Out in {0}</value>
   </data>
   <data name="IncomingExchange" xml:space="preserve">
-    <value>Incoming exchange</value>
+    <value>{0} Incoming exchange</value>
   </data>
   <data name="IncomingInvoicePayment" xml:space="preserve">
-    <value>Incoming invoice payment</value>
+    <value>{0} Incoming invoice payment</value>
   </data>
   <data name="None" xml:space="preserve">
     <value />
   </data>
   <data name="OutgoingExchange" xml:space="preserve">
-    <value>Outgoing exchange</value>
+    <value>{0} Outgoing exchange</value>
   </data>
   <data name="OutgoingInvoicePayment" xml:space="preserve">
-    <value>Outgoing invoice payment</value>
+    <value>{0} Outgoing invoice payment</value>
   </data>
   <data name="Recharge" xml:space="preserve">
-    <value>Recharge</value>
+    <value>Cash In {0}</value>
   </data>
   <data name="Withdrawal" xml:space="preserve">
-    <value>Withdrawal</value>
+    <value>{0} Withdrawal</value>
   </data>
 </root>
