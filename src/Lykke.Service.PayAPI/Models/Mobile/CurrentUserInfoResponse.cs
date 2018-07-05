@@ -11,5 +11,6 @@ namespace Lykke.Service.PayAPI.Models.Mobile
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+        public bool IsInternalSupervisor { get; set; }
     }
 }
