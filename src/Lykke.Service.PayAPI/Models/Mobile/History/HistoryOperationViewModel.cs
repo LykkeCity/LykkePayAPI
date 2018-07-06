@@ -23,5 +23,7 @@ namespace Lykke.Service.PayAPI.Models.Mobile.History
         public DateTime? IataInvoiceDate { get; set; }
 
         public string SettlementMonthPeriod { get; set; }
+
+        public string InvoiceStatus { get; set; }
     }
 }

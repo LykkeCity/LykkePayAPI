@@ -25,5 +25,7 @@ namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
         public DateTime? IataInvoiceDate { get; set; }
 
         public string SettlementMonthPeriod { get; set; }
+
+        public string InvoiceStatus { get; set; }
     }
 }
