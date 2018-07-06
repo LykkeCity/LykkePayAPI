@@ -7,7 +7,6 @@ using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayHistory.Client;
 using Lykke.Service.PayInvoice.Client;
-using Lykke.Service.PayInvoice.Client.Models.Invoice;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,11 +17,19 @@ using Lykke.Service.PayAPI.Core.Domain.Invoice;
 using Lykke.Service.PayHistory.Client.AutorestClient.Models;
 using MoreLinq;
 using System.Collections.Concurrent;
+using Lykke.Service.PayInvoice.Client.Models.Invoice;
+using ClientHistoryOperationType = Lykke.Service.PayHistory.Client.AutorestClient.Models.HistoryOperationType;
 
 namespace Lykke.Service.PayAPI.Services
 {
     public class PayHistoryService : IPayHistoryService
     {
+        class HistoryOperationBrief
+        {
+            public string Id { get; set; }
+            public string InvoiceStatus { get; set; }
+        }
+
         private const int BatchPieceSize = 15;
 
         private readonly IPayHistoryClient _payHistoryClient;
@@ -183,6 +190,25 @@ namespace Lykke.Service.PayAPI.Services
             }
 
             return result;
+        }
+
+        public async Task<HistoryOperation> GetLatestPaymentDetailsAsync(string merchantId, string invoiceId)
+        {
+            IEnumerable<HistoryOperationViewModel> invoiceOperations =
+                await _payHistoryClient.GetHistoryByInvoiceAsync(invoiceId);
+
+            var filteredOperations = invoiceOperations.Where(x =>
+                x.Type == ClientHistoryOperationType.OutgoingInvoicePayment &&
+                x.InvoiceStatus == InvoiceStatus.Paid.ToString());
+
+            HistoryOperationViewModel operation =
+                filteredOperations.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
+
+            if (operation == null) return null;
+
+            HistoryOperationModel operationDetails = await _payHistoryClient.GetDetailsAsync(merchantId, operation.Id);
+
+            return Mapper.Map<HistoryOperation>(operationDetails);
         }
 
         private void FillEmployeeEmail(HistoryOperationModel model, HistoryOperation result)

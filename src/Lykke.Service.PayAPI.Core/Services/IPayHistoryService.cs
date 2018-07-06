@@ -8,5 +8,6 @@ namespace Lykke.Service.PayAPI.Core.Services
     {
         Task<IReadOnlyList<HistoryOperationView>> GetHistoryAsync(string merchantId);
         Task<HistoryOperation> GetDetailsAsync(string merchantId, string id);
+        Task<HistoryOperation> GetLatestPaymentDetailsAsync(string merchantId, string invoiceId);
     }
 }
