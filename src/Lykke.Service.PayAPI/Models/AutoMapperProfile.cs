@@ -70,17 +70,22 @@ namespace Lykke.Service.PayAPI.Models
 
         private void CreateMobileHistoryMaps()
         {
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>(MemberList.Source)
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>(
+                    MemberList.Source)
                 .ForSourceMember(s => s.InvoiceId, s => s.Ignore())
-                .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore());
+                .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore())
+                .ForSourceMember(s => s.DesiredAssetId, s => s.Ignore())
+                .ForSourceMember(s => s.InvoiceStatus, s => s.Ignore());
 
             CreateMap<HistoryOperationView, HistoryOperationViewModel>();
 
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(MemberList.Source)
-                .ForSourceMember(s=>s.InvoiceId, s=>s.Ignore())
+            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(
+                    MemberList.Source)
+                .ForSourceMember(s => s.InvoiceId, s => s.Ignore())
                 .ForSourceMember(s => s.MerchantId, s => s.Ignore())
                 .ForSourceMember(s => s.EmployeeEmail, s => s.Ignore())
-                .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore());
+                .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore())
+                .ForSourceMember(s => s.DesiredAssetId, s => s.Ignore());
 
             CreateMap<HistoryOperation, HistoryOperationModel>();
         }

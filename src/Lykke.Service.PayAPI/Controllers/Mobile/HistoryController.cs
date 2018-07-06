@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
+using HistoryOperation = Lykke.Service.PayAPI.Core.Domain.PayHistory.HistoryOperation;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -80,16 +81,19 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// Returns latest payment details of the history operation.
         /// </summary>
         /// <response code="200">A details of the history operation.</response>
-        /// <response code="400">Problem occured.</response>        
         /// <response code="404">History operation is not found.</response>  
         [HttpGet]
         [SwaggerOperation("InvoiceLatestPaymentDetails")]
         [ProducesResponseType(typeof(HistoryOperationModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         public async Task<IActionResult> InvoiceLatestPaymentDetails([Required, PartitionOrRowKey] string invoiceId)
         {
-            throw new NotImplementedException();
+            HistoryOperation operation = await _payHistoryService.GetLatestPaymentDetailsAsync(this.GetUserMerchantId(), invoiceId);
+
+            if (operation == null)
+                return NotFound(ErrorResponse.Create("There is no payment operation for the invoice to be fully paid"));
+
+            return Ok(Mapper.Map<HistoryOperationModel>(operation));
         }
     }
 }
