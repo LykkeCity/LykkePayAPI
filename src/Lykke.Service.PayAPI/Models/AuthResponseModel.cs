@@ -32,7 +32,9 @@ namespace Lykke.Service.PayAPI.Models
         /// </summary>
         public bool ForcePinUpdate { get; set; }
 
-        //Tags for push notifications.
+        /// <summary>
+        ///Tags for push notifications.
+        /// </summary>
         public Dictionary<string, string[]> NotificationIds { get; set; }
     }
 }
