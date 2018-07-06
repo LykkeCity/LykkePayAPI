@@ -39,12 +39,14 @@ namespace Lykke.Service.PayAPI.Services
         private readonly IEthereumCoreClient _ethereumCoreClient;
         private readonly IIataService _iataService;
         private readonly IHistoryOperationTitleProvider _historyOperationTitleProvider;
+        private readonly string _merchantDefaultLogoUrl;
         private readonly ILog _log;
 
         public PayHistoryService(IPayHistoryClient payHistoryClient, ILog log,
             IMerchantService merchantService, IPayInvoiceClient payInvoiceClient,
             IExplorerUrlResolver explorerUrlResolver, IEthereumCoreClient ethereumCoreClient,
-            IIataService iataService, IHistoryOperationTitleProvider historyOperationTitleProvider)
+            IIataService iataService, IHistoryOperationTitleProvider historyOperationTitleProvider,
+            string merchantDefaultLogoUrl)
         {
             _payHistoryClient = payHistoryClient;
             _merchantService = merchantService;
@@ -53,6 +55,7 @@ namespace Lykke.Service.PayAPI.Services
             _ethereumCoreClient = ethereumCoreClient;
             _iataService = iataService;
             _historyOperationTitleProvider = historyOperationTitleProvider;
+            _merchantDefaultLogoUrl = merchantDefaultLogoUrl;
             _log = log;
         }
 
@@ -60,6 +63,19 @@ namespace Lykke.Service.PayAPI.Services
         {
             var historyOperations = (await _payHistoryClient.GetHistoryAsync(merchantId)).ToArray();
 
+            return await GetHistoryAsync(historyOperations);
+        }
+
+        public async Task<IReadOnlyList<HistoryOperationView>> GetHistoryByInvoiceAsync(string invoiceId)
+        {
+            var historyOperations = (await _payHistoryClient.GetHistoryByInvoiceAsync(invoiceId)).ToArray();
+
+            return await GetHistoryAsync(historyOperations);
+        }
+
+        private async Task<IReadOnlyList<HistoryOperationView>> GetHistoryAsync(
+            HistoryOperationViewModel[] historyOperations, string merchantId = null)
+        {
             var merchantLogosTask = GetMerchantLogosAsync(historyOperations, merchantId);
             var iataSpecificDataTask = GetIataSpecificDataAsync(historyOperations);
             var titlesTask = GetTitlesAsync(historyOperations);
@@ -70,12 +86,10 @@ namespace Lykke.Service.PayAPI.Services
             {
                 var result = Mapper.Map<HistoryOperationView>(historyOperation);
 
-                string logoKey = string.IsNullOrEmpty(historyOperation.OppositeMerchantId)
-                    ? merchantId
-                    : historyOperation.OppositeMerchantId;
-
+                string logoKey = GetLogoKey(historyOperation);
                 result.MerchantLogoUrl = merchantLogosTask.Result[logoKey];
                 result.Title = titlesTask.Result[historyOperation.Id];
+                result.Amount = GetAmount(historyOperation.Type, historyOperation.Amount);
 
                 if (!string.IsNullOrEmpty(historyOperation.InvoiceId))
                 {
@@ -84,53 +98,38 @@ namespace Lykke.Service.PayAPI.Services
                     result.IataInvoiceDate =
                         ParseIataInvoiceDate(iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate);
                 }
-                
+
                 results.Add(result);
             }
 
             return results;
         }
 
-        public async Task<IReadOnlyList<HistoryOperationView>> GetHistoryByInvoiceAsync(string invoiceId)
+        private decimal GetAmount(PayHistory.Client.AutorestClient.Models.HistoryOperationType type, double amount)
         {
-            var historyOperations = (await _payHistoryClient.GetHistoryByInvoiceAsync(invoiceId)).ToArray();
-
-            var merchantLogosTask = GetMerchantLogosAsync(historyOperations);
-            var iataSpecificDataTask = GetIataSpecificDataAsync(historyOperations);
-            var titlesTask = GetTitlesAsync(historyOperations);
-            await Task.WhenAll(merchantLogosTask, iataSpecificDataTask, titlesTask);
-
-            var results = new List<HistoryOperationView>();
-            foreach (var historyOperation in historyOperations)
+            switch (type)
             {
-                var result = Mapper.Map<HistoryOperationView>(historyOperation);
-
-                if(merchantLogosTask.Result.TryGetValue(historyOperation.OppositeMerchantId, out var logoUrl))
-                {
-                    result.MerchantLogoUrl = logoUrl;
-                }
-                
-                result.Title = titlesTask.Result[historyOperation.Id];
-
-                if (!string.IsNullOrEmpty(historyOperation.InvoiceId))
-                {
-                    result.SettlementMonthPeriod =
-                        iataSpecificDataTask.Result[historyOperation.InvoiceId]?.SettlementMonthPeriod;
-                    result.IataInvoiceDate =
-                        ParseIataInvoiceDate(iataSpecificDataTask.Result[historyOperation.InvoiceId]?.IataInvoiceDate);
-                }
-
-                results.Add(result);
+                case PayHistory.Client.AutorestClient.Models.HistoryOperationType.CashOut:
+                case PayHistory.Client.AutorestClient.Models.HistoryOperationType.OutgoingInvoicePayment:
+                case PayHistory.Client.AutorestClient.Models.HistoryOperationType.OutgoingExchange:
+                    return (decimal) -amount;
+                default:
+                    return (decimal) amount;
             }
-
-            return results;
         }
 
-        private async Task<IDictionary<string,string>> GetMerchantLogosAsync(HistoryOperationViewModel[] historyOperations, string merchantId = null)
+        private string GetLogoKey(HistoryOperationViewModel historyOperation)
         {
-            var merchantIds = historyOperations.Select(o => o.OppositeMerchantId).Where(id => !string.IsNullOrEmpty(id))
+            return historyOperation.OppositeMerchantId ?? string.Empty;
+        }
+
+        private async Task<IDictionary<string, string>> GetMerchantLogosAsync(
+            HistoryOperationViewModel[] historyOperations, string merchantId = null)
+        {
+            var merchantIds = historyOperations.Select(GetLogoKey).Where(k => !string.IsNullOrEmpty(k))
                 .Distinct().ToList();
-            if (!string.IsNullOrEmpty(merchantId) 
+
+            if (!string.IsNullOrEmpty(merchantId)
                 && !merchantIds.Contains(merchantId, StringComparer.OrdinalIgnoreCase))
             {
                 merchantIds.Add(merchantId);
@@ -143,10 +142,13 @@ namespace Lykke.Service.PayAPI.Services
                     _merchantService.GetMerchantLogoUrlAsync(id).ContinueWith(t => results[id] = t.Result)));
             }
 
+            results[string.Empty] = _merchantDefaultLogoUrl;
+
             return results;
         }
 
-        private async Task<IDictionary<string, InvoiceIataSpecificData>> GetIataSpecificDataAsync(HistoryOperationViewModel[] historyOperations)
+        private async Task<IDictionary<string, InvoiceIataSpecificData>> GetIataSpecificDataAsync(
+            HistoryOperationViewModel[] historyOperations)
         {
             var invoiceIds = historyOperations.Where(o => !string.IsNullOrEmpty(o.InvoiceId)).Select(o => o.InvoiceId)
                 .Distinct();
@@ -194,16 +196,13 @@ namespace Lykke.Service.PayAPI.Services
             }
 
             var result = Mapper.Map<HistoryOperation>(historyOperation);
-
-            string detailsMerchantId = string.IsNullOrEmpty(historyOperation.OppositeMerchantId)
-                ? merchantId
-                : historyOperation.OppositeMerchantId;            
-
             try
             {
                 FillEmployeeEmail(historyOperation, result);
+                result.Amount = GetAmount(historyOperation.Type, historyOperation.Amount);
+
                 await Task.WhenAll(FillTitleAsync(result),
-                    FillFromMerchantServiceAsync(result, detailsMerchantId),
+                    FillFromMerchantServiceAsync(historyOperation, result),
                     FillByInvoiceAsync(result, historyOperation.InvoiceId),
                     FillByTxHashAsync(result));
             }
@@ -250,7 +249,7 @@ namespace Lykke.Service.PayAPI.Services
             {
                 result.RequestedBy = model.EmployeeEmail;
             }
-            else if(string.IsNullOrEmpty(model.InvoiceId))
+            else if (string.IsNullOrEmpty(model.InvoiceId))
             {
                 result.SoldBy = model.EmployeeEmail;
             }
@@ -262,19 +261,20 @@ namespace Lykke.Service.PayAPI.Services
 
         private async Task FillTitleAsync(HistoryOperation historyOperation)
         {
-            historyOperation.Title = await 
+            historyOperation.Title = await
                 _historyOperationTitleProvider.GetTitleAsync(historyOperation.AssetId, historyOperation.Type);
         }
 
-        private async Task FillFromMerchantServiceAsync(HistoryOperation historyOperation, string merchantId)
+        private async Task FillFromMerchantServiceAsync(HistoryOperationModel model, HistoryOperation result)
         {
-            var getMerchantNameTask = _merchantService.GetMerchantNameAsync(merchantId);
-            var getMerchantLogoUrlTask = _merchantService.GetMerchantLogoUrlAsync(merchantId);
+            string detailsMerchantId = string.IsNullOrEmpty(model.OppositeMerchantId)
+                ? model.MerchantId
+                : model.OppositeMerchantId;
 
-            await Task.WhenAll(getMerchantNameTask, getMerchantLogoUrlTask);
-
-            historyOperation.MerchantName = getMerchantNameTask.Result;
-            historyOperation.MerchantLogoUrl = getMerchantLogoUrlTask.Result;
+            result.MerchantName = await _merchantService.GetMerchantNameAsync(detailsMerchantId);
+            result.MerchantLogoUrl = string.IsNullOrEmpty(model.OppositeMerchantId)
+                ? _merchantDefaultLogoUrl
+                : await _merchantService.GetMerchantLogoUrlAsync(model.OppositeMerchantId);
         }
 
         private async Task FillByInvoiceAsync(HistoryOperation historyOperation, string invoiceId)
