@@ -1,1 +1,1 @@
-# LykkePayAPI trigger dev build
+# LykkePayAPI
