@@ -8,6 +8,7 @@ using Lykke.Service.PayInternal.Client;
 using Lykke.Service.IataApi.Client;
 using Lykke.Service.PayHistory.Client;
 using Lykke.Service.EthereumCore.Client;
+using Lykke.Service.PayPushNotifications.Client;
 
 namespace Lykke.Service.PayAPI.Core.Settings
 {
@@ -25,6 +26,7 @@ namespace Lykke.Service.PayAPI.Core.Settings
         public IataApiServiceClientSettings IataApiServiceClient { get; set; }
         public PayHistoryServiceClientSettings PayHistoryServiceClient { get; set; }
         public EthereumServiceClientSettings EthereumServiceClient { get; set; }
+        public PayPushNotificationsServiceClientSettings PayPushNotificationsServiceClient { get; set; }
     }
     public class MarketProfileServiceClientSettings
     {
