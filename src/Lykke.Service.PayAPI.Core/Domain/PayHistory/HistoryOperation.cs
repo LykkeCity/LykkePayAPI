@@ -25,8 +25,6 @@ namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
 
         public string InvoiceNumber { get; set; }
 
-        public string BillingCategory { get; set; }
-
-        public string InvoiceStatus { get; set; }
+        public string BillingCategory { get; set; }        
     }
 }
