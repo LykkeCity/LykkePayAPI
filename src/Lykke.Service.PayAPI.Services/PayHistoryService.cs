@@ -241,9 +241,7 @@ namespace Lykke.Service.PayAPI.Services
 
             if (operation == null) return null;
 
-            HistoryOperationModel operationDetails = await _payHistoryClient.GetDetailsAsync(merchantId, operation.Id);
-
-            return Mapper.Map<HistoryOperation>(operationDetails);
+            return await GetDetailsAsync(merchantId, operation.Id);
         }
 
         private void FillEmployeeEmail(HistoryOperationModel model, HistoryOperation result)
