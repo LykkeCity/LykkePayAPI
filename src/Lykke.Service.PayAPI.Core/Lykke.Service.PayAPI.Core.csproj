@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Lykke.Service.PayAPI.Core</AssemblyName>
     <RootNamespace>Lykke.Service.PayAPI.Core</RootNamespace>
     <Version>1.0.0</Version>
@@ -17,7 +17,7 @@
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.5" />
     <PackageReference Include="Lykke.Service.PayHistory.Client" Version="1.0.2" />
     <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.14" />
-    <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="5.2.0" />
+    <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="5.2.0-beta.1" />
     <PackageReference Include="Lykke.Service.IataApi.Client" Version="1.0.1" />
     <PackageReference Include="Lykke.SettingsReader" Version="2.4.0" />
   </ItemGroup>
