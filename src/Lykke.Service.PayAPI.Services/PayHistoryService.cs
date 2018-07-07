@@ -24,12 +24,6 @@ namespace Lykke.Service.PayAPI.Services
 {
     public class PayHistoryService : IPayHistoryService
     {
-        class HistoryOperationBrief
-        {
-            public string Id { get; set; }
-            public string InvoiceStatus { get; set; }
-        }
-
         private const int BatchPieceSize = 15;
 
         private readonly IPayHistoryClient _payHistoryClient;
@@ -235,8 +229,7 @@ namespace Lykke.Service.PayAPI.Services
                 x.Type == ClientHistoryOperationType.OutgoingInvoicePayment &&
                 x.InvoiceStatus == InvoiceStatus.Paid.ToString());
 
-            HistoryOperationViewModel operation =
-                filteredOperations.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
+            HistoryOperationViewModel operation = filteredOperations.MaxBy(x => x.CreatedOn);
 
             if (operation == null) return null;
 
