@@ -206,12 +206,18 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 throw;
             }
 
-            return Ok(new ValidatePinResponseModel
+            var result = new ValidatePinResponseModel
             {
-                Passed = validationResult.Success,
-                NotificationIds = await _payPushNotificationsClient.GetNotificationIdsAsync(
-                    validationResult.EmployeeId, validationResult.MerchantId)
-            });
+                Passed = validationResult.Success
+            };
+
+            if (validationResult.Success)
+            {
+                result.NotificationIds = await _payPushNotificationsClient.GetNotificationIdsAsync(
+                    validationResult.EmployeeId, validationResult.MerchantId);
+            }
+
+            return Ok(result);
         }
     }
 }
