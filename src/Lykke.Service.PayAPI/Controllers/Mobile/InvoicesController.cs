@@ -506,6 +506,12 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 invoice.LogoUrl = isDispute
                     ? await _merchantService.GetMerchantLogoUrlAsync(invoice.ClientName)
                     : await _merchantService.GetMerchantLogoUrlAsync(invoice.MerchantId);
+
+                // if an invoice partially paid, it shows the amount left to pay
+                if (invoice.Status == InvoiceStatus.Underpaid.ToString() && invoice.LeftAmountToPayInSettlementAsset > 0)
+                {
+                    invoice.Amount = invoice.LeftAmountToPayInSettlementAsset;
+                }
             }
         }
 
