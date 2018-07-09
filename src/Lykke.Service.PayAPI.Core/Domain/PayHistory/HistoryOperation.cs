@@ -11,6 +11,8 @@ namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
 
         public string SoldBy { get; set; }
 
+        public string RequestedBy { get; set; }
+
         public string TxHash { get; set; }
 
         public DateTime? TimeStamp { get; set; }
@@ -23,8 +25,6 @@ namespace Lykke.Service.PayAPI.Core.Domain.PayHistory
 
         public string InvoiceNumber { get; set; }
 
-        public string BillingCategory { get; set; }
-
-        public InvoiceStatus? InvoiceStatus { get; set; }
+        public string BillingCategory { get; set; }        
     }
 }

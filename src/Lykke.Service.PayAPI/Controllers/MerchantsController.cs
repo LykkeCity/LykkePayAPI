@@ -121,7 +121,8 @@ namespace Lykke.Service.PayAPI.Controllers
                     MerchantLogoUrl = await _merchantService.GetMerchantLogoUrlAsync(merchantId),
                     FirstName = employee.FirstName,
                     LastName = employee.LastName,
-                    Email = employee.Email
+                    Email = employee.Email,
+                    IsInternalSupervisor = employee.IsInternalSupervisor
                 };
             }
             catch (ErrorResponseException ex) when (ex.StatusCode == HttpStatusCode.NotFound)

@@ -154,6 +154,7 @@ namespace Lykke.Service.PayAPI.Modules
 
             builder.RegisterType<PayHistoryService>()
                 .As<IPayHistoryService>()
+                .WithParameter("merchantDefaultLogoUrl", _settings.CurrentValue.PayAPI.Merchant.MerchantDefaultLogoUrl)
                 .SingleInstance();
 
             builder.RegisterType<HistoryOperationTitleProvider>()
