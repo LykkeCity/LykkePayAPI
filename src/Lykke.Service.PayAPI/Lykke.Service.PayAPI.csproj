@@ -54,25 +54,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.PayAPI.AzureRepositories\Lykke.Service.PayAPI.AzureRepositories.csproj" />
     <ProjectReference Include="..\Lykke.Service.PayAPI.Core\Lykke.Service.PayAPI.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.PayAPI.Services\Lykke.Service.PayAPI.Services.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Core">
-      <HintPath>..\..\..\..\Users\atarutin\.nuget\packages\microsoft.aspnetcore.mvc.core\2.0.3\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Versioning">
-      <HintPath>..\..\..\..\Users\atarutin\.nuget\packages\microsoft.aspnetcore.mvc.versioning\2.1.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Versioning.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.ViewFeatures">
-      <HintPath>..\..\..\..\Users\atarutin\.nuget\packages\microsoft.aspnetcore.mvc.viewfeatures\2.0.3\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.ViewFeatures.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
