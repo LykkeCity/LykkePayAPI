@@ -108,7 +108,7 @@ namespace Lykke.Service.PayAPI.Models
 
         private void CreateMobileHistoryMaps()
         {
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>(
+            CreateMap<PayHistory.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>(
                     MemberList.Source)
                 .ForSourceMember(s => s.InvoiceId, s => s.Ignore())
                 .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore())
@@ -117,7 +117,7 @@ namespace Lykke.Service.PayAPI.Models
 
             CreateMap<HistoryOperationView, HistoryOperationViewModel>();
 
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(
+            CreateMap<PayHistory.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(
                     MemberList.Source)
                 .ForSourceMember(s => s.InvoiceId, s => s.Ignore())
                 .ForSourceMember(s => s.MerchantId, s => s.Ignore())
