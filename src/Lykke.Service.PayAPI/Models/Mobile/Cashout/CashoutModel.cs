@@ -24,6 +24,7 @@ namespace Lykke.Service.PayAPI.Models.Mobile.Cashout
         /// <summary>
         /// Gets or sets desired cashout asset
         /// </summary>
+        [Required]
         [CashoutAssetExists]
         public string DesiredCashoutAsset { get; set; }
     }
