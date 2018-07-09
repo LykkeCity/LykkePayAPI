@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Lykke.Service.PayHistory.Client.AutorestClient.Models;
 
 namespace Lykke.Service.PayAPI.Core.Services
 {
