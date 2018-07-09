@@ -193,7 +193,10 @@ namespace Lykke.Service.PayAPI.Services
 
             var filteredOperations = invoiceOperations.Where(x =>
                 x.Type == ClientHistoryOperationType.OutgoingInvoicePayment &&
-                x.InvoiceStatus == InvoiceStatus.Paid.ToString());
+                x.InvoiceStatus == InvoiceStatus.Paid.ToString()).ToList();
+
+            if (!filteredOperations.Any())
+                return null;
 
             HistoryOperationViewModel operation = filteredOperations.MaxBy(x => x.CreatedOn);
 
