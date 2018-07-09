@@ -6,8 +6,8 @@ using Lykke.Service.PayAPI.Core.Domain.Invoice;
 using Lykke.Service.PayAPI.Core.Domain.PayHistory;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
+using Lykke.Service.PayHistory.AutorestClient.Models;
 using Lykke.Service.PayHistory.Client;
-using Lykke.Service.PayHistory.Client.AutorestClient.Models;
 using Lykke.Service.PayInvoice.Client;
 using MoreLinq;
 using System;
@@ -17,7 +17,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
+using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
 namespace Lykke.Service.PayAPI.Services
 {
@@ -98,13 +98,13 @@ namespace Lykke.Service.PayAPI.Services
             return results;
         }
 
-        private decimal GetAmount(PayHistory.Client.AutorestClient.Models.HistoryOperationType type, double amount)
+        private decimal GetAmount(PayHistory.AutorestClient.Models.HistoryOperationType type, double amount)
         {
             switch (type)
             {
-                case PayHistory.Client.AutorestClient.Models.HistoryOperationType.CashOut:
-                case PayHistory.Client.AutorestClient.Models.HistoryOperationType.OutgoingInvoicePayment:
-                case PayHistory.Client.AutorestClient.Models.HistoryOperationType.OutgoingExchange:
+                case PayHistory.AutorestClient.Models.HistoryOperationType.CashOut:
+                case PayHistory.AutorestClient.Models.HistoryOperationType.OutgoingInvoicePayment:
+                case PayHistory.AutorestClient.Models.HistoryOperationType.OutgoingExchange:
                     return (decimal) -amount;
                 default:
                     return (decimal) amount;
@@ -225,7 +225,7 @@ namespace Lykke.Service.PayAPI.Services
                 await _payHistoryClient.GetHistoryByInvoiceAsync(invoiceId);
 
             var filteredOperations = invoiceOperations.Where(x =>
-                x.Type == ClientHistoryOperationType.OutgoingInvoicePayment &&
+                x.Type == PayHistory.AutorestClient.Models.HistoryOperationType.OutgoingInvoicePayment &&
                 x.InvoiceStatus == InvoiceStatus.Paid.ToString());
 
             HistoryOperationViewModel operation = filteredOperations.MaxBy(x => x.CreatedOn);
@@ -237,7 +237,7 @@ namespace Lykke.Service.PayAPI.Services
 
         private void FillEmployeeEmail(HistoryOperationModel model, HistoryOperation result)
         {
-            if (model.Type == PayHistory.Client.AutorestClient.Models.HistoryOperationType.CashOut)
+            if (model.Type == PayHistory.AutorestClient.Models.HistoryOperationType.CashOut)
             {
                 result.RequestedBy = model.EmployeeEmail;
             }
