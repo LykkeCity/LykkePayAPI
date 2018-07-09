@@ -129,6 +129,10 @@ namespace Lykke.Service.PayAPI.Modules
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata))
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods));
 
+            builder.RegisterType<AssetSettingsService>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata.CashoutAssets.Assets))
+                .As<IAssetSettingsService>();
+
             RegisterHistory(builder);
 
             builder.Populate(_services);
