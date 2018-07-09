@@ -8,6 +8,7 @@ using Lykke.Service.PayAPI.Models.Invoice;
 using Lykke.Service.PayAPI.Models.Mobile.History;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.Asset;
+using Lykke.Service.PayInternal.Client.Models.Exchange;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
@@ -20,7 +21,7 @@ namespace Lykke.Service.PayAPI.Models
             CreateMap<CreatePaymentRequestModel, CreatePaymentRequest>()
                 .ForMember(dest => dest.MerchantId,
                     opt => opt.ResolveUsing((src, dest, destMember, resContext) =>
-                        dest.MerchantId = resContext.Items["MerchantId"].ToString()))
+                        dest.MerchantId = (string) resContext.Items["MerchantId"]))
                 .ForMember(dest => dest.PaymentAssetId, opt => opt.MapFrom(src => src.PaymentAsset))
                 .ForMember(dest => dest.SettlementAssetId, opt => opt.MapFrom(src => src.SettlementAsset));
 
@@ -65,12 +66,26 @@ namespace Lykke.Service.PayAPI.Models
             CreateMap<MerchantWalletBalanceLine, MerchantWalletConvertedBalanceResponse>(MemberList.Destination)
                 .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.MerchantWalletId));
 
+            CreateMap<ExchangeModel, ExchangeRequest>(MemberList.Destination)
+                .ForMember(dest => dest.SourceMerchantWalletId, opt => opt.Ignore())
+                .ForMember(dest => dest.DestMerchantWalletId, opt => opt.Ignore())
+                .ForMember(dest => dest.MerchantId,
+                    opt => opt.ResolveUsing((src, dest, destMember, resContext) =>
+                        dest.MerchantId = (string)resContext.Items["MerchantId"]));
+
+            CreateMap<PreExchangeModel, PreExchangeRequest>(MemberList.Destination)
+                .ForMember(dest => dest.MerchantId,
+                    opt => opt.ResolveUsing((src, dest, destMember, resContext) =>
+                        dest.MerchantId = (string)resContext.Items["MerchantId"]));
+
+            CreateMap<PayInternal.Client.Models.Exchange.ExchangeResponse, ExchangeResponse>(MemberList.Destination);
+
             CreateMobileHistoryMaps();
         }
 
         private void CreateMobileHistoryMaps()
         {
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>(
+            CreateMap<PayHistory.AutorestClient.Models.HistoryOperationViewModel, HistoryOperationView>(
                     MemberList.Source)
                 .ForSourceMember(s => s.InvoiceId, s => s.Ignore())
                 .ForSourceMember(s => s.OppositeMerchantId, s => s.Ignore())
@@ -79,7 +94,7 @@ namespace Lykke.Service.PayAPI.Models
 
             CreateMap<HistoryOperationView, HistoryOperationViewModel>();
 
-            CreateMap<PayHistory.Client.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(
+            CreateMap<PayHistory.AutorestClient.Models.HistoryOperationModel, HistoryOperation>(
                     MemberList.Source)
                 .ForSourceMember(s => s.InvoiceId, s => s.Ignore())
                 .ForSourceMember(s => s.MerchantId, s => s.Ignore())
