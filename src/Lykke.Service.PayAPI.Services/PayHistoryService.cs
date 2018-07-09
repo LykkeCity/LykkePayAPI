@@ -7,7 +7,6 @@ using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayHistory.Client;
 using Lykke.Service.PayInvoice.Client;
-using Lykke.Service.PayInvoice.Client.Models.Invoice;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,6 +17,8 @@ using Lykke.Service.PayAPI.Core.Domain.Invoice;
 using Lykke.Service.PayHistory.Client.AutorestClient.Models;
 using MoreLinq;
 using System.Collections.Concurrent;
+using Lykke.Service.PayInvoice.Client.Models.Invoice;
+using ClientHistoryOperationType = Lykke.Service.PayHistory.Client.AutorestClient.Models.HistoryOperationType;
 
 namespace Lykke.Service.PayAPI.Services
 {
@@ -185,6 +186,22 @@ namespace Lykke.Service.PayAPI.Services
             return result;
         }
 
+        public async Task<HistoryOperation> GetLatestPaymentDetailsAsync(string merchantId, string invoiceId)
+        {
+            IEnumerable<HistoryOperationViewModel> invoiceOperations =
+                await _payHistoryClient.GetHistoryByInvoiceAsync(invoiceId);
+
+            var filteredOperations = invoiceOperations.Where(x =>
+                x.Type == ClientHistoryOperationType.OutgoingInvoicePayment &&
+                x.InvoiceStatus == InvoiceStatus.Paid.ToString());
+
+            HistoryOperationViewModel operation = filteredOperations.MaxBy(x => x.CreatedOn);
+
+            if (operation == null) return null;
+
+            return await GetDetailsAsync(merchantId, operation.Id);
+        }
+
         private void FillEmployeeEmail(HistoryOperationModel model, HistoryOperation result)
         {
             if(string.IsNullOrEmpty(model.InvoiceId))
@@ -195,8 +212,6 @@ namespace Lykke.Service.PayAPI.Services
             {
                 result.PaidBy = model.EmployeeEmail;
             }
-            
-
         }
 
         private async Task FillTitleAsync(HistoryOperation historyOperation)

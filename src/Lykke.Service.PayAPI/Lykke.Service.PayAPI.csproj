@@ -35,10 +35,10 @@
     <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.11" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.19" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.5" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.14" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.17" />
     <PackageReference Include="Lykke.Service.PayInternal.Contract" Version="2.0.2" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
-    <PackageReference Include="Lykke.SettingsReader" Version="2.4.0" />
+    <PackageReference Include="Lykke.SettingsReader" Version="2.4.1" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.1.1" />
