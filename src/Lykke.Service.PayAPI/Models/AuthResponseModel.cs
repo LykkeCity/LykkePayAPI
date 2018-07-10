@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Lykke.Service.PayAPI.Models
+﻿namespace Lykke.Service.PayAPI.Models
 {
     /// <summary>
     /// Authentication details
@@ -31,10 +29,5 @@ namespace Lykke.Service.PayAPI.Models
         /// Gets or sets forcePinUpdateFlag
         /// </summary>
         public bool ForcePinUpdate { get; set; }
-
-        /// <summary>
-        ///Tags for push notifications.
-        /// </summary>
-        public Dictionary<string, string[]> NotificationIds { get; set; }
     }
 }
