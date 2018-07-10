@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -9,7 +8,6 @@ using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayAuth.Client;
 using Lykke.Service.PayAuth.Client.Models.Employees;
-using Lykke.Service.PayPushNotifications.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,16 +22,13 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     {
         private readonly IAuthService _authService;
         private readonly IPayAuthClient _payAuthClient;
-        private readonly IPayPushNotificationsClient _payPushNotificationsClient;
 
         public SecurityController(
             [NotNull] IAuthService authService, 
-            [NotNull] IPayAuthClient payAuthClient,
-            [NotNull] IPayPushNotificationsClient payPushNotificationsClient)
+            [NotNull] IPayAuthClient payAuthClient)
         {
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _payAuthClient = payAuthClient ?? throw new ArgumentNullException(nameof(payAuthClient));
-            _payPushNotificationsClient = payPushNotificationsClient;
         }
 
         /// <summary>
@@ -77,9 +72,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 EmployeeId = validationResult.EmployeeId,
                 MerchantId = validationResult.MerchantId,
                 ForcePasswordUpdate = validationResult.ForcePasswordUpdate,
-                ForcePinUpdate = validationResult.ForcePinUpdate,
-                NotificationIds = await _payPushNotificationsClient.GetNotificationIdsAsync(
-                    validationResult.EmployeeId, validationResult.MerchantId)
+                ForcePinUpdate = validationResult.ForcePinUpdate
             });
         }
 
@@ -206,18 +199,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 throw;
             }
 
-            var result = new ValidatePinResponseModel
-            {
-                Passed = validationResult.Success
-            };
-
-            if (validationResult.Success)
-            {
-                result.NotificationIds = await _payPushNotificationsClient.GetNotificationIdsAsync(
-                    validationResult.EmployeeId, validationResult.MerchantId);
-            }
-
-            return Ok(result);
+            return Ok(new ValidatePinResponseModel {Passed = validationResult.Success});
         }
     }
 }

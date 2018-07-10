@@ -19,7 +19,6 @@ using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.IataApi.Client;
 using Lykke.Service.PayHistory.Client;
-using Lykke.Service.PayPushNotifications.Client;
 
 namespace Lykke.Service.PayAPI.Modules
 {
@@ -135,8 +134,6 @@ namespace Lykke.Service.PayAPI.Modules
                 .As<IAssetSettingsService>();
 
             RegisterHistory(builder);
-            builder.RegisterPayPushNotificationsClient(_settings.CurrentValue.PayPushNotificationsServiceClient,
-                n => n);
 
             builder.Populate(_services);
         }
