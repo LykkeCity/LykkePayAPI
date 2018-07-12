@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Lykke.Service.PayAPI.Validation;
 
 namespace Lykke.Service.PayAPI.Models
 {
@@ -11,7 +12,7 @@ namespace Lykke.Service.PayAPI.Models
         /// Gets or sets email
         /// </summary>
         [Required]
-        [Validation.EmailAddress]
+        [EmailAddressAndRowKey]
         public string Email { get; set; }
 
         /// <summary>
