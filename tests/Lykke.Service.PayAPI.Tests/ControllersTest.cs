@@ -28,7 +28,6 @@ namespace Lykke.Service.PayAPI.Tests
                 .Where(t => t.IsSubclassOf(typeof(Controller)) && !_excludeList.Contains(t.Name))
                 .ToList();
 
-
             IEnumerable<Type> failedControllers = controllerTypes
                 .Where(x => Attribute.GetCustomAttribute(x, typeof(ApiVersionAttribute)) == null)
                 .ToList();

@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Common.Log;
+using JetBrains.Annotations;
+using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Core.Services;
 
 namespace Lykke.Service.PayAPI.Services
@@ -15,9 +17,9 @@ namespace Lykke.Service.PayAPI.Services
     {
         private readonly ILog _log;
 
-        public StartupManager(ILog log)
+        public StartupManager([NotNull] ILogFactory logFactory)
         {
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         public async Task StartAsync()

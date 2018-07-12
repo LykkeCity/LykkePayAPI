@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
-using Common.Log;
+using JetBrains.Annotations;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
@@ -22,16 +22,13 @@ namespace Lykke.Service.PayAPI.Controllers
     {
         private readonly IPayInternalClient _payInternalClient;
         private readonly IHeadersHelper _headersHelper;
-        private readonly ILog _log;
 
         public AssetsController(
-            IPayInternalClient payInternalClient,
-            IHeadersHelper headersHelper,
-            ILog log)
+            [NotNull] IPayInternalClient payInternalClient,
+            [NotNull] IHeadersHelper headersHelper)
         {
             _payInternalClient = payInternalClient ?? throw new ArgumentNullException(nameof(payInternalClient));
             _headersHelper = headersHelper ?? throw new ArgumentNullException(nameof(headersHelper));
-            _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
         /// <summary>
@@ -42,22 +39,12 @@ namespace Lykke.Service.PayAPI.Controllers
         [Route("settlement")]
         [SwaggerOperation("GetSettlementAssets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetSettlementAssets()
         {
-            try
-            {
-                AvailableAssetsResponse response =
-                    await _payInternalClient.GetAvailableSettlementAssetsAsync(_headersHelper.MerchantId);
+            AvailableAssetsResponse response =
+                await _payInternalClient.GetAvailableSettlementAssetsAsync(_headersHelper.MerchantId);
 
-                return Ok(Mapper.Map<AssetsResponseModel>(response));
-            }
-            catch (Exception ex)
-            {
-                _log.WriteError(nameof(GetSettlementAssets), new {_headersHelper.MerchantId}, ex);
-            }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
+            return Ok(Mapper.Map<AssetsResponseModel>(response));
         }
 
         /// <summary>
@@ -69,27 +56,13 @@ namespace Lykke.Service.PayAPI.Controllers
         [Route("payment/{settlementAssetId}")]
         [SwaggerOperation("GetPaymentAssets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPaymentAssets(string settlementAssetId)
         {
-            try
-            {
-                AvailableAssetsResponse response =
-                    await _payInternalClient.GetAvailablePaymentAssetsAsync(_headersHelper.MerchantId,
-                        settlementAssetId);
+            AvailableAssetsResponse response =
+                await _payInternalClient.GetAvailablePaymentAssetsAsync(_headersHelper.MerchantId,
+                    settlementAssetId);
 
-                return Ok(Mapper.Map<AssetsResponseModel>(response));
-            }
-            catch (Exception ex)
-            {
-                _log.WriteError(nameof(GetPaymentAssets), new
-                {
-                    _headersHelper.MerchantId,
-                    settlementAssetId
-                }, ex);
-            }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
+            return Ok(Mapper.Map<AssetsResponseModel>(response));
         }
     }
 }

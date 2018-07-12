@@ -6,6 +6,7 @@ using AutoMapper;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
 using Lykke.Service.PayAPI.Core.Exceptions;
@@ -28,10 +29,12 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         private readonly IMerchantWalletsService _merchantWalletsService;
         private readonly ILog _log;
 
-        public MerchantWalletsController([NotNull] IMerchantWalletsService merchantWalletsService, ILog log)
+        public MerchantWalletsController(
+            [NotNull] IMerchantWalletsService merchantWalletsService, 
+            [NotNull] ILogFactory logFactory)
         {
             _merchantWalletsService = merchantWalletsService ?? throw new ArgumentNullException(nameof(merchantWalletsService));
-            _log = log.CreateComponentScope(nameof(MerchantWalletsController)) ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory.CreateLog(this);
         }
 
         /// <summary>
@@ -61,31 +64,31 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (MerchantNotFoundException e)
             {
-                _log.WriteError(nameof(GetBalances), new
+                _log.Error(e, context: new
                 {
                     merchantId,
                     convertAssetId
-                }, e);
+                });
 
                 return NotFound(ErrorResponse.Create(e.Message));
             }
             catch (BlockchainSupportNotImplemented e)
             {
-                _log.WriteError(nameof(GetBalances), new
+                _log.Error(e, context: new
                 {
                     merchantId,
                     convertAssetId
-                }, e);
+                });
 
                 return StatusCode((int) HttpStatusCode.NotImplemented, ErrorResponse.Create(e.Message));
             }
             catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.BadGateway)
             {
-                _log.WriteError(nameof(GetBalances), new
+                _log.Error(e, context: new
                 {
                     merchantId,
                     convertAssetId
-                }, e);
+                });
 
                 return StatusCode((int) HttpStatusCode.BadGateway, ErrorResponse.Create(e.Message));
             }

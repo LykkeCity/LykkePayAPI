@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
@@ -10,11 +9,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using HistoryOperation = Lykke.Service.PayAPI.Core.Domain.PayHistory.HistoryOperation;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
@@ -26,13 +25,12 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Route("api/v{version:apiVersion}/mobile/history/[action]")]
     public class HistoryController : Controller
     {
-        private readonly ILog _log;
         private readonly IPayHistoryService _payHistoryService;
 
-        public HistoryController(IPayHistoryService payHistoryService, ILog log)
+        public HistoryController(
+            [NotNull] IPayHistoryService payHistoryService)
         {
             _payHistoryService = payHistoryService;
-            _log = log.CreateComponentScope(nameof(HistoryController)) ?? throw new ArgumentNullException(nameof(log));
         }
 
         /// <summary>

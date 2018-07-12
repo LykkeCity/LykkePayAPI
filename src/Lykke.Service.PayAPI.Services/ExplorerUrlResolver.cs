@@ -16,7 +16,7 @@ namespace Lykke.Service.PayAPI.Services
         public string GetExplorerUrl(string transactionHash)
         {
             Uri uri = new Uri(new Uri(_transactionUrl.AddLastSymbolIfNotExists('/')), transactionHash);
-            return uri?.ToString() ?? string.Empty;
+            return uri.ToString() ?? string.Empty;
         }
     }
 }

@@ -6,7 +6,9 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Common.Log;
+using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
@@ -34,17 +36,17 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         private readonly ILog _log;
 
         public InvoicesController(
-            IIataService iataService,
-            IMerchantService merchantService,
-            IPayInternalClient payInternalClient,
-            IPayInvoiceClient payInvoiceClient,
-            ILog log)
+            [NotNull] IIataService iataService,
+            [NotNull] IMerchantService merchantService,
+            [NotNull] IPayInternalClient payInternalClient,
+            [NotNull] IPayInvoiceClient payInvoiceClient,
+            [NotNull] ILogFactory logFactory)
         {
             _iataService = iataService;
             _merchantService = merchantService;
             _payInternalClient = payInternalClient;
             _payInvoiceClient = payInvoiceClient ?? throw new ArgumentNullException(nameof(payInvoiceClient));
-            _log = log.CreateComponentScope(nameof(InvoicesController)) ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory.CreateLog(this);
         }
 
         /// <summary>
@@ -119,7 +121,13 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _log.WriteError(nameof(GetMineByFilter), new { merchantId, clientMerchantIds, statuses, billingCategories }, ex);
+                _log.Error(ex, context: new
+                {
+                    merchantId,
+                    clientMerchantIds,
+                    statuses,
+                    billingCategories
+                });
             }
 
             return StatusCode((int)HttpStatusCode.InternalServerError);
@@ -197,7 +205,12 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _log.WriteError(nameof(GetInboxByFilter), new { merchantId, statuses, billingCategories }, ex);
+                _log.Error(ex, context: new
+                {
+                    merchantId,
+                    statuses,
+                    billingCategories
+                });
             }
 
             return StatusCode((int)HttpStatusCode.InternalServerError);
@@ -282,7 +295,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _log.WriteError(nameof(GetFilterForCurrentMerchant), new { merchantId }, ex);
+                _log.Error(ex, context: new { merchantId });
             }
 
             return StatusCode((int)HttpStatusCode.InternalServerError);
@@ -391,7 +404,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             {
                 IReadOnlyList<string> groupMerchants = await _merchantService.GetGroupMerchantsAsync(merchantId);
 
-                var disputeInvoices = await _payInvoiceClient.GetByFilter(new string[] { merchantId }, groupMerchants, null, dispute: true, null, null, null);
+                var disputeInvoices = await _payInvoiceClient.GetByFilter(new string[] { merchantId }, groupMerchants, null, true, null, null, null);
 
                 var result = Mapper.Map<IReadOnlyList<InvoiceMarkedDisputeResponse>>(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(disputeInvoices));
 
@@ -603,3 +616,4 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
     }
 }
+

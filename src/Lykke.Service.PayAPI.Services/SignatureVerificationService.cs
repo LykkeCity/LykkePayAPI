@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using Common.Log;
 using Lykke.Contracts.Security;
 using Lykke.Service.PayAPI.Core;
 using Lykke.Service.PayAPI.Core.Exceptions;
@@ -14,12 +13,10 @@ namespace Lykke.Service.PayAPI.Services
 {
     public class SignatureVerificationService : ISignatureVerificationService
     {
-        private readonly ILog _log;
         private readonly IPayAuthClient _payAuthClient;
 
-        public SignatureVerificationService(ILog log, IPayAuthClient payAuthClient)
+        public SignatureVerificationService(IPayAuthClient payAuthClient)
         {
-            _log = log ?? throw new ArgumentNullException(nameof(log));
             _payAuthClient = payAuthClient ?? throw new ArgumentNullException(nameof(payAuthClient));
         }
 

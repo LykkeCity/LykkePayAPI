@@ -9,7 +9,6 @@ using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInternal.Client.Models.MerchantGroups;
 using Lykke.Service.PayInvoice.Client;
-using Lykke.Service.PayInvoice.Client.Models.MerchantSetting;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Lykke.Service.PayAPI.Services

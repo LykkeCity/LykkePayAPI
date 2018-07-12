@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
@@ -21,10 +22,10 @@ namespace Lykke.Service.PayAPI.Services
 
         public MerchantWalletsService(
             [NotNull] IPayInternalClient payInternalClient, 
-            [NotNull] ILog log)
+            [NotNull] ILogFactory logFactory)
         {
             _payInternalClient = payInternalClient ?? throw new ArgumentNullException(nameof(payInternalClient));
-            _log = log.CreateComponentScope(nameof(MerchantWalletsService)) ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory.CreateLog(this);
         }
 
         public async Task<IReadOnlyList<MerchantWalletBalanceLine>> GetBalancesAsync(string merchantId, string convertAssetId)
@@ -66,11 +67,11 @@ namespace Lykke.Service.PayAPI.Services
                     }
                     catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.NotFound)
                     {
-                        _log.WriteError(nameof(GetBalancesAsync), new
+                        _log.Warning("Asset pait not found", context: new
                         {
                             baseAssetId = merchantWalletBalanceResponse.AssetDisplayId,
                             quotingAssetId = convertAssetId
-                        }, e);
+                        });
                     }
                 }
 

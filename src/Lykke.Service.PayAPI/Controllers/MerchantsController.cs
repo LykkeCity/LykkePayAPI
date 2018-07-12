@@ -96,7 +96,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// Get information about current user (employee of the merchant)
         /// </summary>
         /// <response code="200">User information</response>
-        /// <response code="404">Employee not found</reponse>
+        /// <response code="404">Employee not found</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet]

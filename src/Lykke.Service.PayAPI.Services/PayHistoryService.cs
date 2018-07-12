@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Common;
-using Common.Log;
 using Lykke.Service.EthereumCore.Client.Models;
 using Lykke.Service.PayAPI.Core.Domain.Invoice;
 using Lykke.Service.PayAPI.Core.Domain.PayHistory;
@@ -17,6 +16,8 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
 namespace Lykke.Service.PayAPI.Services
@@ -35,11 +36,16 @@ namespace Lykke.Service.PayAPI.Services
         private readonly string _merchantDefaultLogoUrl;
         private readonly ILog _log;
 
-        public PayHistoryService(IPayHistoryClient payHistoryClient, ILog log,
-            IMerchantService merchantService, IPayInvoiceClient payInvoiceClient,
-            IExplorerUrlResolver explorerUrlResolver, IEthereumCoreClient ethereumCoreClient,
-            IIataService iataService, IHistoryOperationTitleProvider historyOperationTitleProvider,
-            string merchantDefaultLogoUrl)
+        public PayHistoryService(
+            IPayHistoryClient payHistoryClient,
+            IMerchantService merchantService, 
+            IPayInvoiceClient payInvoiceClient,
+            IExplorerUrlResolver explorerUrlResolver, 
+            IEthereumCoreClient ethereumCoreClient,
+            IIataService iataService, 
+            IHistoryOperationTitleProvider historyOperationTitleProvider,
+            string merchantDefaultLogoUrl,
+            ILogFactory logFactory)
         {
             _payHistoryClient = payHistoryClient;
             _merchantService = merchantService;
@@ -49,7 +55,7 @@ namespace Lykke.Service.PayAPI.Services
             _iataService = iataService;
             _historyOperationTitleProvider = historyOperationTitleProvider;
             _merchantDefaultLogoUrl = merchantDefaultLogoUrl;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         public async Task<IReadOnlyList<HistoryOperationView>> GetHistoryAsync(string merchantId)
@@ -201,8 +207,7 @@ namespace Lykke.Service.PayAPI.Services
             }
             catch (EthereumCoreApiException ex)
             {
-                await _log.WriteErrorAsync(nameof(PayHistoryService), nameof(GetDetailsAsync),
-                    new {historyOperation.TxHash}.ToJson(), ex);
+                _log.Error(ex, context: new {historyOperation.TxHash}.ToJson());
                 return null;
             }
             catch (Exception ex)

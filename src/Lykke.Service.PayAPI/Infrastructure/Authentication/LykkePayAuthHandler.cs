@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Contracts.Security;
 using Lykke.Service.PayAPI.Core;
 using Lykke.Service.PayAPI.Core.Exceptions;
@@ -28,12 +29,12 @@ namespace Lykke.Service.PayAPI.Infrastructure.Authentication
             ISystemClock clock,
             IHttpContextAccessor httpContextAccessor,
             ISignatureVerificationService signatureVerificationService,
-            ILog log) : base(options, logger, encoder, clock)
+            ILogFactory logFactory) : base(options, logger, encoder, clock)
         {
             _httpContext = httpContextAccessor.HttpContext;
             _signatureVerificationService = signatureVerificationService ??
                                             throw new ArgumentNullException(nameof(signatureVerificationService));
-            _log = log ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory.CreateLog(this);
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -65,13 +66,13 @@ namespace Lykke.Service.PayAPI.Infrastructure.Authentication
             }
             catch (UnrecognizedSignatureVerificationException ex)
             {
-                await _log.WriteErrorAsync(nameof(LykkePayAuthHandler), nameof(HandleAuthenticateAsync), ex);
+                _log.Error(ex);
 
                 return AuthenticateResult.Fail(ex.Message);
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(LykkePayAuthHandler), nameof(HandleAuthenticateAsync), ex);
+                _log.Error(ex);
 
                 return AuthenticateResult.Fail(ex);
             }

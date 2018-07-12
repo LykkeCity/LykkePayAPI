@@ -1,5 +1,5 @@
-﻿using Lykke.Service.PayAPI.Core.Services;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Lykke.Service.PayAPI.Core.Services;
 
 namespace Lykke.Service.PayAPI.Services
 {

@@ -10,17 +10,17 @@
   <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="7.0.1" />
     <PackageReference Include="Lykke.Contracts" Version="1.0.51" />
-    <PackageReference Include="Lykke.Service.Assets.Client" Version="4.1.0" />
+    <PackageReference Include="Lykke.Service.Assets.Client" Version="4.2.0" />
     <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.1.0" />
     <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.11" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.19" />
-    <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.5" />
-    <PackageReference Include="Lykke.Service.PayHistory.Client" Version="1.0.11" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.17" />
+    <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.10" />
+    <PackageReference Include="Lykke.Service.PayHistory.Client" Version="1.0.12" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.18" />
     <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="5.2.0" />
     <PackageReference Include="Lykke.Service.IataApi.Client" Version="1.0.1" />
     <PackageReference Include="Lykke.SettingsReader" Version="2.4.1" />
-    <PackageReference Include="Lykke.Service.PayPushNotifications.Client" Version="1.0.1" />
+    <PackageReference Include="Lykke.Service.PayPushNotifications.Client" Version="1.0.2" />
   </ItemGroup>
  
 </Project>

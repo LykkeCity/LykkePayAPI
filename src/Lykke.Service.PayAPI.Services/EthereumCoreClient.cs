@@ -1,5 +1,4 @@
-﻿using Common.Log;
-using Lykke.Service.EthereumCore.Client;
+﻿using Lykke.Service.EthereumCore.Client;
 using Lykke.Service.EthereumCore.Client.Models;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using System;
