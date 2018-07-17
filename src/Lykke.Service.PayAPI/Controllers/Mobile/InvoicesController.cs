@@ -259,7 +259,10 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
                 var calculatedInvoices = await CalcSettlementAmountInBaseAsset(Mapper.Map<IReadOnlyList<InvoiceResponseModel>>(invoices), merchantId);
 
-                filter.MaxRangeInBaseAsset = Math.Ceiling(calculatedInvoices.Max(x => x.SettlementAmountInBaseAsset));
+                filter.MaxRangeInBaseAsset = calculatedInvoices.Any()
+                    ? Math.Ceiling(calculatedInvoices.Max(x => x.SettlementAmountInBaseAsset))
+                    : 0;
+
                 #endregion
 
                 return Ok(filter);
