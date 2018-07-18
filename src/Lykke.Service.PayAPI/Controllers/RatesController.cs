@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Core.Exceptions;
@@ -26,10 +27,10 @@ namespace Lykke.Service.PayAPI.Controllers
 
         public RatesController(
             IRatesService ratesService,
-            ILog log)
+            ILogFactory logFactory)
         {
             _ratesService = ratesService ?? throw new ArgumentNullException(nameof(ratesService));
-            _log = log ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory?.CreateLog(this) ?? throw new ArgumentNullException(nameof(logFactory));
         }
 
         /// <summary>
@@ -56,7 +57,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.WriteError(nameof(GetAssetPairRates), new {AssetPairId = assetPairId}, ex);
+                _log.Error(ex, null, new {AssetPairId = assetPairId});
 
                 if (ex is ApiRequestException apiException)
                 {
