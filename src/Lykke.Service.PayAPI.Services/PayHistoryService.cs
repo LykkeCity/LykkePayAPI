@@ -17,6 +17,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Lykke.Common.Log;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
 
 namespace Lykke.Service.PayAPI.Services
@@ -35,7 +36,7 @@ namespace Lykke.Service.PayAPI.Services
         private readonly string _merchantDefaultLogoUrl;
         private readonly ILog _log;
 
-        public PayHistoryService(IPayHistoryClient payHistoryClient, ILog log,
+        public PayHistoryService(IPayHistoryClient payHistoryClient, ILogFactory logFactory,
             IMerchantService merchantService, IPayInvoiceClient payInvoiceClient,
             IExplorerUrlResolver explorerUrlResolver, IEthereumCoreClient ethereumCoreClient,
             IIataService iataService, IHistoryOperationTitleProvider historyOperationTitleProvider,
@@ -49,7 +50,7 @@ namespace Lykke.Service.PayAPI.Services
             _iataService = iataService;
             _historyOperationTitleProvider = historyOperationTitleProvider;
             _merchantDefaultLogoUrl = merchantDefaultLogoUrl;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         public async Task<IReadOnlyList<HistoryOperationView>> GetHistoryAsync(string merchantId)
@@ -201,8 +202,7 @@ namespace Lykke.Service.PayAPI.Services
             }
             catch (EthereumCoreApiException ex)
             {
-                await _log.WriteErrorAsync(nameof(PayHistoryService), nameof(GetDetailsAsync),
-                    new {historyOperation.TxHash}.ToJson(), ex);
+                _log.Error(ex, null, new {historyOperation.TxHash}.ToJson());
                 return null;
             }
             catch (Exception ex)

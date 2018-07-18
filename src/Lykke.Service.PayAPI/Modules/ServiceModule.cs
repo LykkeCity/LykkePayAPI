@@ -1,48 +1,40 @@
-﻿using System;
-using System.Linq;
-using Autofac;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Common;
-using Common.Log;
 using Lykke.Service.Assets.Client;
 using Lykke.Service.Assets.Client.Models;
-using Lykke.Service.EthereumCore.Client;
+using Lykke.Service.IataApi.Client;
 using Lykke.Service.MarketProfile.Client;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
 using Lykke.Service.PayAPI.Services;
-using Lykke.Service.PayInternal.Client;
-using Lykke.SettingsReader;
-using Microsoft.Extensions.DependencyInjection;
 using Lykke.Service.PayAuth.Client;
 using Lykke.Service.PayCallback.Client;
-using Lykke.Service.PayInvoice.Client;
-using Lykke.Service.IataApi.Client;
 using Lykke.Service.PayHistory.Client;
+using Lykke.Service.PayInternal.Client;
+using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayPushNotifications.Client;
+using Lykke.SettingsReader;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 
 namespace Lykke.Service.PayAPI.Modules
 {
     public class ServiceModule : Module
     {
         private readonly IReloadingManager<AppSettings> _settings;
-        private readonly ILog _log;
         private readonly IServiceCollection _services;
 
-        public ServiceModule(IReloadingManager<AppSettings> settings, ILog log)
+        public ServiceModule(IReloadingManager<AppSettings> settings)
         {
             _settings = settings;
-            _log = log;
 
             _services = new ServiceCollection();
         }
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterInstance(_log)
-                .As<ILog>()
-                .SingleInstance();
-
             builder.RegisterInstance(_settings)
                 .As<IReloadingManager<AppSettings>>()
                 .SingleInstance();
@@ -58,7 +50,9 @@ namespace Lykke.Service.PayAPI.Modules
 
             builder.RegisterType<PayInvoiceClient>()
                 .As<IPayInvoiceClient>()
-                .WithParameter("settings", new PayInvoiceServiceClientSettings() { ServiceUrl = _settings.CurrentValue.PayInvoiceServiceClient.ServiceUrl })
+                .WithParameter("settings",
+                    new PayInvoiceServiceClientSettings()
+                        {ServiceUrl = _settings.CurrentValue.PayInvoiceServiceClient.ServiceUrl})
                 .SingleInstance();
 
             builder.RegisterType<StartupManager>()
@@ -107,7 +101,7 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<AuthService>()
                 .As<IAuthService>()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.JwtSecurity));
-            
+
             builder.RegisterType<MerchantService>()
                 .As<IMerchantService>()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Merchant))
@@ -143,7 +137,7 @@ namespace Lykke.Service.PayAPI.Modules
 
         private void RegisterHistory(ContainerBuilder builder)
         {
-            builder.RegisterPayHistoryClient(_settings.CurrentValue.PayHistoryServiceClient, _log);
+            builder.RegisterPayHistoryClient(_settings.CurrentValue.PayHistoryServiceClient.ServiceUrl);
 
             builder.RegisterType<ExplorerUrlResolver>()
                 .As<IExplorerUrlResolver>()

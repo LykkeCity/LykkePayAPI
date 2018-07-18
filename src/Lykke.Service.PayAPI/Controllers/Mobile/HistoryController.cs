@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
+using Lykke.Common.Log;
 using HistoryOperation = Lykke.Service.PayAPI.Core.Domain.PayHistory.HistoryOperation;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
@@ -29,10 +30,10 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         private readonly ILog _log;
         private readonly IPayHistoryService _payHistoryService;
 
-        public HistoryController(IPayHistoryService payHistoryService, ILog log)
+        public HistoryController(IPayHistoryService payHistoryService, ILogFactory logFactory)
         {
             _payHistoryService = payHistoryService;
-            _log = log.CreateComponentScope(nameof(HistoryController)) ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory?.CreateLog(this) ?? throw new ArgumentNullException(nameof(logFactory));
         }
 
         /// <summary>

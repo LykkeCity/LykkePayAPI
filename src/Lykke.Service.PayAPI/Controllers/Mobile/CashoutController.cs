@@ -5,6 +5,7 @@ using AutoMapper;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Models.Mobile.Cashout;
 using Lykke.Service.PayInternal.Client;
@@ -28,10 +29,10 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 
         public CashoutController(
             [NotNull] IPayInternalClient payInternalClient, 
-            [NotNull] ILog log)
+            [NotNull] ILogFactory logFactory)
         {
             _payInternalClient = payInternalClient ?? throw new ArgumentNullException(nameof(payInternalClient));
-            _log = log.CreateComponentScope(nameof(CashoutController)) ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory?.CreateLog(this) ?? throw new ArgumentNullException(nameof(logFactory));
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 if (apiException?.StatusCode == HttpStatusCode.BadRequest)
                     return BadRequest(apiException.GetContentAs<ErrorResponse>());
 
-                _log.WriteError(nameof(Execute), request, e);
+                _log.Error(e, null, request);
 
                 return BadRequest(ErrorResponse.Create(e.Message));
             }

@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
@@ -27,11 +28,11 @@ namespace Lykke.Service.PayAPI.Controllers
         public AssetsController(
             IPayInternalClient payInternalClient,
             IHeadersHelper headersHelper,
-            ILog log)
+            ILogFactory logFactory)
         {
             _payInternalClient = payInternalClient ?? throw new ArgumentNullException(nameof(payInternalClient));
             _headersHelper = headersHelper ?? throw new ArgumentNullException(nameof(headersHelper));
-            _log = log ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory?.CreateLog(this) ?? throw new ArgumentNullException(nameof(logFactory));
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.WriteError(nameof(GetSettlementAssets), new {_headersHelper.MerchantId}, ex);
+                _log.Error(ex, null, new {_headersHelper.MerchantId});
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -82,11 +83,11 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.WriteError(nameof(GetPaymentAssets), new
+                _log.Error(ex, null, new
                 {
                     _headersHelper.MerchantId,
                     settlementAssetId
-                }, ex);
+                });
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
