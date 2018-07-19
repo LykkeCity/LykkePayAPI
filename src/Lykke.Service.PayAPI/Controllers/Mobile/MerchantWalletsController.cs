@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Domain.MerchantWallets;
 using Lykke.Service.PayAPI.Core.Exceptions;
@@ -28,10 +30,11 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         private readonly IMerchantWalletsService _merchantWalletsService;
         private readonly ILog _log;
 
-        public MerchantWalletsController([NotNull] IMerchantWalletsService merchantWalletsService, ILog log)
+        public MerchantWalletsController([NotNull] IMerchantWalletsService merchantWalletsService,
+            ILogFactory logFactory)
         {
             _merchantWalletsService = merchantWalletsService ?? throw new ArgumentNullException(nameof(merchantWalletsService));
-            _log = log.CreateComponentScope(nameof(MerchantWalletsController)) ?? throw new ArgumentNullException(nameof(log));
+            _log = logFactory?.CreateLog(this) ?? throw new ArgumentNullException(nameof(logFactory));
         }
 
         /// <summary>
@@ -61,31 +64,39 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (MerchantNotFoundException e)
             {
-                _log.WriteError(nameof(GetBalances), new
-                {
-                    merchantId,
-                    convertAssetId
-                }, e);
+                _log.Error(e, null, $@"request:{
+                        new
+                        {
+                            merchantId,
+                            convertAssetId
+                        }.ToJson()
+                    }");
 
                 return NotFound(ErrorResponse.Create(e.Message));
             }
             catch (BlockchainSupportNotImplemented e)
             {
-                _log.WriteError(nameof(GetBalances), new
-                {
-                    merchantId,
-                    convertAssetId
-                }, e);
+                _log.Error(e, null, $@"request:{
+                        new
+                        {
+                            merchantId,
+                            convertAssetId
+                        }.ToJson()
+                    }
+                ");
 
                 return StatusCode((int) HttpStatusCode.NotImplemented, ErrorResponse.Create(e.Message));
             }
             catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.BadGateway)
             {
-                _log.WriteError(nameof(GetBalances), new
-                {
-                    merchantId,
-                    convertAssetId
-                }, e);
+                _log.Error(e, null, $@"request:{
+                        new
+                        {
+                            merchantId,
+                            convertAssetId
+                        }.ToJson()
+                    }
+                ");
 
                 return StatusCode((int) HttpStatusCode.BadGateway, ErrorResponse.Create(e.Message));
             }

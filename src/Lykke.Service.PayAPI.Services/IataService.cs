@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Common.Cache;
+using Lykke.Common.Log;
 using Lykke.Service.IataApi.Client;
 using Lykke.Service.PayAPI.Core.Domain.Invoice;
 using Lykke.Service.PayAPI.Core.Services;
@@ -31,14 +32,14 @@ namespace Lykke.Service.PayAPI.Services
             CacheExpirationPeriodsSettings cacheExpirationPeriodsSettings,
             IataSettings iataSettings,
             IMemoryCache memoryCache,
-            ILog log)
+            ILogFactory logFactory)
         {
             _iataApiClient = iataApiClient;
             _cacheExpirationPeriodsSettings = cacheExpirationPeriodsSettings;
             _iataSettings = iataSettings;
             _iataBillingCategories = new OnDemandDataCache<IReadOnlyList<string>>(memoryCache);
             _invoiceIataSpecificDataCache = new OnDemandDataCache<InvoiceIataSpecificData>(memoryCache);
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         public async Task<IReadOnlyDictionary<string, string>> GetIataBillingCategoriesAsync()
