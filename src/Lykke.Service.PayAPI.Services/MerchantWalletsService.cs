@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Common;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
@@ -67,11 +68,13 @@ namespace Lykke.Service.PayAPI.Services
                     }
                     catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.NotFound)
                     {
-                        _log.Error(e, null, new
-                        {
-                            baseAssetId = merchantWalletBalanceResponse.AssetDisplayId,
-                            quotingAssetId = convertAssetId
-                        });
+                        _log.Error(e, null, $@"request:{
+                                new
+                                {
+                                    baseAssetId = merchantWalletBalanceResponse.AssetDisplayId,
+                                    quotingAssetId = convertAssetId
+                                }.ToJson()
+                            }");
                     }
                 }
 

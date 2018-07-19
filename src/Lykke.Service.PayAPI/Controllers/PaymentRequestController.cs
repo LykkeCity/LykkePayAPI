@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common;
 using Common.Log;
 using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
@@ -74,7 +75,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, request);
+                _log.Error(ex, null, $"request: {request.ToJson()}");
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -106,7 +107,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new {paymentRequestId});
+                _log.Error(ex, null, $"request: {new {paymentRequestId}.ToJson()}");
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -142,11 +143,13 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new
-                {
-                    paymentRequestId,
-                    destinationAddress
-                });
+                _log.Error(ex, null, $@"request: {
+                        new
+                        {
+                            paymentRequestId,
+                            destinationAddress
+                        }.ToJson()
+                    }");
 
                 if (ex is PayInternal.Client.Exceptions.RefundErrorResponseException refundEx)
                 {
@@ -190,11 +193,13 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new
-                {
-                    paymentRequestId,
-                    callbackUrl
-                });
+                _log.Error(ex, null, $@"request:{
+                        new
+                        {
+                            paymentRequestId,
+                            callbackUrl
+                        }.ToJson()
+                    }");
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -221,7 +226,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new {paymentRequestId});
+                _log.Error(ex, null, $"request:{new {paymentRequestId}.ToJson()}");
 
                 if (ex is ErrorResponseException errorEx)
                 {

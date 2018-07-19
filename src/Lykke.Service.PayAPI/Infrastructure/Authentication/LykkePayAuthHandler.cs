@@ -66,13 +66,13 @@ namespace Lykke.Service.PayAPI.Infrastructure.Authentication
             }
             catch (UnrecognizedSignatureVerificationException ex)
             {
-                _log.Error(ex, null, nameof(HandleAuthenticateAsync));
+                _log.Error(ex);
 
                 return AuthenticateResult.Fail(ex.Message);
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, nameof(HandleAuthenticateAsync));
+                _log.Error(ex);
 
                 return AuthenticateResult.Fail(ex);
             }

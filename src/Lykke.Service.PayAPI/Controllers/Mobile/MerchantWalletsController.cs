@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
@@ -63,31 +64,39 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (MerchantNotFoundException e)
             {
-                _log.Error(e, null, new
-                {
-                    merchantId,
-                    convertAssetId
-                });
+                _log.Error(e, null, $@"request:{
+                        new
+                        {
+                            merchantId,
+                            convertAssetId
+                        }.ToJson()
+                    }");
 
                 return NotFound(ErrorResponse.Create(e.Message));
             }
             catch (BlockchainSupportNotImplemented e)
             {
-                _log.Error(e, null, new
-                {
-                    merchantId,
-                    convertAssetId
-                });
+                _log.Error(e, null, $@"request:{
+                        new
+                        {
+                            merchantId,
+                            convertAssetId
+                        }.ToJson()
+                    }
+                ");
 
                 return StatusCode((int) HttpStatusCode.NotImplemented, ErrorResponse.Create(e.Message));
             }
             catch (DefaultErrorResponseException e) when (e.StatusCode == HttpStatusCode.BadGateway)
             {
-                _log.Error(e, null, new
-                {
-                    merchantId,
-                    convertAssetId
-                });
+                _log.Error(e, null, $@"request:{
+                        new
+                        {
+                            merchantId,
+                            convertAssetId
+                        }.ToJson()
+                    }
+                ");
 
                 return StatusCode((int) HttpStatusCode.BadGateway, ErrorResponse.Create(e.Message));
             }
