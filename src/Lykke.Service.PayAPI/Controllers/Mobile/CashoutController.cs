@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
@@ -67,7 +68,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                 if (apiException?.StatusCode == HttpStatusCode.BadRequest)
                     return BadRequest(apiException.GetContentAs<ErrorResponse>());
 
-                _log.Error(e, null, request);
+                _log.Error(e, null, $"request:{request.ToJson()}");
 
                 return BadRequest(ErrorResponse.Create(e.Message));
             }

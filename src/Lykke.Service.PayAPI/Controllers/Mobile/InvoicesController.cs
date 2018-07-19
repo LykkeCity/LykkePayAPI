@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common;
 using Common.Log;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.Log;
@@ -120,7 +121,15 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new { merchantId, clientMerchantIds, statuses, billingCategories });
+                _log.Error(ex, null, $@"request:{
+                        new
+                        {
+                            merchantId,
+                            clientMerchantIds,
+                            statuses,
+                            billingCategories
+                        }.ToJson()
+                    }");
             }
 
             return StatusCode((int)HttpStatusCode.InternalServerError);
@@ -198,7 +207,14 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new { merchantId, statuses, billingCategories });
+                _log.Error(ex, null, $@"request:{
+                        new
+                        {
+                            merchantId,
+                            statuses,
+                            billingCategories
+                        }.ToJson()
+                    }");
             }
 
             return StatusCode((int)HttpStatusCode.InternalServerError);
@@ -286,7 +302,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new { merchantId });
+                _log.Error(ex, null, $"request:{new {merchantId}.ToJson()}");
             }
 
             return StatusCode((int)HttpStatusCode.InternalServerError);

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common;
 using Common.Log;
 using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
@@ -55,7 +56,7 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new {_headersHelper.MerchantId});
+                _log.Error(ex, null, $"request: {new {_headersHelper.MerchantId}.ToJson()}");
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
@@ -83,11 +84,13 @@ namespace Lykke.Service.PayAPI.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, null, new
-                {
-                    _headersHelper.MerchantId,
-                    settlementAssetId
-                });
+                _log.Error(ex, null, $@"request: {
+                        new
+                        {
+                            _headersHelper.MerchantId,
+                            settlementAssetId
+                        }.ToJson()
+                    }");
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
