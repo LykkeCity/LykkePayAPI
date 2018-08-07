@@ -27,6 +27,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/mobile/invoices")]
+    [Produces("application/json")]
     public class InvoicesController : Controller
     {
         private readonly IIataService _iataService;
@@ -136,15 +137,18 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns invoices by filter
+        /// Get incoming invoices
         /// </summary>
-        /// <param name="clientMerchantIds">The merchant ids of the clients (e.g. ?clientMerchantIds=one&amp;clientMerchantIds=two)</param>
-        /// <param name="statuses">The statuses (e.g. ?statuses=one&amp;statuses=two)</param>
-        /// <param name="dispute">The dispute attribute</param>
-        /// <param name="billingCategories">The billing categories (e.g. ?billingCategories=one&amp;billingCategories=two)</param>
-        /// <param name="settlementAssets">The settlement assets (e.g. ?settlementAssets=one&amp;settlementAssets=two)</param>
-        /// <param name="greaterThan">The greater than number for filtering (can be fractional)</param>
-        /// <param name="lessThan">The less than number for filtering (can be fractional)</param>
+        /// <remarks>
+        /// Return the invoices by filter which should be paid by me.
+        /// </remarks>
+        /// <param name="clientMerchantIds">[Optional] The merchant ids of the clients (e.g. ?clientMerchantIds=one&amp;clientMerchantIds=two)</param>
+        /// <param name="statuses">[Optional] The statuses (e.g. ?statuses=one&amp;statuses=two)</param>
+        /// <param name="dispute">[Optional] The dispute attribute</param>
+        /// <param name="billingCategories">[Optional] The billing categories (e.g. ?billingCategories=one&amp;billingCategories=two)</param>
+        /// <param name="settlementAssets">[Optional] The settlement assets (e.g. ?settlementAssets=one&amp;settlementAssets=two)</param>
+        /// <param name="greaterThan">[Optional] The greater than number for filtering (can be fractional)</param>
+        /// <param name="lessThan">[Optional] The less than number for filtering (can be fractional)</param>
         /// <response code="200">A collection of invoices.</response>
         /// <response code="400">Problem occured.</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

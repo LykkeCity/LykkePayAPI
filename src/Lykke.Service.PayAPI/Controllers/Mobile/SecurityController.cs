@@ -20,6 +20,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/mobile")]
+    [Produces("application/json")]
     public class SecurityController : Controller
     {
         private readonly IAuthService _authService;

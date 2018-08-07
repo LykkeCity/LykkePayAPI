@@ -21,6 +21,7 @@ namespace Lykke.Service.PayAPI.Controllers
     [SignatureHeaders]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/rates")]
+    [Produces("application/json")]
     public class RatesController : Controller
     {
         private readonly IRatesService _ratesService;

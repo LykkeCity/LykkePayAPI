@@ -9,6 +9,7 @@ namespace Lykke.Service.PayAPI.Controllers
 {
     // NOTE: See https://lykkex.atlassian.net/wiki/spaces/LKEWALLET/pages/35755585/Add+your+app+to+Monitoring
     [Route("api/isAlive")]
+    [Produces("application/json")]
     public class IsAliveController : Controller
     {
         private readonly IHealthService _healthService;
@@ -21,7 +22,9 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <summary>
         /// Checks service is alive
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// Return the liveness status of the service
+        /// </remarks>
         [HttpGet]
         [SwaggerOperation("IsAlive")]
         [ProducesResponseType(typeof(IsAliveResponse), (int)HttpStatusCode.OK)]

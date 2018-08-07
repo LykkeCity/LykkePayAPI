@@ -17,6 +17,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [BearerHeader]
     [Route("api/v{version:apiVersion}/mobile/assets")]
+    [Produces("application/json")]
     public class AssetsController : ControllerBase
     {
         private readonly IAssetSettingsService _assetSettingsService;

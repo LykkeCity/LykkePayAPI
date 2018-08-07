@@ -25,6 +25,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Route("api/v{version:apiVersion}/mobile/merchantWallets")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [BearerHeader]
+    [Produces("application/json")]
     public class MerchantWalletsController : Controller
     {
         private readonly IMerchantWalletsService _merchantWalletsService;

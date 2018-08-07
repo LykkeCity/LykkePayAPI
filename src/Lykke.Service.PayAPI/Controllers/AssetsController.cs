@@ -16,10 +16,18 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
+    /// <summary>
+    /// Assets API
+    /// </summary>
+    /// <remarks>
+    /// Provide information about assets availability
+    /// Assets are configured per merchant depending of needs
+    /// </remarks>
     [Authorize]
     [SignatureHeaders]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/assets")]
+    [Produces("application/json")]
     public class AssetsController : Controller
     {
         private readonly IPayInternalClient _payInternalClient;
@@ -37,9 +45,16 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Returns list of settlement assets available for merchant
+        /// Get settlement assets
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>Receive the list of settlement assets available for merchant</remarks>
+        /// <example>Example:
+        /// [ "Asset1", "Asset2", "Asset3" ]
+        /// </example>
+        /// <returns>Some returns</returns>
+        /// <response code="200">List of settlement assets</response>
+        /// <x-summary>Test X summary</x-summary>
+        /// <x-description>Test X description</x-description>
         [HttpGet]
         [Route("settlement")]
         [SwaggerOperation("GetSettlementAssets")]
