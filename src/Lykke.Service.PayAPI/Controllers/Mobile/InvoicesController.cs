@@ -560,6 +560,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> PayInvoices([FromBody] PayInvoicesRequestModel model)
         {
+            throw new InvalidOperationException("Simulate 500 error to test mobile app");
             try
             {
                 await _payInvoiceClient.PayInvoicesAsync(new PayInvoicesRequest
