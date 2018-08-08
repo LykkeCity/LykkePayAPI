@@ -52,6 +52,11 @@ namespace Lykke.Service.PayAPI
                     Type = "string"
                 });
             }
+
+            if (isSignAccess || isBearerAccess)
+            {
+                operation.Responses.Add("401", new Response { Description = "Unauthorized" });
+            }
         }
     }
 }
