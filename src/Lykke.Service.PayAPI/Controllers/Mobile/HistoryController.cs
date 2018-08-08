@@ -9,7 +9,6 @@ using Lykke.Service.PayHistory.Client.Publisher;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -43,7 +42,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="200">A collection of history operations.</response>
         /// <response code="400">Problem occured.</response>        
         [HttpGet]
-        [SwaggerOperation("History")]
+        // [SwaggerOperation("History")]
         [ProducesResponseType(typeof(IReadOnlyList<HistoryOperationViewModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Index()
@@ -61,7 +60,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="400">Problem occured.</response>        
         /// <response code="404">History operation is not found.</response>        
         [HttpGet]
-        [SwaggerOperation("HistoryDetails")]
+        // [SwaggerOperation("HistoryDetails")]
         [ProducesResponseType(typeof(HistoryOperationModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -85,7 +84,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="200">A details of the history operation.</response>
         /// <response code="404">History operation is not found.</response>  
         [HttpGet]
-        [SwaggerOperation("InvoiceLatestPaymentDetails")]
+        // [SwaggerOperation("InvoiceLatestPaymentDetails")]
         [ProducesResponseType(typeof(HistoryOperationModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         public async Task<IActionResult> InvoiceLatestPaymentDetails([Required, PartitionOrRowKey] string invoiceId)

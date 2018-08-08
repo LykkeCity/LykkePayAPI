@@ -17,7 +17,6 @@ using Lykke.Service.PayInternal.Client.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -47,7 +46,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="501">Blockchain support not implemented</response>
         /// <response code="502">Internal service request error</response>
         [HttpGet]
-        [SwaggerOperation("GetMerchantWalletConvertedBalances")]
+        // [SwaggerOperation("GetMerchantWalletConvertedBalances")]
         [ProducesResponseType(typeof(IEnumerable<MerchantWalletConvertedBalanceResponse>), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotImplemented)]

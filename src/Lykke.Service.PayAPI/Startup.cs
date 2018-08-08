@@ -19,10 +19,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
+using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -106,7 +109,20 @@ clients to make payments in BTC, ETH and other assets depending on customer need
 
                         options.DescribeAllEnumsAsStrings();
                         options.EnableXmsEnumExtension();
-                        options.EnableXmlDocumentation();
+
+                        #region EnableXmlDocumentation
+                        var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+                        var entryAssembly = Assembly.GetEntryAssembly();
+
+                        //Set the comments path for the swagger json and ui.
+                        var xmlPath = Path.Combine(basePath, $"{entryAssembly.GetName().Name}.xml");
+
+                        if (File.Exists(xmlPath))
+                        {
+                            options.IncludeXmlComments(xmlPath, true);
+                        }
+                        #endregion
+
                         options.MakeResponseValueTypesRequired();
                         // this filter produced null exception: options.OperationFilter<FormFileUploadOperationFilter>();
                     }
@@ -195,6 +211,10 @@ clients to make payments in BTC, ETH and other assets depending on customer need
                     {
                         foreach (var description in provider.ApiVersionDescriptions)
                         {
+                            options.DisplayRequestDuration();
+                            options.ShowExtensions();
+                            options.DefaultModelsExpandDepth(-1);
+                            options.EnableFilter();
                             options.RoutePrefix = "swagger/ui";
                             options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
                                 description.GroupName.ToUpperInvariant());

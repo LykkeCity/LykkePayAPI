@@ -14,7 +14,6 @@ using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using CreatePaymentRequestModel = Lykke.Service.PayAPI.Models.CreatePaymentRequestModel;
 
 namespace Lykke.Service.PayAPI.Controllers
@@ -50,7 +49,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        [SwaggerOperation("CreatePaymentRequest")]
+        // [SwaggerOperation("CreatePaymentRequest")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
@@ -89,7 +88,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("{paymentRequestId}/status")]
-        [SwaggerOperation("GetPaymentRequestStatus")]
+        // [SwaggerOperation("GetPaymentRequestStatus")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
@@ -122,7 +121,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("{paymentRequestId}/refund")]
-        [SwaggerOperation("Refund")]
+        // [SwaggerOperation("Refund")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress)
@@ -169,7 +168,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("{paymentRequestId}/callback")]
-        [SwaggerOperation("SetCallback")]
+        // [SwaggerOperation("SetCallback")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
@@ -208,7 +207,7 @@ namespace Lykke.Service.PayAPI.Controllers
 
         [HttpGet]
         [Route("{paymentRequestId}/callback")]
-        [SwaggerOperation("GetCallback")]
+        // [SwaggerOperation("GetCallback")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(GetPaymentCallbackResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]

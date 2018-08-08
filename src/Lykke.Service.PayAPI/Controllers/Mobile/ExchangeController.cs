@@ -15,7 +15,6 @@ using Lykke.Service.PayInternal.Client.Models.Exchange;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Refit;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using ExchangeResponse = Lykke.Service.PayAPI.Models.ExchangeResponse;
 using AssetRateResponse = Lykke.Service.PayAPI.Models.AssetRateResponse;
 using ExchangeClientResponse = Lykke.Service.PayInternal.Client.Models.Exchange.ExchangeResponse;
@@ -50,7 +49,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="400">Bad request</response>
         [HttpGet]
         [Route("{baseAssetId}/{quotingAssetId}")]
-        [SwaggerOperation(nameof(GetRate))]
+        // [SwaggerOperation(nameof(GetRate))]
         [ProducesResponseType(typeof(AssetRateResponse), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
@@ -111,7 +110,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="200">Exchange operation completed successfully</response>
         /// <response code="400">Bad request</response>
         [HttpPost]
-        [SwaggerOperation(nameof(Execute))]
+        // [SwaggerOperation(nameof(Execute))]
         [ProducesResponseType(typeof(ExchangeResponse), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]
@@ -147,7 +146,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="200">PreExchange operation completed successfully</response>
         /// <response code="400">Bad request</response>
         [HttpPost]
-        [SwaggerOperation(nameof(PreExchange))]
+        // [SwaggerOperation(nameof(PreExchange))]
         [ProducesResponseType(typeof(ExchangeResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]

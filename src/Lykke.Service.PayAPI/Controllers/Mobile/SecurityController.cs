@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Refit;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -46,7 +45,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [AllowAnonymous]
         [HttpPost]
         [Route("auth")]
-        [SwaggerOperation(nameof(Auth))]
+        // [SwaggerOperation(nameof(Auth))]
         [ProducesResponseType(typeof(AuthResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]
@@ -94,7 +93,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpPost]
         [Route("password")]
-        [SwaggerOperation(nameof(UpdatePassword))]
+        // [SwaggerOperation(nameof(UpdatePassword))]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]
@@ -144,7 +143,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpPost]
         [Route("pin")]
-        [SwaggerOperation(nameof(UpdatePin))]
+        // [SwaggerOperation(nameof(UpdatePin))]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]
@@ -183,7 +182,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpPost]
         [Route("pin/validation")]
-        [SwaggerOperation(nameof(ValidatePin))]
+        // [SwaggerOperation(nameof(ValidatePin))]
         [ProducesResponseType(typeof(ValidatePinResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]

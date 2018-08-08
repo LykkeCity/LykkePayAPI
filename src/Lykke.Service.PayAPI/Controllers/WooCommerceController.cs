@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using WooCommerceInvoiceModel = Lykke.Service.PayAPI.Models.WooCommerceInvoiceModel;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Lykke.Service.PayAPI.Models;
 using System.Net;
 using Lykke.Common.Api.Contract.Responses;
@@ -33,7 +32,7 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         [HttpPost("create")]
-        [SwaggerOperation("Create")]
+        // [SwaggerOperation("Create")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
@@ -74,7 +73,7 @@ namespace Lykke.Service.PayAPI.Controllers
 
         
         [HttpPost("status")]
-        [SwaggerOperation("Status")]
+        // [SwaggerOperation("Status")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]

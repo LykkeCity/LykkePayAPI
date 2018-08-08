@@ -13,7 +13,6 @@ using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -42,7 +41,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <returns>Asset pair rates</returns>
         [HttpGet]
         [Route("{assetPairId}")]
-        [SwaggerOperation("GetAssetPairRates")]
+        // [SwaggerOperation("GetAssetPairRates")]
         [ProducesResponseType(typeof(AssetPairResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]

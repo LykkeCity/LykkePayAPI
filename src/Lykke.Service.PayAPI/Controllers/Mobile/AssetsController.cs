@@ -9,7 +9,6 @@ using Lykke.Service.PayAPI.Models.Mobile.Assets;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -33,7 +32,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="200">List of asset names</response>
         [HttpGet]
         [Route("cashout")]
-        [SwaggerOperation(nameof(GetCashoutAssets))]
+        // [SwaggerOperation(nameof(GetCashoutAssets))]
         [ProducesResponseType(typeof(IReadOnlyList<CashoutAssetResponse>), (int) HttpStatusCode.OK)]
         public IActionResult GetCashoutAssets()
         {

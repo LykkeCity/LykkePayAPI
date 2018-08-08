@@ -12,7 +12,6 @@ using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Models.Asset;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -57,7 +56,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <x-description>Test X description</x-description>
         [HttpGet]
         [Route("settlement")]
-        [SwaggerOperation("GetSettlementAssets")]
+        // [SwaggerOperation("GetSettlementAssets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetSettlementAssets()
@@ -84,7 +83,7 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("payment/{settlementAssetId}")]
-        [SwaggerOperation("GetPaymentAssets")]
+        // [SwaggerOperation("GetPaymentAssets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPaymentAssets(string settlementAssetId)

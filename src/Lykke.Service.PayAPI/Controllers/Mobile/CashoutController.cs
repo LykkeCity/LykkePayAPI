@@ -15,7 +15,6 @@ using Lykke.Service.PayInternal.Client.Models.Cashout;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Refit;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -44,7 +43,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// <response code="200">Cashout operation has been successfully executed</response>
         /// <response code="400">Bad request</response>
         [HttpPost]
-        [SwaggerOperation(nameof(Execute))]
+        // [SwaggerOperation(nameof(Execute))]
         [ProducesResponseType(typeof(CashoutResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]

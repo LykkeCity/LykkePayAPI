@@ -19,7 +19,6 @@ using Lykke.Service.PayInvoice.Client.Models.MerchantSetting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -55,7 +54,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [BearerHeader]
         [HttpGet]
         [Route("billing/availableMerchants")]
-        [SwaggerOperation(nameof(GetAvailableMerchantsForBilling))]
+        // [SwaggerOperation(nameof(GetAvailableMerchantsForBilling))]
         [ProducesResponseType(typeof(AvailableMerchantsForBillingResponse), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetAvailableMerchantsForBilling()
@@ -102,7 +101,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [BearerHeader]
         [HttpGet]
         [Route("user")]
-        [SwaggerOperation(nameof(GetCurrentUserInfo))]
+        // [SwaggerOperation(nameof(GetCurrentUserInfo))]
         [ProducesResponseType(typeof(CurrentUserInfoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetCurrentUserInfo()
@@ -143,7 +142,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet("baseAsset/list")]
-        [SwaggerOperation(nameof(GetBaseAssetList))]
+        // [SwaggerOperation(nameof(GetBaseAssetList))]
         [ProducesResponseType(typeof(IReadOnlyList<BaseAssetItemModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
@@ -204,7 +203,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpPost("baseAsset")]
-        [SwaggerOperation(nameof(SetBaseAsset))]
+        // [SwaggerOperation(nameof(SetBaseAsset))]
         [ProducesResponseType(typeof(IReadOnlyList<BaseAssetItemModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
