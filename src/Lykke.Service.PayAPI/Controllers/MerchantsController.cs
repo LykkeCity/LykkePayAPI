@@ -26,6 +26,7 @@ namespace Lykke.Service.PayAPI.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/mobile")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public class MerchantsController : Controller
     {
         private readonly IMerchantService _merchantService;

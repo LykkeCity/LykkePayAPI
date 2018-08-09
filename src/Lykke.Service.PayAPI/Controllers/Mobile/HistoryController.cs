@@ -26,6 +26,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [BearerHeader]
     [Route("api/v{version:apiVersion}/mobile/history/[action]")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public class HistoryController : Controller
     {
         private readonly ILog _log;

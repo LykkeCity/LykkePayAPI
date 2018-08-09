@@ -28,6 +28,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [BearerHeader]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public class ExchangeController : Controller
     {
         private readonly IPayInternalClient _payInternalClient;

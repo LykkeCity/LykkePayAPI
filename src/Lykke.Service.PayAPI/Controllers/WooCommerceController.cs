@@ -19,6 +19,7 @@ namespace Lykke.Service.PayAPI.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/wooCommerce")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public class WooCommerceController : Controller
     {
         private readonly IReloadingManager<AppSettings> _settings;

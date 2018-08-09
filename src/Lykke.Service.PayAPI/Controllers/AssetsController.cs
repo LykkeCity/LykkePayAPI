@@ -28,6 +28,7 @@ namespace Lykke.Service.PayAPI.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/assets")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public class AssetsController : Controller
     {
         private readonly IPayInternalClient _payInternalClient;

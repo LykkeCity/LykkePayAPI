@@ -22,6 +22,7 @@ namespace Lykke.Service.PayAPI.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/rates")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public class RatesController : Controller
     {
         private readonly IRatesService _ratesService;
