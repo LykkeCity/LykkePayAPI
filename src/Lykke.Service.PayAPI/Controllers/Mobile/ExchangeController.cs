@@ -19,6 +19,7 @@ using ExchangeResponse = Lykke.Service.PayAPI.Models.ExchangeResponse;
 using AssetRateResponse = Lykke.Service.PayAPI.Models.AssetRateResponse;
 using ExchangeClientResponse = Lykke.Service.PayInternal.Client.Models.Exchange.ExchangeResponse;
 using AssetRateClientResponse = Lykke.Service.PayInternal.Client.Models.AssetRates.AssetRateResponse;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -41,15 +42,19 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns current exchange rate for the asset pair
+        /// Get exchange rate
         /// </summary>
+        /// <remarks>
+        /// Receive current exchange rate for the asset pair.
+        /// </remarks>
         /// <param name="baseAssetId">Base asset id</param>
         /// <param name="quotingAssetId">Quoting asset id</param>
         /// <response code="200">Asset pair rate</response>
         /// <response code="400">Bad request</response>
         [HttpGet]
         [Route("{baseAssetId}/{quotingAssetId}")]
-        // [SwaggerOperation(nameof(GetRate))]
+        [SwaggerOperation(OperationId = nameof(GetRate))]
+        [SwaggerXSummary("Exchange rate")]
         [ProducesResponseType(typeof(AssetRateResponse), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
@@ -103,14 +108,18 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Executes exchange operation
+        /// Execute exchange
         /// </summary>
+        /// <remarks>
+        /// Execute exchange operation for current merchant.
+        /// </remarks>
         /// <param name="request">Exchange operation request details</param>
         /// <returns></returns>
         /// <response code="200">Exchange operation completed successfully</response>
         /// <response code="400">Bad request</response>
         [HttpPost]
-        // [SwaggerOperation(nameof(Execute))]
+        [SwaggerOperation(OperationId = nameof(Execute))]
+        [SwaggerXSummary("Execute exchange")]
         [ProducesResponseType(typeof(ExchangeResponse), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]
@@ -139,14 +148,17 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns current exchange rate
+        /// Check preexchange
         /// </summary>
+        /// <remarks>
+        /// Check whether exchange is possible.
+        /// </remarks>
         /// <param name="request">PreExchange operation request details</param>
-        /// <returns></returns>
         /// <response code="200">PreExchange operation completed successfully</response>
         /// <response code="400">Bad request</response>
         [HttpPost]
-        // [SwaggerOperation(nameof(PreExchange))]
+        [SwaggerOperation(OperationId = nameof(PreExchange))]
+        [SwaggerXSummary("PreExchange")]
         [ProducesResponseType(typeof(ExchangeResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]

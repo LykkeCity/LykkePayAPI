@@ -17,6 +17,7 @@ using Lykke.Service.PayInternal.Client.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -38,15 +39,19 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns merchant wallets with balances in base asset and converted to given asset
+        /// Get balances
         /// </summary>
+        /// <remarks>
+        /// Receive merchant wallets with balances in base asset and converted to given asset.
+        /// </remarks>
         /// <param name="convertAssetId">Asset id to convert balances to</param>
         /// <response code="200">List of merchant wallet balances</response>
         /// <response code="404">Merchant not found</response>
         /// <response code="501">Blockchain support not implemented</response>
         /// <response code="502">Internal service request error</response>
         [HttpGet]
-        // [SwaggerOperation("GetMerchantWalletConvertedBalances")]
+        [SwaggerOperation(OperationId = "GetMerchantWalletConvertedBalances")]
+        [SwaggerXSummary("Balances")]
         [ProducesResponseType(typeof(IEnumerable<MerchantWalletConvertedBalanceResponse>), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotImplemented)]

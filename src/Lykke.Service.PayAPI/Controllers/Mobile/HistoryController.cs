@@ -16,6 +16,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Lykke.Common.Log;
 using HistoryOperation = Lykke.Service.PayAPI.Core.Domain.PayHistory.HistoryOperation;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -37,12 +38,16 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns list of history operations.
+        /// Get history
         /// </summary>
+        /// <remarks>
+        /// Receive list of history operations.
+        /// </remarks>
         /// <response code="200">A collection of history operations.</response>
         /// <response code="400">Problem occured.</response>        
         [HttpGet]
-        // [SwaggerOperation("History")]
+        [SwaggerOperation(OperationId = "History")]
+        [SwaggerXSummary("History")]
         [ProducesResponseType(typeof(IReadOnlyList<HistoryOperationViewModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Index()
@@ -54,13 +59,17 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns details of the history operation.
+        /// Get history details
         /// </summary>
+        /// <remarks>
+        /// Receive details of the history operation.
+        /// </remarks>
         /// <response code="200">A details of the history operation.</response>
         /// <response code="400">Problem occured.</response>        
         /// <response code="404">History operation is not found.</response>        
         [HttpGet]
-        // [SwaggerOperation("HistoryDetails")]
+        [SwaggerOperation(OperationId = "HistoryDetails")]
+        [SwaggerXSummary("History details")]
         [ProducesResponseType(typeof(HistoryOperationModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -79,12 +88,16 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns latest payment details of the history operation.
+        /// Get latest payment details
         /// </summary>
+        /// <remarks>
+        /// Receive latest payment details of the history operation.
+        /// </remarks>
         /// <response code="200">A details of the history operation.</response>
         /// <response code="404">History operation is not found.</response>  
         [HttpGet]
-        // [SwaggerOperation("InvoiceLatestPaymentDetails")]
+        [SwaggerOperation(OperationId = "InvoiceLatestPaymentDetails")]
+        [SwaggerXSummary("Latest payment details")]
         [ProducesResponseType(typeof(HistoryOperationModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         public async Task<IActionResult> InvoiceLatestPaymentDetails([Required, PartitionOrRowKey] string invoiceId)

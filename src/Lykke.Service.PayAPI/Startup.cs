@@ -12,6 +12,7 @@ using Lykke.Service.PayAPI.Core.Settings;
 using Lykke.Service.PayAPI.Infrastructure.Authentication;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayAPI.Modules;
+using Lykke.Service.PayAPI.SwaggerFilters;
 using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -109,6 +110,7 @@ clients to make payments in BTC, ETH and other assets depending on customer need
 
                         options.DescribeAllEnumsAsStrings();
                         options.EnableXmsEnumExtension();
+                        options.EnableAnnotations();
 
                         #region EnableXmlDocumentation
                         var basePath = PlatformServices.Default.Application.ApplicationBasePath;
@@ -119,7 +121,7 @@ clients to make payments in BTC, ETH and other assets depending on customer need
 
                         if (File.Exists(xmlPath))
                         {
-                            options.IncludeXmlComments(xmlPath, true);
+                            options.IncludeXmlComments(xmlPath);
                         }
                         #endregion
 
@@ -129,6 +131,7 @@ clients to make payments in BTC, ETH and other assets depending on customer need
 
                     options.OperationFilter<SwaggerDefaultValues>();
                     options.OperationFilter<HeaderAccessOperationFilter>();
+                    options.OperationFilter<SwaggerExtensionsFilter>();
                 });
 
                 services.AddAuthentication(options =>
@@ -212,7 +215,6 @@ clients to make payments in BTC, ETH and other assets depending on customer need
                         foreach (var description in provider.ApiVersionDescriptions)
                         {
                             options.DisplayRequestDuration();
-                            options.ShowExtensions();
                             options.DefaultModelsExpandDepth(-1);
                             options.EnableFilter();
                             options.RoutePrefix = "swagger/ui";

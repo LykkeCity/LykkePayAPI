@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Refit;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -27,7 +28,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         private readonly IPayPushNotificationsClient _payPushNotificationsClient;
 
         public SecurityController(
-            [NotNull] IAuthService authService, 
+            [NotNull] IAuthService authService,
             [NotNull] IPayAuthClient payAuthClient,
             [NotNull] IPayPushNotificationsClient payPushNotificationsClient)
         {
@@ -37,7 +38,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Authenticates user
+        /// Authenticate user
         /// </summary>
         /// <param name="request">Authorization request details</param>
         /// <response code="200">Authorization succedded</response>
@@ -45,9 +46,10 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [AllowAnonymous]
         [HttpPost]
         [Route("auth")]
-        // [SwaggerOperation(nameof(Auth))]
-        [ProducesResponseType(typeof(AuthResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [SwaggerOperation(OperationId = nameof(Auth))]
+        [SwaggerXSummary("Authenticate")]
+        [ProducesResponseType(typeof(AuthResponseModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]
         public async Task<IActionResult> Auth([FromBody] AuthRequestModel request)
         {
@@ -84,7 +86,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Updates user password
+        /// Update password
         /// </summary>
         /// <param name="request">Update password request details</param>
         /// <response code="200">Password updated successfully</response>
@@ -93,7 +95,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpPost]
         [Route("password")]
-        // [SwaggerOperation(nameof(UpdatePassword))]
+        [SwaggerOperation(OperationId = nameof(UpdatePassword))]
+        [SwaggerXSummary("Update password")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]
@@ -134,7 +137,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Updates pin code
+        /// Update pin
         /// </summary>
         /// <param name="request">Pin code update details</param>
         /// <response code="200">Pin updated successfully</response>
@@ -143,7 +146,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpPost]
         [Route("pin")]
-        // [SwaggerOperation(nameof(UpdatePin))]
+        [SwaggerOperation(OperationId = nameof(UpdatePin))]
+        [SwaggerXSummary("Update pin")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]
@@ -173,8 +177,11 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Checks if pin is valid
+        /// Validate pin
         /// </summary>
+        /// <remarks>
+        /// Check if pin code is valid
+        /// </remarks>
         /// <param name="request">Pin validation request details</param>
         /// <response code="200">The pin has been successfully validated</response>
         /// <response code="400">Email is invalid</response>
@@ -182,7 +189,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpPost]
         [Route("pin/validation")]
-        // [SwaggerOperation(nameof(ValidatePin))]
+        [SwaggerOperation(OperationId = nameof(ValidatePin))]
+        [SwaggerXSummary("Validate pin")]
         [ProducesResponseType(typeof(ValidatePinResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ValidateModel]

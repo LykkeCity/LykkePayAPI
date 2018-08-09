@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using System.Net;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -22,10 +24,11 @@ namespace Lykke.Service.PayAPI.Controllers
         /// Checks service is alive
         /// </summary>
         /// <remarks>
-        /// Return the liveness status of the service
+        /// Receive the liveness status of the service.
         /// </remarks>
         [HttpGet]
-        // [SwaggerOperation("IsAlive")]
+        [SwaggerOperation(OperationId = "IsAlive")]
+        [SwaggerXSummary("Is alive")]
         [ProducesResponseType(typeof(IsAliveResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public IActionResult Get()

@@ -12,6 +12,7 @@ using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Models.Asset;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -46,17 +47,16 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <summary>
         /// Get settlement assets
         /// </summary>
-        /// <remarks>Receive the list of settlement assets available for merchant</remarks>
-        /// <example>Example:
+        /// <remarks>
+        /// Receive list of settlement assets available for merchant.
+        /// Example:
         /// [ "Asset1", "Asset2", "Asset3" ]
-        /// </example>
-        /// <returns>Some returns</returns>
+        /// </remarks>
         /// <response code="200">List of settlement assets</response>
-        /// <x-summary>Test X summary</x-summary>
-        /// <x-description>Test X description</x-description>
         [HttpGet]
         [Route("settlement")]
-        // [SwaggerOperation("GetSettlementAssets")]
+        [SwaggerOperation(OperationId = "GetSettlementAssets")]
+        [SwaggerXSummary("Settlement assets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetSettlementAssets()
@@ -77,13 +77,17 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Returns list of payment assets available for merchant
+        /// Get payment assets
         /// </summary>
+        /// <remarks>
+        /// Receive list of payment assets available for merchant
+        /// </remarks>
         /// <param name="settlementAssetId">Settlement asset id</param>
         /// <returns></returns>
         [HttpGet]
         [Route("payment/{settlementAssetId}")]
-        // [SwaggerOperation("GetPaymentAssets")]
+        [SwaggerOperation(OperationId = "GetPaymentAssets")]
+        [SwaggerXSummary("Payment assets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPaymentAssets(string settlementAssetId)

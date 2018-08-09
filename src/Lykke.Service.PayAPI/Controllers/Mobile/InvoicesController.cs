@@ -21,6 +21,7 @@ using Lykke.Service.PayInvoice.Client.Models.Invoice;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -50,8 +51,11 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns invoices by filter
+        /// Get my invoices
         /// </summary>
+        /// <remarks>
+        /// Receive the invoices by filter which were created by me.
+        /// </remarks>
         /// <param name="clientMerchantIds">The merchant ids of the clients (e.g. ?clientMerchantIds=one&amp;clientMerchantIds=two)</param>
         /// <param name="statuses">The statuses (e.g. ?statuses=one&amp;statuses=two)</param>
         /// <param name="dispute">The dispute attribute</param>
@@ -64,7 +68,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet("mine")]
-        // [SwaggerOperation("InvoicesGetMineByFilter")]
+        [SwaggerOperation(OperationId = "InvoicesGetMineByFilter")]
+        [SwaggerXSummary("My invoices")]
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
@@ -139,7 +144,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         /// Get incoming invoices
         /// </summary>
         /// <remarks>
-        /// Return the invoices by filter which should be paid by me.
+        /// Receive the invoices by filter which should be paid by me.
         /// </remarks>
         /// <param name="clientMerchantIds">[Optional] The merchant ids of the clients (e.g. ?clientMerchantIds=one&amp;clientMerchantIds=two)</param>
         /// <param name="statuses">[Optional] The statuses (e.g. ?statuses=one&amp;statuses=two)</param>
@@ -153,7 +158,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet("inbox")]
-        // [SwaggerOperation("InvoicesGetInboxByFilter")]
+        [SwaggerOperation(OperationId = "InvoicesGetInboxByFilter")]
+        [SwaggerXSummary("Incoming invoices")]
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
@@ -224,14 +230,18 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Get filter for current merchant
+        /// Get filter
         /// </summary>
+        /// <remarks>
+        /// Get filter for current merchant.
+        /// </remarks>
         /// <response code="200">Filter for current merchant</response>
         /// <response code="400">Problem occured</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet("filter")]
-        // [SwaggerOperation("GetFilterForCurrentMerchant")]
+        [SwaggerOperation(OperationId = "GetFilterForCurrentMerchant")]
+        [SwaggerXSummary("Filter")]
         [ProducesResponseType(typeof(FilterOfMerchantResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
@@ -322,7 +332,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpPost]
         [Route("dispute/mark")]
-        // [SwaggerOperation(nameof(MarkDispute))]
+        [SwaggerOperation(OperationId = nameof(MarkDispute))]
+        [SwaggerXSummary("Mark dispute")]
         [ValidateModel]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
@@ -363,7 +374,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpPost]
         [Route("dispute/cancel")]
-        // [SwaggerOperation(nameof(CancelDispute))]
+        [SwaggerOperation(OperationId = nameof(CancelDispute))]
+        [SwaggerXSummary("Cancel dispute")]
         [ValidateModel]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
@@ -393,8 +405,11 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Get list of my invoices which are marked as Dispute
+        /// Get dispute invoices
         /// </summary>
+        /// <remarks>
+        /// Get list of my invoices which are marked as Dispute.
+        /// </remarks>
         /// <response code="200">Success</response>
         /// <response code="404">Not found</response>
         /// <response code="400">Problem occured</response>
@@ -402,7 +417,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [BearerHeader]
         [HttpGet]
         [Route("dispute/list")]
-        // [SwaggerOperation(nameof(GetMyInvoicesMarkedDispute))]
+        [SwaggerOperation(OperationId = nameof(GetMyInvoicesMarkedDispute))]
+        [SwaggerXSummary("Dispute invoices")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
@@ -549,15 +565,19 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Pay one or multiple invoices with certain amount
+        /// Pay invoices
         /// </summary>
+        /// <remarks>
+        /// Pay one or multiple invoices with certain amount.
+        /// </remarks>
         /// <param name="model">Invoices ids and amount to pay</param>
-        /// <response code="200">Accepted for further processing</response>
+        /// <response code="202">Accepted for further processing</response>
         /// <response code="400">Problem occured</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpPost("pay")]
-        // [SwaggerOperation("PayInvoices")]
+        [SwaggerOperation(OperationId = "PayInvoices")]
+        [SwaggerXSummary("Pay invoices")]
         [ValidateModel]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.Accepted)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
@@ -585,15 +605,19 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Get sum for paying invoices
+        /// Get sum
         /// </summary>
+        /// <remarks>
+        /// Get sum for paying invoices
+        /// </remarks>
         /// <param name="invoicesIds">The invoices ids (e.g. ?invoicesIds=one&amp;invoicesIds=two)</param>
         /// <response code="200">Sum for paying invoices</response>
         /// <response code="400">Problem occured</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet("sum")]
-        // [SwaggerOperation("GetSumToPayInvoices")]
+        [SwaggerOperation(OperationId = "GetSumToPayInvoices")]
+        [SwaggerXSummary("Sum to pay")]
         [ValidateModel]
         [ProducesResponseType(typeof(GetSumToPayResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]

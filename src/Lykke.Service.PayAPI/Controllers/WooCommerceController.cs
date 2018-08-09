@@ -10,6 +10,7 @@ using Lykke.Service.PayInvoice.Client;
 using Lykke.SettingsReader;
 using Lykke.Service.PayAPI.Core.Settings;
 using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
@@ -31,11 +32,18 @@ namespace Lykke.Service.PayAPI.Controllers
             _settings = settings;
         }
 
+        /// <summary>
+        /// Create invoice
+        /// </summary>
+        /// <param name="model">Request model</param>
+        /// <response code="200">Result model</response>
+        /// <response code="400">Problem occured</response>
         [HttpPost("create")]
-        // [SwaggerOperation("Create")]
+        [SwaggerOperation(OperationId = "Create")]
+        [SwaggerXSummary("Create invoice")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(WooCommerceResponse), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Create(WooCommerceInvoiceModel model)
         {
             if (!ModelState.IsValid)
@@ -71,12 +79,18 @@ namespace Lykke.Service.PayAPI.Controllers
             return new JsonResult(response);
         }
 
-        
+        /// <summary>
+        /// Get invoice status
+        /// </summary>
+        /// <param name="model">Request model</param>
+        /// <response code="200">Result model</response>
+        /// <response code="400">Problem occured</response>
         [HttpPost("status")]
-        // [SwaggerOperation("Status")]
+        [SwaggerOperation(OperationId = "Status")]
+        [SwaggerXSummary("Invoice status")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(WooCommerceResponse), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Status(WooCommerceInvoiceModel model)
         {
             if (!ModelState.IsValid)

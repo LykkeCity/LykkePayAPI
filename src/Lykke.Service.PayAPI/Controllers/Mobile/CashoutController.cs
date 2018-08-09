@@ -15,6 +15,7 @@ using Lykke.Service.PayInternal.Client.Models.Cashout;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Refit;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
@@ -37,13 +38,17 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Executes cashout request
+        /// Execute cashout
         /// </summary>
+        /// <remarks>
+        /// Execute cashout request for current merchant.
+        /// </remarks>
         /// <param name="request">Cashout request details</param>
         /// <response code="200">Cashout operation has been successfully executed</response>
         /// <response code="400">Bad request</response>
         [HttpPost]
-        // [SwaggerOperation(nameof(Execute))]
+        [SwaggerOperation(OperationId = nameof(Execute))]
+        [SwaggerXSummary("Execute cashout")]
         [ProducesResponseType(typeof(CashoutResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]
