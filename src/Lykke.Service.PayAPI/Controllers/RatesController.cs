@@ -21,6 +21,8 @@ namespace Lykke.Service.PayAPI.Controllers
     [SignatureHeaders]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/rates")]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     public class RatesController : Controller
     {
         private readonly IRatesService _ratesService;
@@ -35,13 +37,15 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Get asset pair rates
+        /// Get asset pair rate
         /// </summary>
-        /// <param name="assetPairId">Asset pair identifier.</param>
-        /// <returns>Asset pair rates</returns>
+        /// <param name="assetPairId">Asset pair id</param>
+        /// <response code="200">Result model</response>
+        /// <response code="400">Problem occured</response>
         [HttpGet]
         [Route("{assetPairId}")]
-        [SwaggerOperation("GetAssetPairRates")]
+        [SwaggerOperation(OperationId = "GetAssetPairRates")]
+        [SwaggerXSummary("Asset pair rate")]
         [ProducesResponseType(typeof(AssetPairResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]

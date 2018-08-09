@@ -2,7 +2,7 @@
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Lykke.Service.PayAPI
+namespace Lykke.Service.PayAPI.SwaggerFilters
 {
     public class SwaggerDefaultValues : IOperationFilter
     {
