@@ -12,7 +12,7 @@ using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Models.Asset;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers
 {

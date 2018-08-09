@@ -10,7 +10,7 @@ using Lykke.Service.PayInvoice.Client;
 using Lykke.SettingsReader;
 using Lykke.Service.PayAPI.Core.Settings;
 using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers
 {

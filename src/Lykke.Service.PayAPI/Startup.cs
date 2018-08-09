@@ -110,7 +110,6 @@ clients to make payments in BTC, ETH and other assets depending on customer need
 
                         options.DescribeAllEnumsAsStrings();
                         options.EnableXmsEnumExtension();
-                        options.EnableAnnotations();
 
                         #region EnableXmlDocumentation
                         var basePath = PlatformServices.Default.Application.ApplicationBasePath;
@@ -214,9 +213,6 @@ clients to make payments in BTC, ETH and other assets depending on customer need
                     {
                         foreach (var description in provider.ApiVersionDescriptions)
                         {
-                            options.DisplayRequestDuration();
-                            options.DefaultModelsExpandDepth(-1);
-                            options.EnableFilter();
                             options.RoutePrefix = "swagger/ui";
                             options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
                                 description.GroupName.ToUpperInvariant());

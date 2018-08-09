@@ -19,7 +19,7 @@ using ExchangeResponse = Lykke.Service.PayAPI.Models.ExchangeResponse;
 using AssetRateResponse = Lykke.Service.PayAPI.Models.AssetRateResponse;
 using ExchangeClientResponse = Lykke.Service.PayInternal.Client.Models.Exchange.ExchangeResponse;
 using AssetRateClientResponse = Lykke.Service.PayInternal.Client.Models.AssetRates.AssetRateResponse;
-using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
