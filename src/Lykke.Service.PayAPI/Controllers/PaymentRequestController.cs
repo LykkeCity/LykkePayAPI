@@ -183,7 +183,8 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpPost]
         [Route("{paymentRequestId}/callback")]
         [SwaggerOperation(OperationId = "SetCallback")]
-        [SwaggerXSummary("Set callback")]
+        // There should be the only one x-summary for route which is used for GET, POST etc
+        [SwaggerXSummary("Callback")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
@@ -232,7 +233,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpGet]
         [Route("{paymentRequestId}/callback")]
         [SwaggerOperation(OperationId = "GetCallback")]
-        [SwaggerXSummary("Get callback")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(GetPaymentCallbackResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
