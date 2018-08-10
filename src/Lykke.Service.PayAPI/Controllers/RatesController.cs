@@ -47,7 +47,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation(OperationId = "GetAssetPairRates")]
         [SwaggerXSummary("Asset pair rate")]
         [ProducesResponseType(typeof(AssetPairResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetAssetPairRates(string assetPairId)
         {
@@ -68,9 +67,8 @@ namespace Lykke.Service.PayAPI.Controllers
                 {
                     return apiException.GenerateErrorResponse();
                 }
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
     }
 }

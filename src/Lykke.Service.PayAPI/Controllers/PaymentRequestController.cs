@@ -56,7 +56,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerXSummary("Create")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreatePaymentRequest([FromBody] CreatePaymentRequestModel request)
         {
             if (string.IsNullOrWhiteSpace(request.SettlementAsset))
@@ -80,9 +79,8 @@ namespace Lykke.Service.PayAPI.Controllers
             catch (Exception ex)
             {
                 _log.Error(ex, null, $"request: {request.ToJson()}");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
@@ -100,7 +98,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerXSummary("Status")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPaymentRequestStatus(string paymentRequestId)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
@@ -117,9 +114,8 @@ namespace Lykke.Service.PayAPI.Controllers
             catch (Exception ex)
             {
                 _log.Error(ex, null, $"request: {new {paymentRequestId}.ToJson()}");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
@@ -188,7 +184,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerXSummary("Callback")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> SetCallbackUrl(string paymentRequestId, [FromQuery] string callbackUrl)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
@@ -217,9 +212,8 @@ namespace Lykke.Service.PayAPI.Controllers
                             callbackUrl
                         }.ToJson()
                     }");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
@@ -234,7 +228,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpGet]
         [Route("{paymentRequestId}/callback")]
         [SwaggerOperation(OperationId = "GetCallback")]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(GetPaymentCallbackResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetCallbackUrl(string paymentRequestId)
@@ -258,9 +251,8 @@ namespace Lykke.Service.PayAPI.Controllers
                     if (errorEx.StatusCode == HttpStatusCode.NotFound)
                         return NotFound();
                 }
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
     }
 }
