@@ -50,9 +50,6 @@ namespace Lykke.Service.PayAPI.Controllers
         /// </summary>
         /// <remarks>
         /// Receive list of settlement assets available for merchant.
-        /// Example:
-        /// [ "Asset1", "Asset2", "Asset3" ]
-        /// </remarks>
         /// <response code="200">List of settlement assets</response>
         [HttpGet]
         [Route("settlement")]
