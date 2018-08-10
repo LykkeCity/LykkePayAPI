@@ -43,7 +43,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation(OperationId = "Create")]
         [SwaggerXSummary("Create invoice")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(WooCommerceResponse), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Create(WooCommerceInvoiceModel model)
         {
@@ -90,7 +89,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation(OperationId = "Status")]
         [SwaggerXSummary("Invoice status")]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(WooCommerceResponse), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Status(WooCommerceInvoiceModel model)
         {

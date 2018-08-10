@@ -50,8 +50,6 @@ namespace Lykke.Service.PayAPI.Controllers
         /// </summary>
         /// <remarks>
         /// Receive list of settlement assets available for merchant.
-        /// Example:
-        /// [ "Asset1", "Asset2", "Asset3" ]
         /// </remarks>
         /// <response code="200">List of settlement assets</response>
         [HttpGet]
@@ -59,7 +57,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation(OperationId = "GetSettlementAssets")]
         [SwaggerXSummary("Settlement assets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetSettlementAssets()
         {
             try
@@ -72,9 +69,8 @@ namespace Lykke.Service.PayAPI.Controllers
             catch (Exception ex)
             {
                 _log.Error(ex, null, $"request: {new {_headersHelper.MerchantId}.ToJson()}");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
@@ -90,7 +86,6 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation(OperationId = "GetPaymentAssets")]
         [SwaggerXSummary("Payment assets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPaymentAssets(string settlementAssetId)
         {
             try
@@ -110,9 +105,8 @@ namespace Lykke.Service.PayAPI.Controllers
                             settlementAssetId
                         }.ToJson()
                     }");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
     }
 }

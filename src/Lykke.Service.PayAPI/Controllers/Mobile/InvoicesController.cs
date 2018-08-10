@@ -74,7 +74,6 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetMineByFilter(IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, IEnumerable<string> settlementAssets, decimal? greaterThan, decimal? lessThan)
         {
             var merchantId = this.GetUserMerchantId();
@@ -136,9 +135,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                             billingCategories
                         }.ToJson()
                     }");
+                throw;
             }
-
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
@@ -164,7 +162,6 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [ProducesResponseType(typeof(IReadOnlyList<InvoiceResponseModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetInboxByFilter(IEnumerable<string> clientMerchantIds, IEnumerable<string> statuses, bool? dispute, IEnumerable<string> billingCategories, IEnumerable<string> settlementAssets, decimal? greaterThan, decimal? lessThan)
         {
             var merchantId = this.GetUserMerchantId();
@@ -225,9 +222,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
                             billingCategories
                         }.ToJson()
                     }");
+                throw;
             }
-
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
@@ -246,7 +242,6 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         [ProducesResponseType(typeof(FilterOfMerchantResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetFilterForCurrentMerchant()
         {
             var merchantId = this.GetUserMerchantId();
@@ -317,9 +312,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
             catch (Exception ex)
             {
                 _log.Error(ex, null, $"request:{new {merchantId}.ToJson()}");
+                throw;
             }
-
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
