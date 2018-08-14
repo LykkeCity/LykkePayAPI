@@ -15,6 +15,7 @@ using Lykke.Service.PayInternal.Client.Models.Cashout;
 using Lykke.Service.PayInternal.Client.Models.Exchange;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 using Lykke.Service.PayInvoice.Client.Models.Invoice;
+using Lykke.Service.PayVolatility.Models;
 
 namespace Lykke.Service.PayAPI.Models
 {
@@ -102,6 +103,8 @@ namespace Lykke.Service.PayAPI.Models
                 .ForMember(dest => dest.SourceMerchantWalletId, opt => opt.Ignore());
 
             CreateMap<CashoutResponse, CashoutResponseModel>(MemberList.Destination);
+
+            CreateMap<VolatilityModel, VolatilityResponseModel>(MemberList.Destination);
 
             CreateMobileHistoryMaps();
         }
