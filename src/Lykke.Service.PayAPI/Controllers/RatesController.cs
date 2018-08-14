@@ -86,6 +86,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [ProducesResponseType(typeof(VolatilityResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetVolatility(string assetPairId)
         {
             if (string.IsNullOrWhiteSpace(assetPairId))
@@ -101,6 +102,15 @@ namespace Lykke.Service.PayAPI.Controllers
             catch (Exception ex)
             {
                 _log.Error(ex, null, assetPairId);
+
+                if (ex is Refit.ApiException refitEx)
+                {
+                    if (refitEx.StatusCode == HttpStatusCode.NotFound)
+                        return NotFound(ErrorResponse.Create("Asset pair volatility not found"));
+
+                    if (refitEx.StatusCode == HttpStatusCode.BadRequest)
+                        return BadRequest(ErrorResponse.Create(refitEx.Message));
+                }
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);
