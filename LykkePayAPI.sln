@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution 
 		.gitignore = .gitignore
 		lykkepay.yaml = lykkepay.yaml
 		README.md = README.md
+		settings.yaml = settings.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Client", "3. Client", "{C9A2CFDE-EA32-4946-B679-7CE6EFA816B8}"
@@ -72,6 +73,6 @@ Global
 		{A61FFDEE-5725-4650-A788-6E55EE5EFD5B} = {8F9036B1-5106-4C69-B2D2-B78EE52687A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {02A396EA-C1B7-4DA8-8224-EF78D556966C}
+		SolutionGuid = {2172E374-2DB9-44C3-A40E-9E42E5E4D0C1}
 	EndGlobalSection
 EndGlobal
