@@ -25,6 +25,8 @@ namespace Lykke.Service.PayAPI.Controllers
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/mobile")]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     public class MerchantsController : Controller
     {
         private readonly IMerchantService _merchantService;
@@ -45,16 +47,19 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Returns list of merchants available to be billed
+        /// Get list of merchants
         /// </summary>
-        /// <returns>List of merchants</returns>
+        /// <remarks>
+        /// Receive list of merchants available to be billed.
+        /// </remarks>
         /// <response code="200">List of merchants</response>
         /// <reponse code="404">Employee or merchant not found</reponse>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet]
         [Route("billing/availableMerchants")]
-        [SwaggerOperation(nameof(GetAvailableMerchantsForBilling))]
+        [SwaggerOperation(OperationId = nameof(GetAvailableMerchantsForBilling))]
+        [SwaggerXSummary("Available merchants")]
         [ProducesResponseType(typeof(AvailableMerchantsForBillingResponse), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetAvailableMerchantsForBilling()
@@ -93,15 +98,19 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Get information about current user (employee of the merchant)
+        /// Get current user info
         /// </summary>
+        /// <remarks>
+        /// Receive information about current user (employee of the merchant).
+        /// </remarks>
         /// <response code="200">User information</response>
-        /// <response code="404">Employee not found</reponse>
+        /// <response code="404">Employee not found</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet]
         [Route("user")]
-        [SwaggerOperation(nameof(GetCurrentUserInfo))]
+        [SwaggerOperation(OperationId = nameof(GetCurrentUserInfo))]
+        [SwaggerXSummary("User info")]
         [ProducesResponseType(typeof(CurrentUserInfoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetCurrentUserInfo()
@@ -134,15 +143,19 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Get base asset
+        /// Get base asset list
         /// </summary>
+        /// <remarks>
+        /// Receive assets which can be set as base asset.
+        /// </remarks>
         /// <response code="200">Base asset</response>
         /// <response code="404">Assets not found</response>
         /// <response code="400">Problem occured</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpGet("baseAsset/list")]
-        [SwaggerOperation(nameof(GetBaseAssetList))]
+        [SwaggerOperation(OperationId = nameof(GetBaseAssetList))]
+        [SwaggerXSummary("Base asset list")]
         [ProducesResponseType(typeof(IReadOnlyList<BaseAssetItemModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
@@ -195,15 +208,19 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Get base asset
+        /// Set base asset
         /// </summary>
+        /// <remarks>
+        /// Set base asset for current merchant
+        /// </remarks>
         /// <response code="200">Base asset</response>
         /// <response code="404">Assets not found</response>
         /// <response code="400">Problem occured</response>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [BearerHeader]
         [HttpPost("baseAsset")]
-        [SwaggerOperation(nameof(SetBaseAsset))]
+        [SwaggerOperation(OperationId = nameof(SetBaseAsset))]
+        [SwaggerXSummary("Set base asset")]
         [ProducesResponseType(typeof(IReadOnlyList<BaseAssetItemModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]

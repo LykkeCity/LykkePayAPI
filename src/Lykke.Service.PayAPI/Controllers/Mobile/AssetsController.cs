@@ -17,6 +17,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [BearerHeader]
     [Route("api/v{version:apiVersion}/mobile/assets")]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     public class AssetsController : ControllerBase
     {
         private readonly IAssetSettingsService _assetSettingsService;
@@ -27,12 +29,16 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Returns list of available assets for bank cash out
+        /// Get cashout assets
         /// </summary>
+        /// <remarks>
+        /// Receive list of available assets for bank cash out.
+        /// </remarks>
         /// <response code="200">List of asset names</response>
         [HttpGet]
         [Route("cashout")]
-        [SwaggerOperation(nameof(GetCashoutAssets))]
+        [SwaggerOperation(OperationId = nameof(GetCashoutAssets))]
+        [SwaggerXSummary("Cashout assets")]
         [ProducesResponseType(typeof(IReadOnlyList<CashoutAssetResponse>), (int) HttpStatusCode.OK)]
         public IActionResult GetCashoutAssets()
         {

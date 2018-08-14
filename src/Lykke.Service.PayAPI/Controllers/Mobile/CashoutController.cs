@@ -23,6 +23,8 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [BearerHeader]
     [Route("api/v{version:apiVersion}/mobile/cashout")]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     public class CashoutController : Controller
     {
         private readonly IPayInternalClient _payInternalClient;
@@ -37,13 +39,17 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
         }
 
         /// <summary>
-        /// Executes cashout request
+        /// Execute cashout
         /// </summary>
+        /// <remarks>
+        /// Execute cashout request for current merchant.
+        /// </remarks>
         /// <param name="request">Cashout request details</param>
         /// <response code="200">Cashout operation has been successfully executed</response>
         /// <response code="400">Bad request</response>
         [HttpPost]
-        [SwaggerOperation(nameof(Execute))]
+        [SwaggerOperation(OperationId = nameof(Execute))]
+        [SwaggerXSummary("Execute cashout")]
         [ProducesResponseType(typeof(CashoutResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]

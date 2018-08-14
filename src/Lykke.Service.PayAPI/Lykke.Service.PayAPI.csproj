@@ -34,7 +34,7 @@
     <PackageReference Include="Lykke.Logs" Version="5.2.0" />
     <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.11" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.20" />
-	<PackageReference Include="Lykke.MonitoringServiceApiCaller" Version="1.2.2" />
+	<PackageReference Include="Lykke.MonitoringServiceApiCaller" Version="1.6.2" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.12" />
     <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.18" />
     <PackageReference Include="Lykke.Service.PayInternal.Contract" Version="2.0.3" />
@@ -52,6 +52,7 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.2.0" />
   </ItemGroup>
   
   <ItemGroup>

@@ -9,7 +9,6 @@ using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings;
 using Lykke.Service.PayAPI.Services;
 using Lykke.Service.PayAuth.Client;
-using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayHistory.Client;
 using Lykke.Service.PayInternal.Client;
@@ -37,9 +36,6 @@ namespace Lykke.Service.PayAPI.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterInstance(_settings)
-                .As<IReloadingManager<AppSettings>>()
-                .SingleInstance();
             builder.RegisterInstance(_settings)
                 .As<IReloadingManager<AppSettings>>()
                 .SingleInstance();
