@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common;
 using Common.Log;
+using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
@@ -11,6 +12,8 @@ using Lykke.Service.PayAPI.Core.Domain.Rates;
 using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
+using Lykke.Service.PayVolatility.Client;
+using Lykke.Service.PayVolatility.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -24,14 +27,17 @@ namespace Lykke.Service.PayAPI.Controllers
     public class RatesController : Controller
     {
         private readonly IRatesService _ratesService;
+        private readonly IPayVolatilityClient _payVolatilityClient;
         private readonly ILog _log;
 
         public RatesController(
-            IRatesService ratesService,
-            ILogFactory logFactory)
+            [NotNull] IRatesService ratesService,
+            [NotNull] ILogFactory logFactory,
+            [NotNull] IPayVolatilityClient payVolatilityClient)
         {
             _ratesService = ratesService ?? throw new ArgumentNullException(nameof(ratesService));
-            _log = logFactory?.CreateLog(this) ?? throw new ArgumentNullException(nameof(logFactory));
+            _payVolatilityClient = payVolatilityClient ?? throw new ArgumentNullException(nameof(payVolatilityClient));
+            _log = logFactory.CreateLog(this) ?? throw new ArgumentNullException(nameof(logFactory));
         }
 
         /// <summary>
@@ -64,6 +70,37 @@ namespace Lykke.Service.PayAPI.Controllers
                 {
                     return apiException.GenerateErrorResponse();
                 }
+            }
+
+            return StatusCode((int) HttpStatusCode.InternalServerError);
+        }
+
+        /// <summary>
+        /// Get asset pair today's volatility
+        /// </summary>
+        /// <param name="assetPairId">Asset pair id</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("volatility/{assetPairId}")]
+        [SwaggerOperation(nameof(GetVolatility))]
+        [ProducesResponseType(typeof(VolatilityResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetVolatility(string assetPairId)
+        {
+            if (string.IsNullOrWhiteSpace(assetPairId))
+                return BadRequest(ErrorResponse.Create($"{nameof(assetPairId)} has invalid value"));
+
+            try
+            {
+                VolatilityModel volatility =
+                    await _payVolatilityClient.GetDailyVolatilityAsync(DateTime.Today, assetPairId);
+
+                return Ok(Mapper.Map<VolatilityResponseModel>(volatility));
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, null, assetPairId);
             }
 
             return StatusCode((int) HttpStatusCode.InternalServerError);

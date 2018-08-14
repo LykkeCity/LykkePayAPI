@@ -18,6 +18,7 @@ using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using Lykke.Service.PayVolatility.Client;
 
 namespace Lykke.Service.PayAPI.Modules
 {
@@ -129,8 +130,11 @@ namespace Lykke.Service.PayAPI.Modules
                 .As<IAssetSettingsService>();
 
             RegisterHistory(builder);
+
             builder.RegisterPayPushNotificationsClient(_settings.CurrentValue.PayPushNotificationsServiceClient,
                 n => n);
+
+            builder.RegisterCachedPayVolatilityClient(_settings.CurrentValue.PayVolatilityServiceClient, null);
 
             builder.Populate(_services);
         }
