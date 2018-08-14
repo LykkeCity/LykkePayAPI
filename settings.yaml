@@ -1,119 +1,119 @@
 PayAPI: 
-	Db: 
-		LogsConnString: 
+    Db: 
+        LogsConnString: 
             settings-key: LogsConnString
             types: [AzureTableStorage, Tag]
-		 
-	PaymentRequestDueDate: 
+         
+    PaymentRequestDueDate: 
         settings-key: PayAPI-PaymentRequestDueDate
         types: [Tag] 
-	PayInvoicePortalUrl: 
+    PayInvoicePortalUrl: 
         settings-key: PayInvoicePortalUrl
         types: [Tag] 
-	TransactionUrl: 
+    TransactionUrl: 
         settings-key: PayAPI-TransactionUrl 
-	JwtSecurity: 
-		Issuer: 
+    JwtSecurity: 
+        Issuer: 
             settings-key: PayAPI-JwtSecurity-Issuer 
-		Audience: 
+        Audience: 
             settings-key: PayAPI-JwtSecurity-Audience 
-		Key: 
+        Key: 
             settings-key: PayAPI-JwtSecurity-Key 
-		TokenLifetime: 
+        TokenLifetime: 
             settings-key: PayAPI-JwtSecurity-TokenLifetime
-		 
-	CacheExpirationPeriods: 
-		IataBillingCategories: 
+         
+    CacheExpirationPeriods: 
+        IataBillingCategories: 
             settings-key: PayAPI-CacheExpirationPeriods-IataBillingCategories 
-		MerchantLogoUrl: 
+        MerchantLogoUrl: 
             settings-key: PayAPI-CacheExpirationPeriods-MerchantLogoUrl 
-		MerchantName: 
+        MerchantName: 
             settings-key: PayAPI-CacheExpirationPeriods-MerchantName
-		 
-	Iata: 
-		AssetsMap: 
-			Values: 
+         
+    Iata: 
+        AssetsMap: 
+            Values: 
                 settings-key: PayAPI-Iata-AssetsMap-Values
                 types: [Json]
-			 
-		CashoutAssets: 
-			Assets: 
+             
+        CashoutAssets: 
+            Assets: 
                 settings-key: PayAPI-Iata-CashoutAssets-Assets
                 types: [JsonArray]
-			
-		 
-	Merchant: 
-		MerchantDefaultLogoUrl: 
+            
+         
+    Merchant: 
+        MerchantDefaultLogoUrl: 
             settings-key: PayAPI-Merchant-MerchantDefaultLogoUrl
-		
-	 
+        
+     
 PayAuthServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: PayAuthServiceUrl
         types: [Tag]
-	 
+     
 PayCallbackServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: PayCallbackServiceUrl
         types: [Tag]
-	 
+     
 PayHistoryServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: PayHistoryServiceUrl
         types: [Tag]
-	 
+     
 PayInternalServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: PayInternalServiceUrl
         types: [Tag]
-	 
+     
 PayInvoiceServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: PayInvoiceServiceUrl
         types: [Tag]
-	 
+     
 PayPushNotificationsServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: PayPushNotificationsServiceUrl
         types: [Tag]
-	 
+     
 PayVolatilityServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: PayVolatilityServiceUrl
         types: [Tag]
-	 
+     
 AssetsServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: AssetsServiceUrl 
-	ExpirationPeriod: 
+    ExpirationPeriod: 
         settings-key: AssetsServiceExpirationPeriod
-	 
+     
 EthereumServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: EthereumApiServiceUrl 
-	HotwalletAddress: 
+    HotwalletAddress: 
         settings-key: EthereumApiHotwalletAddress
-	 
+     
 IataApiServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: IataApiServiceUrl 
-	ApiKey: 
+    ApiKey: 
         settings-key: IataApiKey
-	 
+     
 MarketProfileServiceClient: 
-	ServiceUrl: 
+    ServiceUrl: 
         settings-key: MarketProfileServiceUrl
-	 
+     
 SlackNotifications: 
-	AzureQueue: 
-		ConnectionString: 
+    AzureQueue: 
+        ConnectionString: 
             settings-key: SlackNotificationsConnString
             types: [AzureTableStorage] 
-		QueueName: slack-notifications
-		 
-	ThrottlingLimitSeconds: 
+        QueueName: slack-notifications
+         
+    ThrottlingLimitSeconds: 
         settings-key: SlackNotificationsThrottlingLimit
-	 
+     
 MonitoringServiceClient: 
-	MonitoringServiceUrl: 
+    MonitoringServiceUrl: 
         settings-key: MonitoringServiceUrl
