@@ -29,6 +29,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -220,7 +221,11 @@ clients to make payments in BTC, ETH and other assets depending on customer need
 
                 app.UseSwagger(c =>
                 {
-                    c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+                    c.PreSerializeFilters.Add((swagger, httpReq) =>
+                    {
+                        swagger.Host = httpReq.Host.Value;
+                        swagger.Schemes = new List<string> { "https" };
+                    });
                 });
 
                 app.UseSwaggerUI(
