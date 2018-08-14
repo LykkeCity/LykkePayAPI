@@ -199,6 +199,13 @@ clients to make payments in BTC, ETH and other assets depending on customer need
 
                 app.UseLykkeMiddleware(ex => new { Message = "Technical problem" });
 
+                app.UseCors(builder =>
+                {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                });
+
                 app.UseAuthentication();
 
                 app.UseMvc();
