@@ -8,6 +8,7 @@ using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayCallback.Client;
 using Lykke.Service.PayCallback.Client.Models;
 using Lykke.Service.PayInternal.Client;
+using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInternal.Client.Models.Order;
 using Lykke.Service.PayInternal.Client.Models.PaymentRequest;
 
@@ -51,9 +52,19 @@ namespace Lykke.Service.PayAPI.Services
                     PaymentRequestId = payment.Id
                 });
             }
-            catch (PayInternal.Client.Exceptions.DefaultErrorResponseException ex)
+            catch (DefaultErrorResponseException ex)
             {
                 throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
+            }
+            catch (CreatePaymentRequestResponseException ex)
+            {
+                if (ex.Error.Code == CreatePaymentRequestErrorType.SettlementAssetNotAvailable)
+                    throw new InvalidSettlementAssetException();
+
+                if (ex.Error.Code == CreatePaymentRequestErrorType.PaymentAssetNotAvailable)
+                    throw new InvalidPaymentAssetException();
+
+                throw new ApiRequestException(ex.Message, string.Empty, ex.StatusCode);
             }
 
             if (!string.IsNullOrWhiteSpace(request.CallbackUrl))
@@ -91,7 +102,7 @@ namespace Lykke.Service.PayAPI.Services
             {
                 return await _payInternalClient.GetPaymentRequestDetailsAsync(merchantId, paymentRequestId);
             }
-            catch (PayInternal.Client.Exceptions.DefaultErrorResponseException ex)
+            catch (DefaultErrorResponseException ex)
             {
                 throw new ApiRequestException(ex.Error.ErrorMessage, string.Empty, ex.StatusCode);
             }

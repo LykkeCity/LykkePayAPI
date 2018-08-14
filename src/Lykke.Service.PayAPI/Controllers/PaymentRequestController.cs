@@ -7,6 +7,7 @@ using Common.Log;
 using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
+using Lykke.Service.PayAPI.Core.Exceptions;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayCallback.Client;
@@ -52,11 +53,14 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation("CreatePaymentRequest")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [ValidateModel]
         public async Task<IActionResult> CreatePaymentRequest([FromBody] CreatePaymentRequestModel request)
         {
             if (string.IsNullOrWhiteSpace(request.SettlementAsset))
                 return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidSettlementAsset));
+
+            if (string.IsNullOrWhiteSpace(request.PaymentAsset))
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidPaymentAsset));
 
             try
             {
@@ -73,12 +77,24 @@ namespace Lykke.Service.PayAPI.Controllers
 
                 return Ok(paymentRequestDetails.ToStatusApiModel());
             }
+            catch (InvalidSettlementAssetException ex)
+            {
+                _log.Error(ex, null, $"request: {request.ToJson()}");
+
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidSettlementAsset));
+            }
+            catch (InvalidPaymentAssetException ex)
+            {
+                _log.Error(ex, null, $"request: {request.ToJson()}");
+
+                return BadRequest(PaymentErrorResponseModel.Create(PaymentErrorType.InvalidPaymentAsset));
+            }
             catch (Exception ex)
             {
                 _log.Error(ex, null, $"request: {request.ToJson()}");
-            }
 
-            return StatusCode((int) HttpStatusCode.InternalServerError);
+                throw;
+            }
         }
 
         /// <summary>

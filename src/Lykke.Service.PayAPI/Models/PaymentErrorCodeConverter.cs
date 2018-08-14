@@ -26,6 +26,9 @@ namespace Lykke.Service.PayAPI.Models
                 case PaymentErrorType.InvalidSettlementAsset:
                     writer.WriteValue("INVALID_SETTLEMENTASSET");
                     break;
+                case PaymentErrorType.InvalidPaymentAsset:
+                    writer.WriteValue("INVALID_PAYMENTASSET");
+                    break;
                 case PaymentErrorType.InvalidCallbackUrl:
                     writer.WriteValue("INVALID_CALLBACKURL");
                     break;
