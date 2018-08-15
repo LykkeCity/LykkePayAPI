@@ -12,6 +12,8 @@
 
         InvalidSettlementAsset,
 
-        InvalidCallbackUrl
+        InvalidCallbackUrl,
+
+        InvalidPaymentAsset
     }
 }
