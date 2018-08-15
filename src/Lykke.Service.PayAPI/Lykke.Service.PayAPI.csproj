@@ -35,7 +35,7 @@
     <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.11" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.20" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.12" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.18" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.21" />
     <PackageReference Include="Lykke.Service.PayInternal.Contract" Version="2.0.3" />
     <PackageReference Include="Lykke.Service.PayPushNotifications.Client" Version="1.0.2" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
