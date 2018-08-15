@@ -41,6 +41,8 @@ info:
 
     - 404 `Not Found` - resource was not found.
 host: pay-api-dev.lykkex.net
+schemes:
+  - https
 paths:
   /api/v1/assets/settlement:
     get:
