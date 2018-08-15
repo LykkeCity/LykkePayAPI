@@ -5,7 +5,7 @@ using System.Linq;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core;
 
-namespace Lykke.Service.PayAPI
+namespace Lykke.Service.PayAPI.SwaggerFilters
 {
     public class HeaderAccessOperationFilter : IOperationFilter
     {
@@ -51,6 +51,11 @@ namespace Lykke.Service.PayAPI
                     Required = true,
                     Type = "string"
                 });
+            }
+
+            if (isSignAccess || isBearerAccess)
+            {
+                operation.Responses.Add("401", new Response { Description = "Unauthorized" });
             }
         }
     }
