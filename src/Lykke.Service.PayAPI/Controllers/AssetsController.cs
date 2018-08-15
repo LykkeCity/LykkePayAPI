@@ -119,7 +119,7 @@ namespace Lykke.Service.PayAPI.Controllers
                         return BadRequest(clientEx.Error);
                 }
 
-				throw;
+                throw;
             }
         }
     }
