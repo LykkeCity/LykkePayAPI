@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common;
 using Common.Log;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.Log;
 using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Models;
 using Lykke.Service.PayInternal.Client;
+using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInternal.Client.Models.Asset;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -86,6 +88,8 @@ namespace Lykke.Service.PayAPI.Controllers
         [SwaggerOperation(OperationId = "GetPaymentAssets")]
         [SwaggerXSummary("Payment assets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetPaymentAssets(string settlementAssetId)
         {
             try
@@ -105,6 +109,16 @@ namespace Lykke.Service.PayAPI.Controllers
                             settlementAssetId
                         }.ToJson()
                     }");
+
+                if (ex is DefaultErrorResponseException clientEx)
+                {
+                    if (clientEx.StatusCode == HttpStatusCode.NotFound)
+                        return NotFound(clientEx.Error);
+
+                    if (clientEx.StatusCode == HttpStatusCode.BadRequest)
+                        return BadRequest(clientEx.Error);
+                }
+
                 throw;
             }
         }
