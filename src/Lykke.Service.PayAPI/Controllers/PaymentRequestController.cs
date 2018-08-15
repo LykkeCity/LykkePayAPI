@@ -23,6 +23,8 @@ namespace Lykke.Service.PayAPI.Controllers
     [SignatureHeaders]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/paymentRequest")]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     public class PaymentRequestController : Controller
     {
         private readonly IPaymentRequestService _paymentRequestService;
@@ -44,15 +46,16 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Creates payment request and order
+        /// Create payment request and order
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="request">Request model</param>
+        /// <response code="200">Result model</response>
+        /// <response code="400">Problem occured</response>
         [HttpPost]
-        [SwaggerOperation("CreatePaymentRequest")]
+        [SwaggerOperation(OperationId = "CreatePaymentRequest")]
+        [SwaggerXSummary("Create")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreatePaymentRequest([FromBody] CreatePaymentRequestModel request)
         {
             if (string.IsNullOrWhiteSpace(request.SettlementAsset))
@@ -76,22 +79,25 @@ namespace Lykke.Service.PayAPI.Controllers
             catch (Exception ex)
             {
                 _log.Error(ex, null, $"request: {request.ToJson()}");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
-        /// Returns status of a payment request
+        /// Get status
         /// </summary>
-        /// <param name="paymentRequestId"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// Receive status of a payment request.
+        /// </remarks>
+        /// <param name="paymentRequestId">Payment request id</param>
+        /// <response code="200">Result model</response>
+        /// <response code="400">Problem occured</response>
         [HttpGet]
         [Route("{paymentRequestId}/status")]
-        [SwaggerOperation("GetPaymentRequestStatus")]
+        [SwaggerOperation(OperationId = "GetPaymentRequestStatus")]
+        [SwaggerXSummary("Status")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPaymentRequestStatus(string paymentRequestId)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
@@ -108,20 +114,21 @@ namespace Lykke.Service.PayAPI.Controllers
             catch (Exception ex)
             {
                 _log.Error(ex, null, $"request: {new {paymentRequestId}.ToJson()}");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
-        /// Initiates a refund on a payment
+        /// Initiate a refund on a payment
         /// </summary>
-        /// <param name="paymentRequestId"></param>
-        /// <param name="destinationAddress"></param>
-        /// <returns></returns>
+        /// <param name="paymentRequestId">Payment request id</param>
+        /// <param name="destinationAddress">Destination address</param>
+        /// <response code="200">Result model</response>
+        /// <response code="400">Problem occured</response>
         [HttpPost]
         [Route("{paymentRequestId}/refund")]
-        [SwaggerOperation("Refund")]
+        [SwaggerOperation(OperationId = "Refund")]
+        [SwaggerXSummary("Refund")]
         [ProducesResponseType(typeof(PaymentStatusResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Refund(string paymentRequestId, [FromQuery] string destinationAddress)
@@ -161,17 +168,22 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Adds or updates payment request callback url
+        /// Set callback url
         /// </summary>
-        /// <param name="paymentRequestId"></param>
-        /// <param name="callbackUrl"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// Add or update payment request callback url.
+        /// </remarks>
+        /// <param name="paymentRequestId">Payment request id</param>
+        /// <param name="callbackUrl">Callback url</param>
+        /// <response code="200">Result model</response>
+        /// <response code="400">Problem occured</response>
         [HttpPost]
         [Route("{paymentRequestId}/callback")]
-        [SwaggerOperation("SetCallback")]
+        [SwaggerOperation(OperationId = "SetCallback")]
+        // There should be the only one x-summary for route which is used for GET, POST etc
+        [SwaggerXSummary("Callback")]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> SetCallbackUrl(string paymentRequestId, [FromQuery] string callbackUrl)
         {
             if (!paymentRequestId.IsValidPaymentRequestId())
@@ -200,15 +212,22 @@ namespace Lykke.Service.PayAPI.Controllers
                             callbackUrl
                         }.ToJson()
                     }");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
+        /// <summary>
+        /// Get callback url
+        /// </summary>
+        /// <remarks>
+        /// Receive payment request callback url.s
+        /// </remarks>
+        /// <param name="paymentRequestId">Payment request id</param>
+        /// <response code="200">Result model</response>
+        /// <response code="400">Problem occured</response>
         [HttpGet]
         [Route("{paymentRequestId}/callback")]
-        [SwaggerOperation("GetCallback")]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
+        [SwaggerOperation(OperationId = "GetCallback")]
         [ProducesResponseType(typeof(GetPaymentCallbackResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(PaymentErrorResponseModel), (int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetCallbackUrl(string paymentRequestId)
@@ -232,9 +251,8 @@ namespace Lykke.Service.PayAPI.Controllers
                     if (errorEx.StatusCode == HttpStatusCode.NotFound)
                         return NotFound();
                 }
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
     }
 }

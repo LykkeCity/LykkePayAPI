@@ -18,10 +18,19 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.PayAPI.Controllers
 {
+    /// <summary>
+    /// Assets API
+    /// </summary>
+    /// <remarks>
+    /// Provide information about assets availability
+    /// Assets are configured per merchant depending of needs
+    /// </remarks>
     [Authorize]
     [SignatureHeaders]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/assets")]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     public class AssetsController : Controller
     {
         private readonly IPayInternalClient _payInternalClient;
@@ -39,14 +48,17 @@ namespace Lykke.Service.PayAPI.Controllers
         }
 
         /// <summary>
-        /// Returns list of settlement assets available for merchant
+        /// Get settlement assets
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// Receive list of settlement assets available for merchant.
+        /// </remarks>
+        /// <response code="200">List of settlement assets</response>
         [HttpGet]
         [Route("settlement")]
-        [SwaggerOperation("GetSettlementAssets")]
+        [SwaggerOperation(OperationId = "GetSettlementAssets")]
+        [SwaggerXSummary("Settlement assets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetSettlementAssets()
         {
             try
@@ -59,21 +71,23 @@ namespace Lykke.Service.PayAPI.Controllers
             catch (Exception ex)
             {
                 _log.Error(ex, null, $"request: {new {_headersHelper.MerchantId}.ToJson()}");
+                throw;
             }
-
-            return StatusCode((int) HttpStatusCode.InternalServerError);
         }
 
         /// <summary>
-        /// Returns list of payment assets available for merchant
+        /// Get payment assets
         /// </summary>
+        /// <remarks>
+        /// Receive list of payment assets available for merchant
+        /// </remarks>
         /// <param name="settlementAssetId">Settlement asset id</param>
         /// <returns></returns>
         [HttpGet]
         [Route("payment/{settlementAssetId}")]
-        [SwaggerOperation("GetPaymentAssets")]
+        [SwaggerOperation(OperationId = "GetPaymentAssets")]
+        [SwaggerXSummary("Payment assets")]
         [ProducesResponseType(typeof(AssetsResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetPaymentAssets(string settlementAssetId)
@@ -104,9 +118,9 @@ namespace Lykke.Service.PayAPI.Controllers
                     if (clientEx.StatusCode == HttpStatusCode.BadRequest)
                         return BadRequest(clientEx.Error);
                 }
-            }
 
-            return StatusCode((int) HttpStatusCode.InternalServerError);
+                throw;
+            }
         }
     }
 }
