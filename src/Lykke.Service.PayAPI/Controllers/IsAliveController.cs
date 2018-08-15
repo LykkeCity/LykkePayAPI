@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Net;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Service.PayAPI.Attributes;
 using Lykke.Service.PayAPI.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -9,6 +10,7 @@ namespace Lykke.Service.PayAPI.Controllers
 {
     // NOTE: See https://lykkex.atlassian.net/wiki/spaces/LKEWALLET/pages/35755585/Add+your+app+to+Monitoring
     [Route("api/isAlive")]
+    [Produces("application/json")]
     public class IsAliveController : Controller
     {
         private readonly IHealthService _healthService;
@@ -21,9 +23,12 @@ namespace Lykke.Service.PayAPI.Controllers
         /// <summary>
         /// Checks service is alive
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// Receive the liveness status of the service.
+        /// </remarks>
         [HttpGet]
-        [SwaggerOperation("IsAlive")]
+        [SwaggerOperation(OperationId = "IsAlive")]
+        [SwaggerXSummary("Is alive")]
         [ProducesResponseType(typeof(IsAliveResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public IActionResult Get()
