@@ -216,7 +216,7 @@ clients to make payments in BTC, ETH and other assets depending on customer need
                     c.PreSerializeFilters.Add((swagger, httpReq) =>
                     {
                         swagger.Host = httpReq.Host.Value;
-                        swagger.Schemes = new List<string> { "https" };
+                        swagger.Schemes = new List<string> { "https", "http" };
                     });
                 });
 
