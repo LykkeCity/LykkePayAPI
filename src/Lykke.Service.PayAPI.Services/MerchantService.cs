@@ -9,7 +9,7 @@ using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Exceptions;
 using Lykke.Service.PayInternal.Client.Models.MerchantGroups;
 using Lykke.Service.PayInvoice.Client;
-using Lykke.Service.PayInvoice.Client.Models.MerchantSetting;
+using Lykke.Service.PayMerchant.Client;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Lykke.Service.PayAPI.Services
@@ -22,13 +22,15 @@ namespace Lykke.Service.PayAPI.Services
         private readonly OnDemandDataCache<string> _merchantNamesCache;
         private readonly OnDemandDataCache<string> _merchantLogoUrlsCache;
         private readonly CacheExpirationPeriodsSettings _cacheExpirationPeriods;
+        private readonly IPayMerchantClient _payMerchantClient;
 
         public MerchantService(
             IPayInternalClient payInternalClient,
             IPayInvoiceClient payInvoiceClient,
             IMemoryCache memoryCache,
             MerchantSettings merchantSettings,
-            CacheExpirationPeriodsSettings cacheExpirationPeriods)
+            CacheExpirationPeriodsSettings cacheExpirationPeriods, 
+            IPayMerchantClient payMerchantClient)
         {
             _payInternalClient = payInternalClient;
             _payInvoiceClient = payInvoiceClient;
@@ -36,6 +38,7 @@ namespace Lykke.Service.PayAPI.Services
             _merchantNamesCache = new OnDemandDataCache<string>(memoryCache);
             _merchantLogoUrlsCache = new OnDemandDataCache<string>(memoryCache);
             _cacheExpirationPeriods = cacheExpirationPeriods;
+            _payMerchantClient = payMerchantClient;
         }
 
         public async Task<string> GetMerchantNameAsync(string merchantId)
@@ -44,7 +47,7 @@ namespace Lykke.Service.PayAPI.Services
                 (
                     $"MerchantName-{merchantId}",
                     async x => {
-                        var merchant = await _payInternalClient.GetMerchantByIdAsync(merchantId);
+                        var merchant = await _payMerchantClient.Api.GetByIdAsync(merchantId);
                         return merchant.DisplayName;
                     },
                     _cacheExpirationPeriods.MerchantName
