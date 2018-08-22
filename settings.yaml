@@ -117,3 +117,8 @@ SlackNotifications:
 MonitoringServiceClient: 
     MonitoringServiceUrl: 
         settings-key: MonitoringServiceUrl
+
+PayMerchantServiceClient:
+    ServiceUrl:
+        settings-key: PayMerchantServiceUrl
+        types: [Tag]

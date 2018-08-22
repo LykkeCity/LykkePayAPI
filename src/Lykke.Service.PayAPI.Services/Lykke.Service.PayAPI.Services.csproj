@@ -14,7 +14,7 @@
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.12" />
     <PackageReference Include="Lykke.Service.PayHistory.Client" Version="1.0.12" />
     <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.21" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
