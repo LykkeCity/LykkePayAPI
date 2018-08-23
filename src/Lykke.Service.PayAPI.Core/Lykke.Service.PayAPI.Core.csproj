@@ -12,15 +12,16 @@
     <PackageReference Include="Lykke.Contracts" Version="1.0.51" />
     <PackageReference Include="Lykke.Service.Assets.Client" Version="4.4.0" />
     <PackageReference Include="Lykke.Service.MarketProfile.Client" Version="1.1.0" />
-    <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.11" />
+    <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.12" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.0.20" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.12" />
     <PackageReference Include="Lykke.Service.PayHistory.Client" Version="1.0.12" />
     <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.21" />
     <PackageReference Include="Lykke.Service.PayInvoice.Client" Version="5.2.0" />
     <PackageReference Include="Lykke.Service.IataApi.Client" Version="1.0.1" />
-    <PackageReference Include="Lykke.Service.PayVolatility.Client" Version="1.0.2" />
-    <PackageReference Include="Lykke.SettingsReader" Version="3.0.0" />
+    <PackageReference Include="Lykke.Service.PayMerchant.Client" Version="1.0.1" />
+    <PackageReference Include="Lykke.Service.PayVolatility.Client" Version="1.0.3" />
+    <PackageReference Include="Lykke.SettingsReader" Version="4.0.1" />
     <PackageReference Include="Lykke.Service.PayPushNotifications.Client" Version="1.0.2" />
   </ItemGroup>
  
