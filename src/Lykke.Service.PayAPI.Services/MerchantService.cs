@@ -7,7 +7,7 @@ using Lykke.Service.PayAPI.Core.Services;
 using Lykke.Service.PayAPI.Core.Settings.ServiceSettings;
 using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Exceptions;
-using Lykke.Service.PayInternal.Client.Models.MerchantGroups;
+using Lykke.Service.PayMerchant.Client.Models;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayMerchant.Client;
 using Microsoft.Extensions.Caching.Memory;
@@ -79,7 +79,7 @@ namespace Lykke.Service.PayAPI.Services
 
         public async Task<IReadOnlyList<string>> GetGroupMerchantsAsync(string merchantId)
         {
-            MerchantsByUsageResponse response = await _payInternalClient.GetMerchantsByUsageAsync(
+            MerchantsByUsageResponse response = await _payMerchantClient.GroupsApi.GetMerchantsByUsageAsync(
                 new GetMerchantsByUsageRequest
                 {
                     MerchantId = merchantId,
