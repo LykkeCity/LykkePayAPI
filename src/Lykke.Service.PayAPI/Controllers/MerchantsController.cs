@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Common;
 using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
@@ -12,10 +13,11 @@ using Lykke.Service.PayAPI.Models.Merchant;
 using Lykke.Service.PayAPI.Models.Mobile;
 using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Exceptions;
-using Lykke.Service.PayInternal.Client.Models.MerchantGroups;
+using Lykke.Service.PayMerchant.Client.Models;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Employee;
 using Lykke.Service.PayInvoice.Client.Models.MerchantSetting;
+using Lykke.Service.PayMerchant.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,17 +35,20 @@ namespace Lykke.Service.PayAPI.Controllers
         private readonly IIataService _iataService;
         private readonly IPayInvoiceClient _payInvoiceClient;
         private readonly IPayInternalClient _payInternalClient;
+        private readonly IPayMerchantClient _payMerchantClient;
 
         public MerchantsController(
             [NotNull] IMerchantService merchantService,
             [NotNull] IIataService iataService,
             [NotNull] IPayInvoiceClient payInvoiceClient,
-            [NotNull] IPayInternalClient payInternalClient)
+            [NotNull] IPayInternalClient payInternalClient, 
+            [NotNull] IPayMerchantClient payMerchantClient)
         {
             _merchantService = merchantService ?? throw new ArgumentNullException(nameof(merchantService));
             _iataService = iataService ?? throw new ArgumentNullException(nameof(iataService));
             _payInvoiceClient = payInvoiceClient ?? throw new ArgumentNullException(nameof(payInvoiceClient));
             _payInternalClient = payInternalClient ?? throw new ArgumentNullException(nameof(payInternalClient));
+            _payMerchantClient = payMerchantClient ?? throw new ArgumentNullException(nameof(payMerchantClient));
         }
 
         /// <summary>
@@ -72,7 +77,7 @@ namespace Lykke.Service.PayAPI.Controllers
             {
                 EmployeeModel employee = await _payInvoiceClient.GetEmployeeByEmailAsync(email);
 
-                merchantsResponse = await _payInternalClient.GetMerchantsByUsageAsync(
+                merchantsResponse = await _payMerchantClient.GroupsApi.GetMerchantsByUsageAsync(
                     new GetMerchantsByUsageRequest
                     {
                         MerchantId = employee.MerchantId,
