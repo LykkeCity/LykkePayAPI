@@ -1,9 +1,8 @@
 PayAPI: 
     Db: 
         LogsConnString: 
-            settings-key: LogsConnString
+            settings-key: PayAPI-LogsConnString
             types: [AzureTableStorage, Tag]
-         
     PaymentRequestDueDate: 
         settings-key: PayAPI-PaymentRequestDueDate
         types: [Tag] 
@@ -12,40 +11,44 @@ PayAPI:
         types: [Tag] 
     TransactionUrl: 
         settings-key: PayAPI-TransactionUrl 
+        types: [Tag] 
     JwtSecurity: 
         Issuer: 
             settings-key: PayAPI-JwtSecurity-Issuer 
+            types: [Tag] 
         Audience: 
             settings-key: PayAPI-JwtSecurity-Audience 
+            types: [Tag] 
         Key: 
             settings-key: PayAPI-JwtSecurity-Key 
+            types: [Tag] 
         TokenLifetime: 
             settings-key: PayAPI-JwtSecurity-TokenLifetime
-         
+            types: [Tag] 
     CacheExpirationPeriods: 
         IataBillingCategories: 
             settings-key: PayAPI-CacheExpirationPeriods-IataBillingCategories 
+            types: [Tag] 
         MerchantLogoUrl: 
             settings-key: PayAPI-CacheExpirationPeriods-MerchantLogoUrl 
+            types: [Tag] 
         MerchantName: 
             settings-key: PayAPI-CacheExpirationPeriods-MerchantName
-         
+            types: [Tag] 
     Iata: 
         AssetsMap: 
             Values: 
                 settings-key: PayAPI-Iata-AssetsMap-Values
-                types: [Json]
+                types: [Json, Tag]
              
         CashoutAssets: 
             Assets: 
                 settings-key: PayAPI-Iata-CashoutAssets-Assets
-                types: [JsonArray]
-            
-         
+                types: [JsonArray, Tag]
     Merchant: 
         MerchantDefaultLogoUrl: 
             settings-key: PayAPI-Merchant-MerchantDefaultLogoUrl
-        
+            types: [Tag]   
      
 PayAuthServiceClient: 
     ServiceUrl: 
@@ -85,32 +88,43 @@ PayVolatilityServiceClient:
 AssetsServiceClient: 
     ServiceUrl: 
         settings-key: AssetsServiceUrl 
+        types: [Tag] 
     ExpirationPeriod: 
         settings-key: AssetsServiceExpirationPeriod
+        types: [Tag] 
      
 EthereumServiceClient: 
     ServiceUrl: 
         settings-key: EthereumApiServiceUrl 
+        types: [Tag] 
     HotwalletAddress: 
         settings-key: EthereumApiHotwalletAddress
+        types: [Tag] 
      
 IataApiServiceClient: 
     ServiceUrl: 
         settings-key: IataApiServiceUrl 
+        types: [Tag] 
     ApiKey: 
         settings-key: IataApiKey
+        types: [Tag] 
      
 MarketProfileServiceClient: 
     ServiceUrl: 
         settings-key: MarketProfileServiceUrl
-     
+        types: [Tag] 
+
+PayMerchantServiceClient:
+    ServiceUrl:
+        settings-key: PayMerchantServiceUrl
+        types: [Tag]
+        
 SlackNotifications: 
     AzureQueue: 
         ConnectionString: 
             settings-key: SlackNotificationsConnString
             types: [AzureTableStorage] 
         QueueName: slack-notifications
-         
     ThrottlingLimitSeconds: 
         settings-key: SlackNotificationsThrottlingLimit
      
