@@ -1,7 +1,7 @@
 PayAPI: 
     Db: 
         LogsConnString: 
-            settings-key: PayAPI-LogsConnString
+            settings-key: LykkePayLogsConnString
             types: [AzureTableStorage, Tag]
     PaymentRequestDueDate: 
         settings-key: PayAPI-PaymentRequestDueDate
