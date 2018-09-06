@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using Lykke.Service.PayAPI.Core;
 using Lykke.Service.PayAPI.Core.Domain.PaymentRequest;
 
 namespace Lykke.Service.PayAPI.Services
@@ -14,7 +15,8 @@ namespace Lykke.Service.PayAPI.Services
                 .ForMember(dest => dest.MarkupFixedFee, opt => opt.MapFrom(src => src.FixedFee))
                 .ForMember(dest => dest.DueDate,
                     opt => opt.ResolveUsing((src, dest, destMember, resContext) =>
-                        dest.DueDate = (DateTime) resContext.Items["DueDate"]));
+                        dest.DueDate = (DateTime) resContext.Items["DueDate"]))
+                .ForMember(dest => dest.Initiator, opt => opt.UseValue(LykkePayConstants.PaymentRequestInitiator));
 
             CreateMap<RefundRequest, PayInternal.Client.Models.PaymentRequest.RefundRequestModel>();
         }

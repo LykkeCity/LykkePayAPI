@@ -97,7 +97,7 @@ namespace Lykke.Service.PayAPI.Controllers
             try
             {
                 VolatilityModel volatility =
-                    await _payVolatilityClient.GetDailyVolatilityAsync(assetPairId);
+                    await _payVolatilityClient.Volatility.GetDailyVolatilityAsync(assetPairId);
 
                 return Ok(Mapper.Map<VolatilityResponseModel>(volatility));
             }

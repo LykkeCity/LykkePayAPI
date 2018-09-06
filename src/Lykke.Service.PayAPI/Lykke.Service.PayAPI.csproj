@@ -28,14 +28,14 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="Lykke.Common" Version="7.0.3" />
+    <PackageReference Include="Lykke.Common" Version="7.0.4" />
     <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.10.1" />
     <PackageReference Include="Lykke.Contracts" Version="1.0.51" />
-    <PackageReference Include="Lykke.Logs" Version="5.2.0" />
+    <PackageReference Include="Lykke.Logs" Version="6.0.0" />
     <PackageReference Include="Lykke.Service.EthereumCore.Client" Version="1.1.12" />
     <PackageReference Include="Lykke.Service.PayAuth.Client" Version="1.1.2" />
     <PackageReference Include="Lykke.Service.PayCallback.Client" Version="1.0.12" />
-    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.23" />
+    <PackageReference Include="Lykke.Service.PayInternal.Client" Version="2.0.24" />
     <PackageReference Include="Lykke.Service.PayInternal.Contract" Version="2.0.3" />
     <PackageReference Include="Lykke.Service.PayPushNotifications.Client" Version="1.0.2" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
