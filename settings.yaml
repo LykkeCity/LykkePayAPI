@@ -81,6 +81,9 @@ PayPushNotificationsServiceClient:
         types: [Tag]
      
 PayVolatilityServiceClient: 
+    CachePeriod:
+        settings-key: PayVolatilityCachePeriod
+        types: [Tag]
     ServiceUrl: 
         settings-key: PayVolatilityServiceUrl
         types: [Tag]
@@ -99,7 +102,7 @@ EthereumServiceClient:
         types: [Tag] 
     HotwalletAddress: 
         settings-key: EthereumApiHotwalletAddress
-        types: [Tag] 
+        types: [Tag, Optional] 
      
 IataApiServiceClient: 
     ServiceUrl: 
@@ -131,3 +134,4 @@ SlackNotifications:
 MonitoringServiceClient: 
     MonitoringServiceUrl: 
         settings-key: MonitoringServiceUrl
+        types: [Tag]
