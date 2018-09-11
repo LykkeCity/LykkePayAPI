@@ -9,6 +9,9 @@
         }
 
         public const string SystemId = "LykkePay";
+
         public const string AuthenticationScheme = "Lykke Pay Auth Scheme";
+
+        public const string PaymentRequestInitiator = "PublicAPI";
     }
 }
