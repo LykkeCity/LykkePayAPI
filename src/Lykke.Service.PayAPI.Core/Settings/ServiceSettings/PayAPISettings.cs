@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lykke.SettingsReader.Attributes;
 
 namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
 {
@@ -11,6 +12,7 @@ namespace Lykke.Service.PayAPI.Core.Settings.ServiceSettings
         public MerchantSettings Merchant { get; set; }
         public JwtSecuritySettings JwtSecurity { get; set; }
         public CacheExpirationPeriodsSettings CacheExpirationPeriods { get; set; }
+        [Optional]
         public IataSettings Iata { get; set; }
         public string TransactionUrl { get; set; }
     }
