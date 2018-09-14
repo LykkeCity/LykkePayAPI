@@ -25,6 +25,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Route("api/v{version:apiVersion}/mobile/cashout")]
     [Produces("application/json")]
     [Consumes("application/json")]
+    [NonController]
     public class CashoutController : Controller
     {
         private readonly IPayInternalClient _payInternalClient;
