@@ -25,9 +25,11 @@ namespace Lykke.Service.PayAPI.Core.Settings
         public PayInternalServiceClientSettings PayInternalServiceClient { get; set; }
         public PayCallbackServiceClientSettings PayCallbackServiceClient { get; set; }
         public MonitoringServiceClientSettings MonitoringServiceClient { get; set; }
+        [Optional]
         public IataApiServiceClientSettings IataApiServiceClient { get; set; }
         public PayHistoryServiceClientSettings PayHistoryServiceClient { get; set; }
         public EthereumServiceClientSettings EthereumServiceClient { get; set; }
+        [Optional]
         public PayPushNotificationsServiceClientSettings PayPushNotificationsServiceClient { get; set; }
         public PayVolatilityServiceClientSettings PayVolatilityServiceClient { get; set; }
         public PayMerchantServiceClientSettings PayMerchantServiceClient { get; set; }

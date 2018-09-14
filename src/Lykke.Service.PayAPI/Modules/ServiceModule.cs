@@ -83,10 +83,13 @@ namespace Lykke.Service.PayAPI.Modules
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.PayCallbackServiceClient))
                 .SingleInstance();
 
-            builder.RegisterType<IataApiClient>()
-                .As<IIataApiClient>()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.IataApiServiceClient))
-                .SingleInstance();
+            if (_settings.CurrentValue.IataApiServiceClient != null)
+            {
+                builder.RegisterType<IataApiClient>()
+                    .As<IIataApiClient>()
+                    .WithParameter(TypedParameter.From(_settings.CurrentValue.IataApiServiceClient))
+                    .SingleInstance();
+            }
 
             builder.RegisterType<PaymentRequestService>()
                 .As<IPaymentRequestService>()
@@ -120,19 +123,25 @@ namespace Lykke.Service.PayAPI.Modules
             builder.RegisterType<MerchantWalletsService>()
                 .As<IMerchantWalletsService>();
 
-            builder.RegisterType<IataService>()
-                .As<IIataService>()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata))
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods));
+            if (_settings.CurrentValue.PayAPI.Iata != null)
+            {
+                builder.RegisterType<IataService>()
+                    .As<IIataService>()
+                    .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata))
+                    .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.CacheExpirationPeriods));
 
-            builder.RegisterType<AssetSettingsService>()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata.CashoutAssets.Assets))
-                .As<IAssetSettingsService>();
+                builder.RegisterType<AssetSettingsService>()
+                    .WithParameter(TypedParameter.From(_settings.CurrentValue.PayAPI.Iata.CashoutAssets.Assets))
+                    .As<IAssetSettingsService>();
+            }
 
             RegisterHistory(builder);
 
-            builder.RegisterPayPushNotificationsClient(_settings.CurrentValue.PayPushNotificationsServiceClient,
-                n => n);
+            if (_settings.CurrentValue.PayPushNotificationsServiceClient != null)
+            {
+                builder.RegisterPayPushNotificationsClient(_settings.CurrentValue.PayPushNotificationsServiceClient,
+                    n => n);
+            }
 
             builder.RegisterCachedPayVolatilityClient(_settings.CurrentValue.PayVolatilityServiceClient, null);
 
