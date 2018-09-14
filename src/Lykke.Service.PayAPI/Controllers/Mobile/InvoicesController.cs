@@ -29,6 +29,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Route("api/v{version:apiVersion}/mobile/invoices")]
     [Produces("application/json")]
     [Consumes("application/json")]
+    [NonController]
     public class InvoicesController : Controller
     {
         private readonly IIataService _iataService;

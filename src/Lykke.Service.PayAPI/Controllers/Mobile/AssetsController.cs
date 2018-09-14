@@ -19,6 +19,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [Route("api/v{version:apiVersion}/mobile/assets")]
     [Produces("application/json")]
     [Consumes("application/json")]
+    [NonController]
     public class AssetsController : ControllerBase
     {
         private readonly IAssetSettingsService _assetSettingsService;

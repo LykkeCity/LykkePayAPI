@@ -29,6 +29,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [BearerHeader]
     [Produces("application/json")]
     [Consumes("application/json")]
+    [NonController]
     public class ExchangeController : Controller
     {
         private readonly IPayInternalClient _payInternalClient;
