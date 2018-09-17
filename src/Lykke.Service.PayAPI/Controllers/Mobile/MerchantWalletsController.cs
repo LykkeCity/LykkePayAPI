@@ -27,6 +27,7 @@ namespace Lykke.Service.PayAPI.Controllers.Mobile
     [BearerHeader]
     [Produces("application/json")]
     [Consumes("application/json")]
+    [NonController]
     public class MerchantWalletsController : Controller
     {
         private readonly IMerchantWalletsService _merchantWalletsService;

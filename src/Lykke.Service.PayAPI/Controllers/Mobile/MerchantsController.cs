@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Common;
 using JetBrains.Annotations;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.PayAPI.Attributes;
@@ -13,22 +12,23 @@ using Lykke.Service.PayAPI.Models.Merchant;
 using Lykke.Service.PayAPI.Models.Mobile;
 using Lykke.Service.PayInternal.Client;
 using Lykke.Service.PayInternal.Client.Exceptions;
-using Lykke.Service.PayMerchant.Client.Models;
 using Lykke.Service.PayInvoice.Client;
 using Lykke.Service.PayInvoice.Client.Models.Employee;
 using Lykke.Service.PayInvoice.Client.Models.MerchantSetting;
 using Lykke.Service.PayMerchant.Client;
+using Lykke.Service.PayMerchant.Client.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Lykke.Service.PayAPI.Controllers
+namespace Lykke.Service.PayAPI.Controllers.Mobile
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/mobile")]
     [Produces("application/json")]
     [Consumes("application/json")]
+    [NonController]
     public class MerchantsController : Controller
     {
         private readonly IMerchantService _merchantService;
