@@ -417,6 +417,7 @@ paths:
             $ref: '#/definitions/ErrorResponse'
         '500':
           description: Server Error
+    x-summary: Asset pair volatility
   /api/v1/wooCommerce/create:
     post:
       tags:

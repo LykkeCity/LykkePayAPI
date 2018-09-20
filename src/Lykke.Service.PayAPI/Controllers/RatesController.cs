@@ -85,6 +85,7 @@ namespace Lykke.Service.PayAPI.Controllers
         [HttpGet]
         [Route("volatility/{assetPairId}")]
         [SwaggerOperation(nameof(GetVolatility))]
+        [SwaggerXSummary("Asset pair volatility")]
         [ProducesResponseType(typeof(VolatilityResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
