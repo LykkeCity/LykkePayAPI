@@ -49,7 +49,7 @@ paths:
       tags:
         - Assets
       summary: Get settlement assets
-      description: "Receive list of settlement assets available for merchant."
+      description: Receive list of settlement assets available for merchant.
       operationId: GetSettlementAssets
       consumes: []
       produces:
@@ -104,8 +104,16 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/AssetsResponseModel'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
         '401':
           description: Unauthorized
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
     x-summary: Payment assets
   /api/v1/mobile/assets/cashout:
     get:
@@ -1117,6 +1125,8 @@ paths:
             $ref: '#/definitions/PaymentErrorResponseModel'
         '401':
           description: Unauthorized
+        '404':
+          description: Not Found
     post:
       tags:
         - PaymentRequest
@@ -1194,6 +1204,49 @@ paths:
         '401':
           description: Unauthorized
     x-summary: Asset pair rate
+  '/api/v1/rates/volatility/{assetPairId}':
+    get:
+      tags:
+        - Rates
+      summary: Get asset pair today's volatility
+      operationId: GetVolatility
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: assetPairId
+          in: path
+          description: Asset pair id
+          required: true
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/VolatilityResponseModel'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Server Error
+    x-summary: Volatility
   /api/v1/mobile/auth:
     post:
       tags:
@@ -1478,6 +1531,20 @@ definitions:
         type: array
         items:
           type: string
+  ErrorResponse:
+    required:
+      - errorMessage
+      - modelErrors
+    type: object
+    properties:
+      errorMessage:
+        type: string
+      modelErrors:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            type: string
   CashoutAssetResponse:
     description: Cashout asset
     required:
@@ -1523,20 +1590,6 @@ definitions:
         format: double
         description: Gets or sets amount
         type: number
-  ErrorResponse:
-    required:
-      - errorMessage
-      - modelErrors
-    type: object
-    properties:
-      errorMessage:
-        type: string
-      modelErrors:
-        type: object
-        additionalProperties:
-          type: array
-          items:
-            type: string
   AssetRateResponse:
     description: Asset rate details
     required:
@@ -2204,6 +2257,7 @@ definitions:
           - RefundIsNotAvailable
           - InvalidSettlementAsset
           - InvalidCallbackUrl
+          - InvalidPaymentAsset
         type: string
         x-ms-enum:
           name: PaymentErrorType
@@ -2234,6 +2288,37 @@ definitions:
       accuracy:
         format: int32
         type: integer
+  VolatilityResponseModel:
+    required:
+      - assetPairId
+      - date
+      - closePriceStdev
+      - highPriceStdev
+      - multiplierFactor
+      - closePriceVolatilityShield
+      - highPriceVolatilityShield
+    type: object
+    properties:
+      assetPairId:
+        type: string
+      date:
+        format: date-time
+        type: string
+      closePriceStdev:
+        format: double
+        type: number
+      highPriceStdev:
+        format: double
+        type: number
+      multiplierFactor:
+        format: double
+        type: number
+      closePriceVolatilityShield:
+        format: double
+        type: number
+      highPriceVolatilityShield:
+        format: double
+        type: number
   AuthRequestModel:
     description: Authorization request details
     required:
