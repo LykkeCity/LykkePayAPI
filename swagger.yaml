@@ -1,0 +1,886 @@
+swagger: '2.0'
+info:
+  version: v1
+  title: PayAPI
+  description: >-
+    **Lykke PayAPI** is the set of API methods aimed to provide customers the
+    out-of-the-box functionality for their 
+
+    clients to make payments in BTC, ETH and other assets depending on customer
+    needs.
+
+
+    #### Allowed HTTPs requests:
+
+    - **POST** : To create resource. 
+
+    - **PUT** : To update resource. 
+
+    - **GET** : To get a resource or list of resources. 
+
+    - **DELETE** : To delete resource. pi 
+
+
+    #### Description Of Usual Server Responses:
+
+    - 200 `OK` - the request was successful (some API calls may return 201
+    instead).
+
+    - 201 `Created` - the request was successful and a resource was created.
+
+    - 204 `No Content` - the request was successful but there is no
+    representation to return (i.e. the response is empty).
+
+    - 400 `Bad Request` - the request could not be understood or was missing
+    required parameters.
+
+    - 401 `Unauthorized` - authentication failed or user doesn't have
+    permissions for requested operation.
+
+    - 403 `Forbidden` - access denied.
+
+    - 404 `Not Found` - resource was not found.
+host: pay-api.lykke.com
+schemes:
+  - https
+paths:
+  /api/v1/assets/settlement:
+    get:
+      tags:
+        - Assets
+      summary: Get settlement assets
+      description: Receive list of settlement assets available for merchant.
+      operationId: GetSettlementAssets
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: List of settlement assets
+          schema:
+            $ref: '#/definitions/AssetsResponseModel'
+        '401':
+          description: Unauthorized
+    x-summary: Settlement assets
+  '/api/v1/assets/payment/{settlementAssetId}':
+    get:
+      tags:
+        - Assets
+      summary: Get payment assets
+      description: Receive list of payment assets available for merchant
+      operationId: GetPaymentAssets
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: settlementAssetId
+          in: path
+          description: Settlement asset id
+          required: true
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/AssetsResponseModel'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    x-summary: Payment assets
+  /api/isAlive:
+    get:
+      tags:
+        - IsAlive
+      summary: Checks service is alive
+      description: Receive the liveness status of the service.
+      operationId: IsAlive
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: api-version
+          in: query
+          description: The requested API version
+          required: false
+          type: string
+          default: '1.0'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/IsAliveResponse'
+        '500':
+          description: Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    x-summary: Is alive
+  /api/v1/paymentRequest:
+    post:
+      tags:
+        - PaymentRequest
+      summary: Create payment request and order
+      operationId: CreatePaymentRequest
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: request
+          in: body
+          description: Request model
+          required: false
+          schema:
+            $ref: '#/definitions/CreatePaymentRequestModel'
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Result model
+          schema:
+            $ref: '#/definitions/PaymentStatusResponseModel'
+        '400':
+          description: Problem occured
+          schema:
+            $ref: '#/definitions/PaymentErrorResponseModel'
+        '401':
+          description: Unauthorized
+    x-summary: Create
+  '/api/v1/paymentRequest/{paymentRequestId}/status':
+    get:
+      tags:
+        - PaymentRequest
+      summary: Get status
+      description: Receive status of a payment request.
+      operationId: GetPaymentRequestStatus
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: paymentRequestId
+          in: path
+          description: Payment request id
+          required: true
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Result model
+          schema:
+            $ref: '#/definitions/PaymentStatusResponseModel'
+        '400':
+          description: Problem occured
+          schema:
+            $ref: '#/definitions/PaymentErrorResponseModel'
+        '401':
+          description: Unauthorized
+    x-summary: Status
+  '/api/v1/paymentRequest/{paymentRequestId}/refund':
+    post:
+      tags:
+        - PaymentRequest
+      summary: Initiate a refund on a payment
+      operationId: Refund
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: paymentRequestId
+          in: path
+          description: Payment request id
+          required: true
+          type: string
+        - name: destinationAddress
+          in: query
+          description: Destination address
+          required: false
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Result model
+          schema:
+            $ref: '#/definitions/PaymentStatusResponseModel'
+        '400':
+          description: Problem occured
+          schema:
+            $ref: '#/definitions/PaymentErrorResponseModel'
+        '401':
+          description: Unauthorized
+    x-summary: Refund
+  '/api/v1/paymentRequest/{paymentRequestId}/callback':
+    get:
+      tags:
+        - PaymentRequest
+      summary: Get callback url
+      description: Receive payment request callback url.s
+      operationId: GetCallback
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: paymentRequestId
+          in: path
+          description: Payment request id
+          required: true
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Result model
+          schema:
+            $ref: '#/definitions/GetPaymentCallbackResponseModel'
+        '400':
+          description: Problem occured
+          schema:
+            $ref: '#/definitions/PaymentErrorResponseModel'
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - PaymentRequest
+      summary: Set callback url
+      description: Add or update payment request callback url.
+      operationId: SetCallback
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: paymentRequestId
+          in: path
+          description: Payment request id
+          required: true
+          type: string
+        - name: callbackUrl
+          in: query
+          description: Callback url
+          required: false
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Result model
+        '400':
+          description: Problem occured
+          schema:
+            $ref: '#/definitions/PaymentErrorResponseModel'
+        '401':
+          description: Unauthorized
+    x-summary: Callback
+  '/api/v1/rates/{assetPairId}':
+    get:
+      tags:
+        - Rates
+      summary: Get asset pair rate
+      operationId: GetAssetPairRates
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: assetPairId
+          in: path
+          description: Asset pair id
+          required: true
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Result model
+          schema:
+            $ref: '#/definitions/AssetPairResponseModel'
+        '400':
+          description: Problem occured
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+    x-summary: Asset pair rate
+  '/api/v1/rates/volatility/{assetPairId}':
+    get:
+      tags:
+        - Rates
+      summary: Get asset pair today's volatility
+      operationId: GetVolatility
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: assetPairId
+          in: path
+          description: Asset pair id
+          required: true
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/VolatilityResponseModel'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Server Error
+    x-summary: Asset pair volatility
+  /api/v1/wooCommerce/create:
+    post:
+      tags:
+        - WooCommerce
+      summary: Create invoice
+      operationId: Create
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: InvoiceNumber
+          in: query
+          required: false
+          type: string
+        - name: ClientName
+          in: query
+          required: false
+          type: string
+        - name: ClientEmail
+          in: query
+          required: false
+          type: string
+        - name: Amount
+          in: query
+          required: true
+          type: number
+          format: double
+        - name: Currency
+          in: query
+          required: false
+          type: string
+        - name: Status
+          in: query
+          required: false
+          type: string
+        - name: MerchantId
+          in: query
+          required: false
+          type: string
+        - name: Signature
+          in: query
+          required: false
+          type: string
+        - name: InvoiceId
+          in: query
+          required: false
+          type: string
+        - name: CallbackUrl
+          in: query
+          required: false
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Result model
+          schema:
+            $ref: '#/definitions/WooCommerceResponse'
+        '400':
+          description: Problem occured
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+    x-summary: Create invoice
+  /api/v1/wooCommerce/status:
+    post:
+      tags:
+        - WooCommerce
+      summary: Get invoice status
+      operationId: Status
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - name: InvoiceNumber
+          in: query
+          required: false
+          type: string
+        - name: ClientName
+          in: query
+          required: false
+          type: string
+        - name: ClientEmail
+          in: query
+          required: false
+          type: string
+        - name: Amount
+          in: query
+          required: true
+          type: number
+          format: double
+        - name: Currency
+          in: query
+          required: false
+          type: string
+        - name: Status
+          in: query
+          required: false
+          type: string
+        - name: MerchantId
+          in: query
+          required: false
+          type: string
+        - name: Signature
+          in: query
+          required: false
+          type: string
+        - name: InvoiceId
+          in: query
+          required: false
+          type: string
+        - name: CallbackUrl
+          in: query
+          required: false
+          type: string
+        - name: Lykke-Merchant-Id
+          in: header
+          description: MerchantId
+          required: true
+          type: string
+        - name: Lykke-Merchant-Sign
+          in: header
+          description: signature
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Result model
+          schema:
+            $ref: '#/definitions/WooCommerceResponse'
+        '400':
+          description: Problem occured
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+    x-summary: Invoice status
+definitions:
+  AssetsResponseModel:
+    required:
+      - assets
+    type: object
+    properties:
+      assets:
+        type: array
+        items:
+          type: string
+  ErrorResponse:
+    required:
+      - errorMessage
+      - modelErrors
+    type: object
+    properties:
+      errorMessage:
+        type: string
+      modelErrors:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            type: string
+  IsAliveResponse:
+    required:
+      - name
+      - version
+      - env
+      - isDebug
+      - issueIndicators
+    type: object
+    properties:
+      name:
+        type: string
+      version:
+        type: string
+      env:
+        type: string
+      isDebug:
+        type: boolean
+      issueIndicators:
+        type: array
+        items:
+          $ref: '#/definitions/IssueIndicator'
+  IssueIndicator:
+    required:
+      - type
+      - value
+    type: object
+    properties:
+      type:
+        type: string
+      value:
+        type: string
+  CreatePaymentRequestModel:
+    required:
+      - settlementAsset
+      - amount
+      - paymentAsset
+      - callbackURL
+      - orderId
+      - percent
+      - pips
+      - fixedFee
+    type: object
+    properties:
+      settlementAsset:
+        type: string
+      amount:
+        format: double
+        type: number
+      paymentAsset:
+        type: string
+      callbackURL:
+        type: string
+      orderId:
+        type: string
+      percent:
+        format: double
+        type: number
+      pips:
+        format: int32
+        type: integer
+      fixedFee:
+        format: double
+        type: number
+  PaymentStatusResponseModel:
+    required:
+      - id
+      - paymentStatus
+      - error
+      - orderId
+      - paymentAsset
+      - settlementAsset
+      - paymentRequest
+      - refundRequest
+      - settlementResponse
+    type: object
+    properties:
+      id:
+        type: string
+      paymentStatus:
+        type: string
+      error:
+        $ref: '#/definitions/ErrorResponseModel'
+      orderId:
+        type: string
+      paymentAsset:
+        type: string
+      settlementAsset:
+        type: string
+      paymentRequest:
+        $ref: '#/definitions/PaymentRequestResponseModel'
+      refundRequest:
+        $ref: '#/definitions/RefundRequestResponseModel'
+      settlementResponse:
+        $ref: '#/definitions/SettlementRequestResponseModel'
+  ErrorResponseModel:
+    required:
+      - code
+    type: object
+    properties:
+      code:
+        type: string
+  PaymentRequestResponseModel:
+    required:
+      - created_at
+      - exchangeRate
+      - amount
+      - address
+      - expiration_datetime
+      - transactions
+    type: object
+    properties:
+      created_at:
+        type: string
+      exchangeRate:
+        format: double
+        type: number
+      amount:
+        format: double
+        type: number
+      address:
+        type: string
+      expiration_datetime:
+        type: string
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/PaymentResponseTransactionModel'
+  RefundRequestResponseModel:
+    required:
+      - created_at
+      - amount
+      - address
+      - expiration_datetime
+      - transactions
+    type: object
+    properties:
+      created_at:
+        type: string
+      amount:
+        format: double
+        type: number
+      address:
+        type: string
+      expiration_datetime:
+        type: string
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/RefundResponseTransactionModel'
+  SettlementRequestResponseModel:
+    type: object
+    properties: {}
+  PaymentResponseTransactionModel:
+    required:
+      - transactionId
+      - timestamp
+      - numberOfConfirmations
+      - amount
+      - url
+    type: object
+    properties:
+      transactionId:
+        type: string
+      timestamp:
+        type: string
+      numberOfConfirmations:
+        format: int32
+        type: integer
+      amount:
+        format: double
+        type: number
+      url:
+        type: string
+  RefundResponseTransactionModel:
+    required:
+      - transactionId
+      - timestamp
+      - numberOfConfirmations
+      - amount
+      - url
+    type: object
+    properties:
+      transactionId:
+        type: string
+      timestamp:
+        type: string
+      numberOfConfirmations:
+        format: int32
+        type: integer
+      amount:
+        format: double
+        type: number
+      url:
+        type: string
+  PaymentErrorResponseModel:
+    required:
+      - error
+    type: object
+    properties:
+      error:
+        $ref: '#/definitions/PaymentErrorDetailsModel'
+  PaymentErrorDetailsModel:
+    required:
+      - code
+    type: object
+    properties:
+      code:
+        enum:
+          - InvalidPaymentId
+          - InvalidDestinationAddress
+          - NoPaymentTransactions
+          - RefundIsNotAvailable
+          - InvalidSettlementAsset
+          - InvalidCallbackUrl
+          - InvalidPaymentAsset
+        type: string
+        x-ms-enum:
+          name: PaymentErrorType
+          modelAsString: false
+  GetPaymentCallbackResponseModel:
+    required:
+      - callbackUrl
+    type: object
+    properties:
+      callbackUrl:
+        type: string
+  AssetPairResponseModel:
+    required:
+      - assetPair
+      - ask
+      - bid
+      - accuracy
+    type: object
+    properties:
+      assetPair:
+        type: string
+      ask:
+        format: double
+        type: number
+      bid:
+        format: double
+        type: number
+      accuracy:
+        format: int32
+        type: integer
+  VolatilityResponseModel:
+    required:
+      - assetPairId
+      - date
+      - closePriceStdev
+      - highPriceStdev
+      - multiplierFactor
+      - closePriceVolatilityShield
+      - highPriceVolatilityShield
+    type: object
+    properties:
+      assetPairId:
+        type: string
+      date:
+        format: date-time
+        type: string
+      closePriceStdev:
+        format: double
+        type: number
+      highPriceStdev:
+        format: double
+        type: number
+      multiplierFactor:
+        format: double
+        type: number
+      closePriceVolatilityShield:
+        format: double
+        type: number
+      highPriceVolatilityShield:
+        format: double
+        type: number
+  WooCommerceResponse:
+    required:
+      - invoiceURL
+      - errorCode
+      - message
+      - status
+      - invoiceId
+    type: object
+    properties:
+      invoiceURL:
+        type: string
+      errorCode:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+      invoiceId:
+        type: string
+securityDefinitions: {}
